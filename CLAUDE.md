@@ -26,5 +26,7 @@ Read `docs/architecture/overview.md` and `docs/brief/original-brief.md` before c
 Work sprint by sprint (`docs/development-roadmap.md`). Stop for owner review at sprint boundaries.
 After each sprint: update docs, write a handover summary, list unresolved risks.
 
-## Commands (fill in during Sprint 1)
-`composer test` · `composer lint` · `composer analyse` · `npm run dev`
+## Commands
+`composer test` · `composer lint` (`lint:fix` to apply) · `composer analyse` · `composer check` (all three) · `npm run dev` · `npm run build`
+New terminal on Windows: `. .\scripts\dev\dev-env.ps1` (PHP 8.3 first), `.\scripts\dev\postgres.ps1 start`. Setup: `docs/development/setup.md`.
+Portable PostgreSQL is not a service; tests need it running.

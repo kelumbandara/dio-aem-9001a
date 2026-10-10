@@ -1,0 +1,34 @@
+<?php
+
+use App\Modules\Core\Http\Controllers\Web\AuditLogController;
+use App\Modules\Core\Http\Controllers\Web\DashboardController;
+use App\Modules\Core\Http\Controllers\Web\LocaleController;
+use App\Modules\Core\Http\Controllers\Web\LoginController;
+use App\Modules\Core\Http\Controllers\Web\MfaController;
+use App\Modules\Core\Http\Controllers\Web\ModuleController;
+use Illuminate\Support\Facades\Route;
+
+Route::post('locale', [LocaleController::class, 'update'])->name('locale.update');
+
+Route::middleware('guest')->group(function () {
+    Route::get('login', [LoginController::class, 'create'])->name('login');
+    Route::post('login', [LoginController::class, 'store'])->middleware('throttle:login')->name('login.store');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::post('logout', [LoginController::class, 'destroy'])->name('logout');
+
+    // Reachable before MFA enrolment so privileged users can complete it.
+    Route::get('mfa/setup', [MfaController::class, 'setup'])->name('mfa.setup');
+    Route::post('mfa/confirm', [MfaController::class, 'confirm'])->name('mfa.confirm');
+
+    Route::middleware('mfa.enrolled')->group(function () {
+        Route::get('/', DashboardController::class)->name('dashboard');
+
+        Route::get('admin/modules', [ModuleController::class, 'index'])->name('modules.index');
+        Route::post('admin/modules/{module}/enable', [ModuleController::class, 'enable'])->name('modules.enable');
+        Route::post('admin/modules/{module}/disable', [ModuleController::class, 'disable'])->name('modules.disable');
+
+        Route::get('admin/audit-log', [AuditLogController::class, 'index'])->name('audit-log.index');
+    });
+});

@@ -3,22 +3,37 @@
 AI-powered ERP and manual MES (IoT-ready) for Sri Lankan SMEs — manufacturing and trading.
 One shared codebase, independent deployment per customer (Coolify).
 
-**Status:** Phase 0 — architecture documentation awaiting owner review. No application code yet.
+**Status:** Sprint 1 (Foundation) complete and awaiting owner review — see
+[docs/handover/sprint-1.md](docs/handover/sprint-1.md). Everything beyond Core (approvals, master data,
+inventory, finance, sales, procurement, manufacturing, AI, mobile) is still design.
 
 ## Documentation
 
 - Original brief: [docs/brief/original-brief.md](docs/brief/original-brief.md)
 - Architecture: [docs/architecture/overview.md](docs/architecture/overview.md) and sibling files
+- What Core actually does today: [docs/architecture/core-module.md](docs/architecture/core-module.md)
 - Open decisions: [docs/architecture/decisions/0000-open-decisions.md](docs/architecture/decisions/0000-open-decisions.md)
-- Roadmap & Sprint 1 backlog: [docs/development-roadmap.md](docs/development-roadmap.md)
+- Roadmap & sprint backlogs: [docs/development-roadmap.md](docs/development-roadmap.md)
 - Test strategy: [docs/test-strategy.md](docs/test-strategy.md)
+- Developer setup: [docs/development/setup.md](docs/development/setup.md)
 - Working agreement for Claude: [CLAUDE.md](CLAUDE.md)
 
-## Planned stack
+## Stack
 
-Laravel 13 (PHP 8.3+), PostgreSQL, Redis/Horizon, Blade + Tailwind + Alpine (+ Livewire),
-React Native (TypeScript), Claude API, WhatsApp Business Platform, Docker, Coolify, GitHub Actions.
+Laravel 13 (PHP 8.3+), PostgreSQL 16, Blade + Tailwind 4 + Alpine, Sanctum, spatie/laravel-permission,
+Pest, Pint, Larastan. Planned: Redis/Horizon, Livewire where reactive, React Native, Claude API,
+WhatsApp Business Platform, Docker, Coolify.
 
-## Local setup
+## Quick start
 
-Will be added in Sprint 1 (requires PHP 8.3+ with `pdo_pgsql`, Composer, Node 22, PostgreSQL 16).
+Requires PHP 8.3+ with `pdo_pgsql`, Composer, Node 22, PostgreSQL 16 (details and Windows notes in
+[docs/development/setup.md](docs/development/setup.md)).
+
+```bash
+composer install
+cp .env.example .env && php artisan key:generate   # then set DB_PASSWORD in .env
+php artisan migrate --seed
+npm install && npm run build
+php artisan serve
+composer check                                     # lint + static analysis + tests
+```

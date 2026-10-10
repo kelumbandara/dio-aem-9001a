@@ -98,6 +98,26 @@ tokens in/out, cost, latency), `ai_tool_calls` (validated input, decision, resul
 6. Document numbers unique and gap-policy documented (gapless only where legally required).
 7. Every approval-executed action stores the approved payload hash; execution revalidates it.
 
+## 3a. Sprint 1 deviations from the catalog above
+
+Implemented in `app/Modules/Core/Database/Migrations` (details in [core-module.md](core-module.md)).
+
+| Catalog said | Implemented | Why |
+|---|---|---|
+| `user_types` table | `users.user_type` string (`internal`/`customer`/`supplier`/`agent`) | four fixed values, no attributes; a table adds a join for no gain. Only `internal` can sign in today. |
+| `number_sequences` + `number_sequence_allocations` | `number_sequences` (definition) + `number_sequence_counters` (one row per period/branch bucket, locked on allocation) | allocation happens under a row lock in the caller's transaction, so no allocation log is needed for correctness |
+| `settings (key, scope, value json)` | plus `scope_id` (default 0, not NULL) | keeps the unique index `(key, scope, scope_id)` NULL-free on PostgreSQL |
+| `warehouses/locations (shell)` in the S1 backlog | **not created in S1** | Inventory owns them ([modules.md](modules.md)); created in S4 |
+| LKR currency seed in the S1 backlog | `company_profile.base_currency = 'LKR'` only | `currencies` belongs to MasterData (S3) |
+| `version` on every document | `branches.version` (reference implementation) | pattern proven on the first API resource; documents add it with their tables |
+| `notifications`, `attachments` | not created in S1 | roadmap places them in S2 |
+| `mfa_secrets` | `secret` and `recovery_codes` use encrypted casts; `last_used_timestep` added for TOTP replay protection | |
+| `idempotency_keys` | `(scope, key)` unique, stores request hash and the successful response | scope = `user:<id>` |
+| `audit_logs` | append-only enforced by a PostgreSQL trigger (`prevent_row_mutation`) in addition to the model guard; `correlation_id` = `X-Request-Id` | invariant: ledgers are immutable |
+
+`departments`, `employees` and `company_profile` exist with models, factories and audit, but have no
+API or screens yet (shell, as in the roadmap). `company_profile` is constrained to a single row (`id = 1`).
+
 ## 4. Migration policy
 
 Forward-only in production; destructive changes (drop column/table) need explicit approval and a

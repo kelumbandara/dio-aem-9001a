@@ -14,6 +14,13 @@ Aligned with OWASP ASVS / Top 10 and OWASP Top 10 for LLM Applications. Sri Lank
 - Sanctum tokens: named per device, expiry, revocation, abilities; mobile stores in Keychain/Keystore.
 - Sessions: secure/HttpOnly/SameSite cookies, CSRF on web, re-auth for sensitive actions.
 
+> **Implemented in Sprint 1:** RBAC (spatie/laravel-permission, guard `web`), Sanctum tokens with
+> expiry and revocation, login throttling, TOTP + single-use recovery codes with replay protection,
+> MFA enrolment enforced for `super-admin`/`admin`, encrypted PII (`employees.nic`) and MFA secrets,
+> append-only audit log with redaction. See [core-module.md](core-module.md) §4. **Not yet done:**
+> password breach/strength rules, lockout beyond rate limiting, record-level (branch/department) scopes,
+> CSP/HSTS headers, upload controls (Sprint 2), re-auth for sensitive actions.
+
 ## 2. Application security
 
 - Form Requests validate everything; mass-assignment guarded; parameterised queries only.

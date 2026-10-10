@@ -1,0 +1,17 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    paths:
+        - app
+        - bootstrap
+        - config
+        - database
+        - routes
+    level: 6
+    excludePaths:
+        - app/Modules/*/Database/Migrations/*
+    # Lets Larastan infer model properties from the schema (each module keeps its own migrations).
+    databaseMigrationsPath:
+        - database/migrations
+        - app/Modules/Core/Database/Migrations

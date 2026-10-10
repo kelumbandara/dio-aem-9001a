@@ -18,7 +18,7 @@ bank reconciliation import, Maintenance module, pgvector RAG.
 | Phase | Content |
 |---|---|
 | **0 Architecture** (now) | These docs; owner review; env setup (PHP 8.3, PostgreSQL) |
-| **S1 Foundation** | Laravel 13 scaffold, module skeleton + arch tests, auth (Sanctum, MFA hooks), company/branches/departments/warehouses shell, users vs employees, roles/permissions, settings, numbering, audit log, module toggles, API v1 base + error format, i18n (en/si/ta) shell, Blade layout/components, Pest + CI |
+| **S1 Foundation** (done, pending review: [handover](handover/sprint-1.md)) | Laravel 13 scaffold, module skeleton + arch tests, auth (Sanctum, MFA hooks), company/branches/departments/warehouses shell, users vs employees, roles/permissions, settings, numbering, audit log, module toggles, API v1 base + error format, i18n (en/si/ta) shell, Blade layout/components, Pest + CI |
 | **S2 Approvals + Notifications + Attachments** | Approval engine, authority matrix, notifications, secure uploads, queue/Horizon, scheduler |
 | **S3 Master Data** | Items, UoM, categories, customers, suppliers, currencies, tax codes (LKR/VAT/SSCL/NBT seed), price lists |
 | **S4 Inventory** | Ledger, balances, lots, receive/issue, transfers, adjustments, reservations, reorder, negative-stock guard + reconciliation tests |
@@ -49,7 +49,7 @@ owner's call at review.
 
 ## Sprint 1 backlog (detailed)
 
-1. Install/verify PHP 8.3, PostgreSQL, Composer, Node; `.env` for local.
+1. Install/verify PHP 8.3, PostgreSQL, Composer, Node; `.env` for local. *(done)*
 2. `composer create-project laravel/laravel` in repo root; Pest, Pint, Larastan, Sanctum, permission pkg.
 3. Module loader + `ModuleServiceProvider` base + `config/modules.php` + arch test.
 4. Core migrations: company_profile, branches, departments, warehouses/locations (shell), users,
@@ -64,3 +64,4 @@ owner's call at review.
 9. Seeders: roles, permissions, LKR currency, default company profile, demo admin (dev only).
 10. Tests: auth, permission, numbering concurrency, audit, module toggle, arch, API contract.
 11. Docs: update architecture docs, developer setup, handover summary.
+> Sprint 1 delivered all items; deviations (warehouses, LKR currency seed, `user_types`) are listed in [handover/sprint-1.md](handover/sprint-1.md) §4.

@@ -1,6 +1,6 @@
 # Architecture Overview — DIO AI ERP + MES
 
-Status: **DRAFT for review** (Phase 0). Nothing below is implemented yet.
+Status: **Sprint 1 done (Core + module framework implemented, see [core-module.md](core-module.md)); everything else is still design.**
 
 ## 1. Concept
 

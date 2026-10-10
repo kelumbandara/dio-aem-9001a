@@ -26,6 +26,14 @@
 | Localisation | `Accept-Language: en|si|ta` for messages |
 | Correlation | `X-Request-Id` accepted/returned, stored in audit logs |
 
+### 2a. As implemented in Sprint 1
+
+- Idempotency: scoped per user; only `2xx` responses are stored and replayed (header
+  `Idempotent-Replayed: true`); a failed attempt releases the key. Missing header → `400`.
+- Concurrency: integer `version` in the body of `PATCH` (not `ETag`/`If-Match` yet) → stale = `409`.
+- Filtering uses `filter[...]`, sorting `sort=-field`, both whitelisted per resource; `per_page` max 100 (`422` above).
+- Machine codes introduced so far: see [core-module.md](core-module.md) §6.
+
 ## 3. Response shapes
 
 Success: `{"data": {...}, "meta": {...}}`
