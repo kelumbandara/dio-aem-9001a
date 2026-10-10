@@ -1,0 +1,9 @@
+﻿vendor/
+ode_modules/
+.env
+.env.*
+!.env.example
+storage/*.key
+.idea/
+.vscode/
+*.log
