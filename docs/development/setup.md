@@ -107,3 +107,17 @@ for a new password. The seeder refuses to run outside `local`/`testing`.
   (`php --ini` shows which file is loaded).
 - Tests fail with connection refused: PostgreSQL is not running (`.\scripts\dev\postgres.ps1 start`).
 - `Vite manifest not found` in the browser: run `npm run build` or keep `npm run dev` running.
+
+## 6. Redis (from Sprint 2: queues, cache, rate limits)
+
+Redis runs in Docker (Docker Desktop with WSL2). The client is `predis` (pure PHP), so no PHP extension is needed.
+
+```powershell
+# one-off: put a password in .env  ->  REDIS_PASSWORD=<random>   (REDIS_CLIENT=predis is already set)
+docker compose up -d redis      # listens on 127.0.0.1:6379 only, password required, data persisted in a volume
+docker compose ps               # STATUS should say (healthy)
+docker compose down             # stop (data volume is kept)
+```
+
+Laravel Horizon needs the `pcntl`/`posix` extensions, which do not exist on Windows PHP. Locally use
+`php artisan queue:work redis`; Horizon runs in the Linux container (Coolify) and in Docker locally.
