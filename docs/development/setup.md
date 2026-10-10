@@ -119,5 +119,41 @@ docker compose ps               # STATUS should say (healthy)
 docker compose down             # stop (data volume is kept)
 ```
 
-Laravel Horizon needs the `pcntl`/`posix` extensions, which do not exist on Windows PHP. Locally use
-`php artisan queue:work redis`; Horizon runs in the Linux container (Coolify) and in Docker locally.
+Laravel Horizon needs the `pcntl`/`posix` extensions, which do not exist on Windows PHP, and is **not installed
+yet** (see [deployment.md](../architecture/deployment.md)). Locally use `php artisan queue:work redis`.
+
+## 7. Running the whole app (web + worker + scheduler)
+
+An approved request is executed by a **queued job**, and reminders, expiry, the outbox relay, audit-partition
+maintenance and attachment purge run from the **scheduler**. So three processes are needed:
+
+```powershell
+.\scripts\dev\postgres.ps1 start     # once per boot
+docker compose up -d redis           # once per boot (Docker Desktop must be running)
+.\scripts\dev\run.ps1                # opens: web server :8000, queue worker, scheduler (close the windows to stop)
+```
+
+Without the worker an approved request stays *Approved* (not *Done*) until a worker picks it up.
+
+### Demo data (local only)
+
+```powershell
+php artisan migrate --seed
+```
+
+prints, once, passwords for `admin@dio.test` (super-admin, must enrol an authenticator app), and the demo staff
+`requester@dio.test` (role `sales`), `approver@dio.test` and `approver2@dio.test` (role `finance-approver`; no MFA
+needed). A demo policy requires one finance approval for the demo action from LKR 1,000. Try it at
+**Approval demo** in the sidebar (only present in the `local` environment): sign in as the requester, request
+LKR 25,000, sign in as an approver (another browser profile or private window), approve, and watch the request
+become *Done*. Re-running `DemoStaffSeeder` resets those passwords.
+
+### Frontend assets
+
+`public/build` is committed so a server without Node can run the app. After changing Blade views that use a
+Tailwind class not used before, or any JavaScript, run `npm run build` and commit the result.
+
+### Scheduler on a server
+
+`* * * * * php /path/to/artisan schedule:run` (cron) or the long-running `php artisan schedule:work`.
+Run `php artisan queue:work redis --tries=3` under Supervisor/systemd/Coolify.

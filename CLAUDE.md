@@ -29,4 +29,5 @@ After each sprint: update docs, write a handover summary, list unresolved risks.
 ## Commands
 `composer test` · `composer lint` (`lint:fix` to apply) · `composer analyse` · `composer check` (all three) · `npm run dev` · `npm run build`
 New terminal on Windows: `. .\scripts\dev\dev-env.ps1` (PHP 8.3 first), `.\scripts\dev\postgres.ps1 start`. Setup: `docs/development/setup.md`.
-Portable PostgreSQL is not a service; tests need it running.
+Portable PostgreSQL is not a service; tests need it running. Redis: `docker compose up -d redis`. Run the app with its worker and scheduler: `.\scripts\dev\run.ps1`.
+After changing Blade views with new Tailwind classes run `npm run build` and commit `public/build` (deployments without Node rely on it).

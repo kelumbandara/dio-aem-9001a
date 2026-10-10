@@ -118,6 +118,23 @@ Implemented in `app/Modules/Core/Database/Migrations` (details in [core-module.m
 `departments`, `employees` and `company_profile` exist with models, factories and audit, but have no
 API or screens yet (shell, as in the roadmap). `company_profile` is constrained to a single row (`id = 1`).
 
+## 3b. Sprint 2 additions and deviations
+
+| Catalog said | Implemented | Why |
+|---|---|---|
+| `notifications` | Laravel's standard table (`uuid` id, `data` holds translation keys + params) | rendered in the reader's language |
+| `attachments` (polymorphic, sha256, mime, size, scan_status) | as listed, plus soft deletes; `attachable_type` is the morph **alias**; `path` is unique and random | files are purged later by `attachments:purge` |
+| `outbox_events` | + `actor_type`, `actor_id`, `branch_id`, `failed_at` (parked) | envelope fields and the dead-letter state |
+| `audit_logs` | **partitioned by month** (PostgreSQL), composite primary key `(id, occurred_at)`, default partition; migration `2026_10_11_000004` copies existing rows and is forward-only | retention without breaking append-only: expired months are dropped as partitions |
+| `approval_policies` | + `risk_levels`, amount range, `branch_ids`, `priority`, `expiry_hours`, `reminder_after_hours`, `allow_self_approval`, `distinct_approvers`; soft deletes | conditions and four-eyes rules |
+| `approval_policy_steps` (order, approver role/user, min/max amount) | order, role **or** user (CHECK), label; **no per-step amount** | amount limits live in the authority matrix; equal `step_order` = parallel |
+| `approval_authority_matrix` | role **or** user (CHECK), `action_key` (`*` = all), `max_amount` (null = unlimited) | evaluated only for actions that have rows |
+| `approval_requests` | + `document_no` (numbering `APR/{FY}/{SEQ}`), `policy_snapshot`, `summary`, `amount`, `idempotency_key` (unique per requester), `expires_at`, `last_reminded_at`, `version`; status CHECK | `draft` is not a request state |
+| `approval_request_steps` | step status `waiting/pending/approved/rejected/skipped` | |
+| `approval_decisions` | append-only (trigger on PostgreSQL), stores `payload_hash`, `on_behalf_of`, channel, IP | |
+| `approval_delegations` | time-boxed (CHECK `ends_at > starts_at`, delegator ≠ delegate), optional `action_key`, `revoked_at` | max length `approvals.delegation_max_days` (90) |
+| `approval_executions` | one row per attempt, append-only; partial unique index allows one `succeeded` per request (PostgreSQL) | retry history |
+
 ## 4. Migration policy
 
 Forward-only in production; destructive changes (drop column/table) need explicit approval and a

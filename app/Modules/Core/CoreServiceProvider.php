@@ -2,18 +2,31 @@
 
 namespace App\Modules\Core;
 
+use App\Modules\Core\Console\MaintainAuditLog;
 use App\Modules\Core\Console\PruneIdempotencyKeys;
+use App\Modules\Core\Console\PurgeAttachments;
+use App\Modules\Core\Console\RelayOutbox;
+use App\Modules\Core\Contracts\AttachmentScanner;
+use App\Modules\Core\Contracts\AttachmentStore;
 use App\Modules\Core\Contracts\AuditLogger;
+use App\Modules\Core\Contracts\EventOutbox;
+use App\Modules\Core\Contracts\Notifier;
 use App\Modules\Core\Contracts\NumberingService;
 use App\Modules\Core\Contracts\SettingsService;
+use App\Modules\Core\Contracts\UserDirectory;
 use App\Modules\Core\DTOs\MenuItem;
 use App\Modules\Core\Http\Middleware\EnforceMfaEnrollment;
 use App\Modules\Core\Http\Middleware\EnsureModuleEnabled;
 use App\Modules\Core\Http\Middleware\RequireIdempotencyKey;
 use App\Modules\Core\Models\User;
+use App\Modules\Core\Services\AttachmentService;
 use App\Modules\Core\Services\DatabaseAuditLogger;
+use App\Modules\Core\Services\DatabaseNotifier;
 use App\Modules\Core\Services\DatabaseNumberingService;
 use App\Modules\Core\Services\DatabaseSettingsService;
+use App\Modules\Core\Services\EloquentUserDirectory;
+use App\Modules\Core\Services\NullAttachmentScanner;
+use App\Modules\Core\Services\OutboxRecorder;
 use App\Support\ModuleServiceProvider;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -57,6 +70,12 @@ class CoreServiceProvider extends ModuleServiceProvider
         $this->app->singleton(AuditLogger::class, DatabaseAuditLogger::class);
         $this->app->singleton(SettingsService::class, DatabaseSettingsService::class);
         $this->app->singleton(NumberingService::class, DatabaseNumberingService::class);
+        $this->app->singleton(UserDirectory::class, EloquentUserDirectory::class);
+        $this->app->singleton(Notifier::class, DatabaseNotifier::class);
+        $this->app->singleton(EventOutbox::class, OutboxRecorder::class);
+        $this->app->singleton(AttachmentStore::class, AttachmentService::class);
+        // Replace with a real scanner (e.g. ClamAV) to turn on virus scanning; see AttachmentScanner.
+        $this->app->singleton(AttachmentScanner::class, NullAttachmentScanner::class);
     }
 
     public function boot(): void
@@ -80,7 +99,12 @@ class CoreServiceProvider extends ModuleServiceProvider
             ->by($request->user()?->getAuthIdentifier() ?: $request->ip()));
 
         if ($this->app->runningInConsole()) {
-            $this->commands([PruneIdempotencyKeys::class]);
+            $this->commands([
+                PruneIdempotencyKeys::class,
+                MaintainAuditLog::class,
+                RelayOutbox::class,
+                PurgeAttachments::class,
+            ]);
         }
     }
 }

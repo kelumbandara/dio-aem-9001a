@@ -23,6 +23,15 @@ jobs:
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
 
     env:
       DB_CONNECTION: pgsql
@@ -31,6 +40,10 @@ jobs:
       DB_DATABASE: dio_erp_test
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
+      REDIS_CLIENT: predis
+      REDIS_HOST: 127.0.0.1
+      REDIS_PORT: 6379
+      # REDIS_PASSWORD is deliberately not set: .env.example's "null" applies (CI Redis has no password)
 
     steps:
       - uses: actions/checkout@v4

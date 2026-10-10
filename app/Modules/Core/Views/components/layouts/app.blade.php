@@ -42,6 +42,13 @@
                     <x-core::icon name="menu" class="h-6 w-6" />
                 </button>
                 <h1 class="min-w-0 flex-1 truncate text-lg font-semibold text-slate-900">{{ $title }}</h1>
+                @php $unread = auth()->user()->unreadNotifications()->count(); @endphp
+                <a href="{{ route('notifications.index') }}" class="relative rounded-lg p-2 text-slate-600 hover:bg-slate-100" aria-label="{{ __('core::ui.notifications.title') }}">
+                    <x-core::icon name="bell" class="h-6 w-6" />
+                    @if ($unread > 0)
+                        <span class="absolute -end-0.5 -top-0.5 min-w-5 rounded-full bg-red-600 px-1 text-center text-[11px] font-semibold leading-5 text-white">{{ $unread > 99 ? '99+' : $unread }}</span>
+                    @endif
+                </a>
                 <x-core::language-switcher />
                 <div class="hidden text-sm text-slate-600 sm:block">{{ auth()->user()->name }}</div>
                 <form method="POST" action="{{ route('logout') }}">

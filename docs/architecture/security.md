@@ -19,7 +19,10 @@ Aligned with OWASP ASVS / Top 10 and OWASP Top 10 for LLM Applications. Sri Lank
 > MFA enrolment enforced for `super-admin`/`admin`, encrypted PII (`employees.nic`) and MFA secrets,
 > append-only audit log with redaction. See [core-module.md](core-module.md) §4. **Not yet done:**
 > password breach/strength rules, lockout beyond rate limiting, record-level (branch/department) scopes,
-> CSP/HSTS headers, upload controls (Sprint 2), re-auth for sensitive actions.
+> CSP/HSTS headers, re-auth for sensitive actions. **Sprint 2** added upload controls (content-based type check,
+> allow-list, random private storage, size cap, signed short-lived downloads, antivirus hook – no scanner is wired,
+> files are recorded as `skipped`), backend-enforced approvals (roles read through a directory so `super-admin` is
+> not an approver; payload hash re-verified before execution), and audit retention by partition drop.
 
 ## 2. Application security
 

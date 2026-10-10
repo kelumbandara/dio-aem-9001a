@@ -57,3 +57,16 @@
 - Ordering is guaranteed only per aggregate (`aggregate_id`), never globally.
 - Consumers record processed `event.id` to be idempotent.
 - Schema changes: add fields compatibly; breaking change = new `version`.
+
+## 5. As implemented (Sprint 2)
+
+The relay exists: `outbox:relay` publishes `outbox_events` rows as `App\Modules\Core\Events\IntegrationEvent`
+(Laravel event) with the envelope above. Delivery, retry/backoff, parking, per-aggregate ordering and
+concurrent relays are described in [core-module.md](core-module.md) §7. Producers call
+`Core\Contracts\EventOutbox::record($type, $data, $aggregateType, $aggregateId, $branchId)` inside their transaction.
+
+Events produced so far: `approval.requested`, `approval.approved`, `approval.rejected`, `approval.cancelled`,
+`approval.expired`, `approval.executed`, `approval.execution_failed` (aggregate `approval_request`).
+**No module consumes any event yet.** The consumers listed in the catalog arrive with their modules.
+Not implemented: a consumer-side processed-event table (listeners must dedupe on `IntegrationEvent::$id`
+themselves) and the `inbox_events` processing loop.

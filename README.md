@@ -3,8 +3,9 @@
 AI-powered ERP and manual MES (IoT-ready) for Sri Lankan SMEs — manufacturing and trading.
 One shared codebase, independent deployment per customer (Coolify).
 
-**Status:** Sprint 1 (Foundation) complete and awaiting owner review — see
-[docs/handover/sprint-1.md](docs/handover/sprint-1.md). Everything beyond Core (approvals, master data,
+**Status:** Sprint 2 (Approvals, notifications, attachments, queue/scheduler) complete and awaiting owner
+review — see [docs/handover/sprint-2.md](docs/handover/sprint-2.md); Sprint 1 handover:
+[docs/handover/sprint-1.md](docs/handover/sprint-1.md). Everything beyond Core and Approvals (master data,
 inventory, finance, sales, procurement, manufacturing, AI, mobile) is still design.
 
 ## Documentation
@@ -16,12 +17,13 @@ inventory, finance, sales, procurement, manufacturing, AI, mobile) is still desi
 - Roadmap & sprint backlogs: [docs/development-roadmap.md](docs/development-roadmap.md)
 - Test strategy: [docs/test-strategy.md](docs/test-strategy.md)
 - Developer setup: [docs/development/setup.md](docs/development/setup.md)
+- Adding an approval-gated action: [docs/development/gating-an-action.md](docs/development/gating-an-action.md)
 - Working agreement for Claude: [CLAUDE.md](CLAUDE.md)
 
 ## Stack
 
 Laravel 13 (PHP 8.3+), PostgreSQL 16, Blade + Tailwind 4 + Alpine, Sanctum, spatie/laravel-permission,
-Pest, Pint, Larastan. Planned: Redis/Horizon, Livewire where reactive, React Native, Claude API,
+Redis (queue, cache), Pest, Pint, Larastan. Planned: Horizon, Livewire where reactive, React Native, Claude API,
 WhatsApp Business Platform, Docker, Coolify.
 
 ## Quick start

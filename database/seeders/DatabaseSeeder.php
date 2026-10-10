@@ -2,8 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Modules\Approvals\Database\Seeders\DemoApprovalSeeder;
 use App\Modules\Core\Database\Seeders\CompanyProfileSeeder;
 use App\Modules\Core\Database\Seeders\DemoAdminSeeder;
+use App\Modules\Core\Database\Seeders\DemoStaffSeeder;
 use App\Modules\Core\Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Database\Seeder;
 
@@ -18,6 +20,8 @@ class DatabaseSeeder extends Seeder
             RolesAndPermissionsSeeder::class,
             CompanyProfileSeeder::class,
             DemoAdminSeeder::class, // no-op outside local/testing
+            DemoStaffSeeder::class, // no-op outside local
+            DemoApprovalSeeder::class, // no-op outside local (needs the demo staff's role)
         ]);
     }
 }

@@ -1,11 +1,13 @@
 <?php
 
+use App\Modules\Core\Http\Controllers\Web\AttachmentController;
 use App\Modules\Core\Http\Controllers\Web\AuditLogController;
 use App\Modules\Core\Http\Controllers\Web\DashboardController;
 use App\Modules\Core\Http\Controllers\Web\LocaleController;
 use App\Modules\Core\Http\Controllers\Web\LoginController;
 use App\Modules\Core\Http\Controllers\Web\MfaController;
 use App\Modules\Core\Http\Controllers\Web\ModuleController;
+use App\Modules\Core\Http\Controllers\Web\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('locale', [LocaleController::class, 'update'])->name('locale.update');
@@ -30,5 +32,13 @@ Route::middleware('auth')->group(function () {
         Route::post('admin/modules/{module}/disable', [ModuleController::class, 'disable'])->name('modules.disable');
 
         Route::get('admin/audit-log', [AuditLogController::class, 'index'])->name('audit-log.index');
+
+        Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::post('notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
+        Route::post('notifications/{notification}/read', [NotificationController::class, 'read'])->name('notifications.read');
+
+        Route::post('attachments', [AttachmentController::class, 'store'])->middleware('throttle:30,1')->name('attachments.store');
+        Route::delete('attachments/{attachment}', [AttachmentController::class, 'destroy'])->name('attachments.destroy');
+        Route::get('attachments/{attachment}/download', [AttachmentController::class, 'download'])->name('attachments.download');
     });
 });

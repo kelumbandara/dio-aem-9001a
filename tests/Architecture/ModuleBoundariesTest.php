@@ -1,6 +1,12 @@
 <?php
 
+use App\Modules\Approvals\Actions\ExecuteApprovedRequest;
+use App\Modules\Approvals\Contracts\Approvable;
+use App\Modules\Approvals\Demo\DemoExpense;
+use App\Modules\Approvals\DTOs\ExecutionToken;
+use App\Modules\Approvals\Jobs\ExecuteApprovedRequestJob;
 use Illuminate\Database\Eloquent\Model;
+use Tests\Support\Approvals\FakePayment;
 use Tests\Support\ModuleBoundaryChecker;
 
 function realChecker(): ModuleBoundaryChecker
@@ -47,6 +53,19 @@ arch('DTOs are immutable')->expect('App\Modules\Core\DTOs')->toBeFinal()->toBeRe
 arch('models are Eloquent models')->expect('App\Modules\Core\Models')->toExtend(Model::class);
 arch('no debugging leftovers')->expect(['dd', 'dump', 'var_dump', 'ray', 'die', 'exit'])->not->toBeUsed();
 arch('nobody calls env() outside config')->expect('env')->not->toBeUsedIn(['App']);
+arch('an approved action can only be executed through the approval engine')
+    ->expect(ExecutionToken::class)
+    ->toOnlyBeUsedIn([
+        ExecuteApprovedRequest::class,
+        Approvable::class,
+        FakePayment::class,   // test double that implements Approvable
+        DemoExpense::class,   // local-only demo action that implements Approvable
+    ]);
+arch('approvals are never executed from controllers or commands')
+    ->expect(ExecuteApprovedRequest::class)
+    ->toOnlyBeUsedIn([ExecuteApprovedRequestJob::class, ExecutionToken::class]);
+arch('approvables are interfaces, payload hashing never sees floats')
+    ->expect(Approvable::class)->toBeInterface();
 arch('actions and services do not depend on controllers')
     ->expect(['App\Modules\Core\Actions', 'App\Modules\Core\Services'])
     ->not->toUse('App\Modules\Core\Http\Controllers');

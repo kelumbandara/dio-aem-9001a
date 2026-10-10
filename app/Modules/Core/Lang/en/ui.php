@@ -60,4 +60,24 @@ return [
         'title' => 'Audit log',
         'subtitle' => 'Append-only record of who changed what.',
     ],
+
+    'notifications' => [
+        'title' => 'Notifications',
+        'subtitle' => 'Messages about your approvals and other work.',
+        'empty' => 'You have no notifications.',
+        'mark_all_read' => 'Mark all as read',
+        'level' => ['info' => 'Info', 'success' => 'Done', 'warning' => 'Attention', 'danger' => 'Problem'],
+    ],
+
+    'attachments' => [
+        'title' => 'Attachments',
+        'upload' => 'Attach a file',
+        'choose' => 'Choose file',
+        'uploaded' => 'The file was attached.',
+        'deleted' => 'The attachment was removed.',
+        'none' => 'No files attached.',
+        'download' => 'Download',
+        'remove' => 'Remove',
+        'hint' => 'PDF, images, Word, Excel, CSV or text, up to :size MB.',
+    ],
 ];

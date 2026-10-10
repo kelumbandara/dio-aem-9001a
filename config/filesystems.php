@@ -38,6 +38,16 @@ return [
             'report' => false,
         ],
 
+        // Business documents. Private, never web-served; set ATTACHMENTS_DISK=s3 in production.
+        'attachments' => [
+            'driver' => 'local',
+            'root' => storage_path('app/private/attachments'),
+            'serve' => false,
+            'visibility' => 'private',
+            'throw' => true,
+            'report' => false,
+        ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),

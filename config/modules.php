@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Approvals\ApprovalsServiceProvider;
 use App\Modules\Core\CoreServiceProvider;
 
 /*
@@ -25,8 +26,15 @@ return [
             'enabled' => true,
             'required' => true,
         ],
+        'approvals' => [
+            'name' => 'Approvals',
+            'provider' => ApprovalsServiceProvider::class,
+            'depends_on' => ['core'],
+            'enabled' => true,
+            'required' => false,
+        ],
     ],
 
     // Namespaces other modules may import from a module (everything else is private).
-    'public_namespaces' => ['Contracts', 'DTOs', 'Events'],
+    'public_namespaces' => ['Contracts', 'DTOs', 'Events', 'Concerns'],
 ];

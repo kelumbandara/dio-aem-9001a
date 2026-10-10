@@ -39,7 +39,7 @@ it('persists a toggle and audits it', function () {
     expect(fakeRegistry()->isEnabled('finance'))->toBeTrue(); // a brand new instance reads it from the database
 
     $registry->disable('finance');
-    expect(AuditLog::whereIn('event', ['module.enabled', 'module.disabled'])->pluck('event')->all())->toBe(['module.enabled', 'module.disabled']);
+    expect(AuditLog::whereIn('event', ['module.enabled', 'module.disabled'])->orderBy('id')->pluck('event')->all())->toBe(['module.enabled', 'module.disabled']);
 });
 
 it('cannot disable a required module', function () {
@@ -120,8 +120,8 @@ it('manages modules from the admin page', function () {
     $this->actingAs(userWithPermissions('core.branch.view'))->post('/admin/modules/finance/disable')->assertForbidden();
 });
 
-it('ships with Core as the only registered module for Sprint 1', function () {
+it('registers Core and Approvals', function () {
     $keys = array_keys(config('modules.modules'));
 
-    expect($keys)->toBe(['core']);
+    expect($keys)->toBe(['core', 'approvals']);
 });

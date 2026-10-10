@@ -12,6 +12,31 @@ return [
     'audit' => [
         // Attribute names (case-insensitive substring match) whose values are never stored.
         'redact' => ['password', 'remember_token', 'secret', 'recovery_codes', 'token', 'nic'],
+        // Whole months are dropped, so entries live between N and N+1 months (owner decision: 3).
+        'retention_months' => (int) env('AUDIT_RETENTION_MONTHS', 3),
+    ],
+
+    'outbox' => [
+        'batch_size' => 100,
+        'max_attempts' => 8,
+    ],
+
+    'attachments' => [
+        // Private disk (S3-compatible in production); never served from the web root.
+        'disk' => env('ATTACHMENTS_DISK', 'attachments'),
+        'max_kb' => 10240,
+        // detected MIME type => allowed extensions. Anything else is rejected, whatever the client says.
+        'allowed' => [
+            'application/pdf' => ['pdf'],
+            'image/png' => ['png'],
+            'image/jpeg' => ['jpg', 'jpeg'],
+            'image/webp' => ['webp'],
+            'text/plain' => ['txt', 'log'],
+            'text/csv' => ['csv'],
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => ['docx'],
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => ['xlsx'],
+        ],
+        'download_url_minutes' => 5,
     ],
 
     'mfa' => [

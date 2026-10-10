@@ -13,7 +13,7 @@ design intent is in [overview.md](overview.md), [modules.md](modules.md) and [se
 | Toggle | `module_settings` table + `ModuleRegistry` | `enable`/`disable` validate dependencies both ways, `required` modules cannot be disabled, changes are audited and cached |
 | Enforcement | `module:<key>` middleware on every module route group | disabled module → `403 core.module_disabled` (API) or HTTP 403 (web). Routes stay registered, so toggling needs no route-cache rebuild |
 | Visibility | `ModuleRegistry::menuFor()` / `permissions()` | menu items and permissions of disabled modules disappear |
-| Boundaries | `tests/Architecture` + `tests/Support/ModuleBoundaryChecker` | tokenises every file under `app/Modules`, fails on an upward/undeclared dependency or use of a non-public namespace (`Contracts`, `DTOs`, `Events`). The checker itself is tested against fixtures. |
+| Boundaries | `tests/Architecture` + `tests/Support/ModuleBoundaryChecker` | tokenises every file under `app/Modules`, fails on an upward/undeclared dependency or use of a non-public namespace (`Contracts`, `DTOs`, `Events`, `Concerns`). The checker itself is tested against fixtures. |
 
 Shared kernel outside modules: `app/Support` (module base provider, `BusinessException`, API error
 renderer, base controller). Modules may use it; it must not contain business logic.
@@ -82,3 +82,82 @@ See [database.md](database.md) §Sprint 1 deviations.
 `idempotency.in_progress` · `concurrency.stale_version` · `core.module_disabled` · `core.module_unknown` ·
 `core.module_required` · `core.module_dependency_disabled` · `core.module_has_dependents` ·
 `core.branch_in_use` · `core.numbering_unknown_sequence` · `server.error` · `http.<status>`.
+
+## 7. Added in Sprint 2
+
+### Public surface for other modules
+
+Public namespaces are now `Contracts`, `DTOs`, `Events` **and `Concerns`** (the reusable model traits
+`HasPublicId` and `Auditable`). New contracts: `UserDirectory` (roles, role members, active users,
+display names – modules above Core never import Core's `User`), `Notifier`, `EventOutbox`,
+`AttachmentStore`, `AttachmentScanner`, `HasAttachments` (marker). New DTOs/events: `NotificationMessage`,
+`AttachmentInfo`, `IntegrationEvent`.
+
+### Notifications
+
+`Notifier::notify($userIds, NotificationMessage)` writes an in-app notification for each active internal
+user (deduplicated). A message carries **translation keys and parameters, not text**
+(`approvals::notifications.requested` + `{doc, summary, requester}`), so it is rendered in the *reader's*
+language when they open it; a missing translation shows the key instead of hiding the gap. It is written
+**synchronously inside the caller's transaction**: a rolled-back change leaves no notification. UI: bell
+with unread count in the header, `/notifications` (mark one/all read; the link is followed only if it is a
+local path), API `GET /api/v1/notifications`, `POST …/{id}/read`, `POST …/read-all`. Email, WhatsApp and
+SMS delivery are Communications (S14) and will be queued; nothing sends outside the app today.
+
+### Attachments
+
+`AttachmentStore::store()` for any model implementing `HasAttachments` (it needs a `public_id`, a morph
+alias registered with `Relation::morphMap()` and a policy with `view` and `attach`). An attachment is exactly
+as visible as its parent record. Hardening:
+
+- the type is detected from the **file's bytes** (`finfo`; Office files are checked inside the zip), never taken from the client;
+- only allow-listed type + extension pairs: PDF, PNG, JPEG, WebP, TXT/LOG, CSV, DOCX, XLSX (`config/core.php`); SVG, HTML, scripts and executables are refused;
+- dangerous words anywhere in the name are refused (`invoice.php.pdf`); display names are sanitised (Sinhala/Tamil kept) and never used as paths;
+- 10 MB cap (`core.attachments.max_kb`), empty files refused;
+- stored on the private `attachments` disk under a random name (`Y/m/uuid.ext`); the SHA-256 is recorded;
+- an antivirus hook runs before anything is persisted (`AttachmentScanner`); the default **records `skipped`** – no scanner is wired yet;
+- downloads are always `Content-Disposition: attachment` with `X-Content-Type-Options: nosniff`, the detected type, `no-store`; API download URLs are short-lived signed URLs (5 min) **and** still authorise the viewer;
+- delete is a soft delete; `attachments:purge` (daily) removes the file and row 30 days later; upload, download, delete and purge are audited.
+
+API: `GET/POST /api/v1/attachments`, `GET/DELETE …/{id}`, `GET …/{id}/download` (signed). Uploads are not
+idempotency-keyed (multipart bodies are not hashed). Web: upload/delete/download routes and the
+`<x-core::attachments>` component.
+
+### Outbox relay
+
+`outbox:relay` (every minute, no overlap) publishes pending rows as `IntegrationEvent` envelopes
+(id, type, version, occurred_at, actor, correlation id, branch, aggregate, data). At-least-once: a row is
+marked processed only after all synchronous listeners returned; each event runs in its own savepoint so a
+failing listener (even with a database error) rolls back its own writes without stopping the others;
+failures back off 2, 4, 8… minutes (cap 1 h) and are **parked** (`failed_at`) after `core.outbox.max_attempts`
+(8) – parked rows are reported by a non-zero command exit code and never silently dropped; events of one
+aggregate are delivered in order (a failing event holds back later events of the *same* aggregate only);
+several relays can run at once (`FOR UPDATE SKIP LOCKED`). Listeners with real work should be queued and
+must be idempotent (use `IntegrationEvent::$id`).
+
+### Audit retention (owner decision: 3 months)
+
+On PostgreSQL `audit_logs` is partitioned by month (existing rows were copied by the migration). `audit:maintain`
+(daily 02:00) creates the next months' partitions and **drops whole partitions older than the retention**
+(`AUDIT_RETENTION_MONTHS`, default 3). Entries therefore live between 3 and 4 months. Row `UPDATE`/`DELETE`
+stays blocked by the trigger, which is cloned to every partition; dropping a partition is DDL and is itself
+audited (`audit.partitions_dropped`). The default partition (rows outside any month) is never dropped.
+On other databases the command deletes expired rows. **Nothing exports audit data before it is dropped.**
+
+### Queue, cache, scheduler
+
+Redis (via `predis`) is the dev default for queue, cache and rate limits (`QUEUE_CONNECTION=redis`,
+`CACHE_STORE=redis`); tests use `sync`/`array`, plus tests that talk to a real Redis when one is reachable.
+The scheduler (`schedule:work` / the scheduler container) runs: `outbox:relay` (minutely), `idempotency:prune`
+(daily), `audit:maintain` (02:00), `attachments:purge` (02:30), `approvals:expire` and `approvals:remind` (hourly).
+**Laravel Horizon is not installed** – see [deployment.md](deployment.md).
+
+### New stable error codes
+
+`attachment.too_large` · `attachment.type_not_allowed` · `attachment.upload_failed` · `attachment.infected` ·
+`attachment.unknown_target` · `attachment.missing` · `approvals.not_eligible` · `approvals.not_pending` ·
+`approvals.not_open` · `approvals.not_retryable` · `approvals.expired` · `approvals.cannot_cancel` ·
+`approvals.comment_required` · `approvals.no_approver` · `approvals.payload_changed` ·
+`approvals.execution_error` · `approvals.unknown_action` · `approvals.unknown_role` · `approvals.unknown_user` ·
+`approvals.invalid_step` · `approvals.steps_required` · `approvals.invalid_range` · `approvals.invalid_holder` ·
+`approvals.invalid_delegation` · `approvals.delegation_too_long`.

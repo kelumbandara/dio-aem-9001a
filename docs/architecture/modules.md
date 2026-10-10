@@ -40,7 +40,7 @@ Maintenance (machine PM/breakdown) is post-MVP but `Machine` is owned by Manufac
 Rules:
 
 1. A module may depend only on modules **below** it, and only via their **Contracts**
-   (`Modules/X/Contracts`, `Modules/X/DTOs`, `Modules/X/Events`).
+   (`Modules/X/Contracts`, `Modules/X/DTOs`, `Modules/X/Events`, plus `Modules/X/Concerns` for reusable model traits).
 2. **Events go upward/sideways, calls go downward.** e.g. Sales invoice posting raises
    `SalesInvoicePosted`; Finance listens and creates the journal; Sales never imports Finance.
 3. No cross-module foreign keys **except** to Core and MasterData ids (enforced FKs are allowed to

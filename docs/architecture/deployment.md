@@ -25,6 +25,20 @@ Coolify project: <customer>
 Environment per customer: `APP_KEY`, DB creds, Redis, S3, mail, WhatsApp, AI provider key,
 `MODULES_PROFILE`, locale/timezone defaults. All secrets in Coolify secret store.
 
+### Processes in Sprint 2
+
+The same image runs three roles: `app` (web), `worker` (`php artisan queue:work redis --tries=3`,
+supervised/restarted by Coolify) and `scheduler` (`php artisan schedule:work`). Approvals, the outbox relay,
+reminders, expiry, audit partition maintenance and attachment purge all depend on the worker and the scheduler
+being up – put alerts on both. Redis is required (queue, cache, rate limits); use `REDIS_CLIENT=phpredis` in the
+image if the extension is installed, otherwise `predis`.
+
+**Laravel Horizon was not installed in Sprint 2.** It needs the `pcntl`/`posix` extensions, which Windows PHP
+lacks, and could not be run or verified on the development machine; adding it blind would be unverified code.
+`queue:work` provides the same processing. Horizon (dashboard, metrics, balancing) is added together with the
+production Dockerfile (Sprint 15), or earlier if the owner wants to run the dev stack in Docker – the code
+needs no change except the dashboard gate (admin + MFA).
+
 ## 3. Build and release
 
 - Multi-stage Dockerfile (composer install --no-dev, Vite build, opcache, non-root user).
@@ -47,7 +61,7 @@ Environment per customer: `APP_KEY`, DB creds, Redis, S3, mail, WhatsApp, AI pro
 ## 5. Health and monitoring
 
 `/health/live` (process), `/health/ready` (DB, Redis, storage, queue lag) — no secrets in output.
-Horizon dashboard (admin + MFA), failed-job alerts, Sentry-compatible error tracking, uptime
+Horizon dashboard (admin + MFA, once installed), failed-job alerts, Sentry-compatible error tracking, uptime
 checks, disk/DB size alerts, AI cost alerts.
 
 ## 6. Environments
