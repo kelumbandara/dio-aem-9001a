@@ -10,7 +10,10 @@ use App\Modules\Approvals\Services\ApprovalEngine;
 use App\Modules\Approvals\Services\PayloadHasher;
 use App\Modules\Core\Contracts\AuditLogger;
 use App\Support\Exceptions\BusinessException;
+use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use JsonException;
 use Throwable;
 
 /**
@@ -47,7 +50,13 @@ final class ExecuteApprovedRequest
             $attempt = ApprovalExecution::query()->where('request_id', $request->id)->count() + 1;
 
             // The stored payload must still hash to what the approvers saw and approved.
-            if (! hash_equals($request->payload_hash, $this->hasher->hash($request->payload))) {
+            try {
+                $payload = json_decode(Crypt::decryptString((string) $request->getRawOriginal('payload')), true, 512, JSON_THROW_ON_ERROR);
+            } catch (DecryptException|JsonException) {
+                $payload = null;
+            }
+
+            if ($payload === null || ! hash_equals($request->payload_hash, $this->hasher->hash($payload))) {
                 $this->audit->record('approval.payload_tampered', $request, [], [], ['expected' => $request->payload_hash]);
                 $message = 'The request data changed after approval; it was not executed.';
                 $this->record($request, $attempt, 'failed', null, 'approvals.payload_changed', $message);

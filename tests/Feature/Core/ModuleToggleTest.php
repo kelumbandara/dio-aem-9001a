@@ -123,5 +123,5 @@ it('manages modules from the admin page', function () {
 it('registers Core and Approvals', function () {
     $keys = array_keys(config('modules.modules'));
 
-    expect($keys)->toBe(['core', 'approvals']);
+    expect($keys)->toBe(['core', 'approvals', 'masterdata']);
 });

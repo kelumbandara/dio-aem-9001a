@@ -71,7 +71,7 @@ class ApprovalRequest extends Model implements HasAttachments
     {
         return [
             'policy_snapshot' => 'array',
-            'payload' => 'array',
+            'payload' => 'encrypted:array', // may carry sensitive values such as bank account numbers
             'amount' => 'decimal:4',
             'expires_at' => 'datetime',
             'decided_at' => 'datetime',

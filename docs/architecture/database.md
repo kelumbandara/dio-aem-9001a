@@ -37,10 +37,11 @@ status, expires_at, requested_by, channel, ai_run_id), `approval_request_steps`,
 `approval_decisions` (comment), `approval_delegations`, `approval_executions` (status, result, error).
 
 ### MasterData
-`customers`, `customer_contacts`, `customer_addresses`, `suppliers`, `supplier_contacts`,
-`items`, `item_categories`, `item_uoms` (conversion), `units_of_measure`, `item_variants`(post-MVP),
-`price_lists`, `price_list_items`, `currencies`, `exchange_rates`, `tax_codes`, `tax_rates`
-(effective-dated), `payment_terms`.
+Built in S3 (columns and rules: [masterdata.md](masterdata.md)): `customers`, `customer_contacts`,
+`customer_addresses`, `suppliers`, `supplier_contacts`, `supplier_addresses`, `supplier_bank_accounts` (account
+number encrypted), `items`, `item_categories`, `item_uoms` (conversion), `units_of_measure`, `price_lists`,
+`price_list_items`, `currencies`, `exchange_rates`, `tax_codes`, `tax_rates` (effective-dated), `payment_terms`.
+Not built: `item_variants` (post-MVP). Approval payloads (`approval_requests.payload`) are encrypted text since S3.
 
 ### Inventory
 `warehouses`, `locations`, `lots` (batch no, expiry, item), `stock_ledger` (immutable: item, location,

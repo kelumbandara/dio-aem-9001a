@@ -11,7 +11,7 @@ return [
 
     'audit' => [
         // Attribute names (case-insensitive substring match) whose values are never stored.
-        'redact' => ['password', 'remember_token', 'secret', 'recovery_codes', 'token', 'nic'],
+        'redact' => ['password', 'remember_token', 'secret', 'recovery_codes', 'token', 'nic', 'account_no', 'iban', 'swift'],
         // Whole months are dropped, so entries live between N and N+1 months (owner decision: 3).
         'retention_months' => (int) env('AUDIT_RETENTION_MONTHS', 3),
     ],

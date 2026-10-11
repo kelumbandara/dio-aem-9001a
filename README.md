@@ -3,16 +3,17 @@
 AI-powered ERP and manual MES (IoT-ready) for Sri Lankan SMEs — manufacturing and trading.
 One shared codebase, independent deployment per customer (Coolify).
 
-**Status:** Sprint 2 (Approvals, notifications, attachments, queue/scheduler) complete and awaiting owner
-review — see [docs/handover/sprint-2.md](docs/handover/sprint-2.md); Sprint 1 handover:
-[docs/handover/sprint-1.md](docs/handover/sprint-1.md). Everything beyond Core and Approvals (master data,
-inventory, finance, sales, procurement, manufacturing, AI, mobile) is still design.
+**Status:** Sprint 3 (Master Data: items, units, categories, customers, suppliers, currencies, tax codes, price
+lists, CSV import) complete and awaiting owner review — see [docs/handover/sprint-3.md](docs/handover/sprint-3.md);
+earlier handovers: [Sprint 2](docs/handover/sprint-2.md), [Sprint 1](docs/handover/sprint-1.md). Everything beyond
+Core, Approvals and Master Data (inventory, finance, sales, procurement, manufacturing, AI, mobile) is still design.
 
 ## Documentation
 
 - Original brief: [docs/brief/original-brief.md](docs/brief/original-brief.md)
 - Architecture: [docs/architecture/overview.md](docs/architecture/overview.md) and sibling files
 - What Core actually does today: [docs/architecture/core-module.md](docs/architecture/core-module.md)
+- What Master Data does today: [docs/architecture/masterdata.md](docs/architecture/masterdata.md)
 - Open decisions: [docs/architecture/decisions/0000-open-decisions.md](docs/architecture/decisions/0000-open-decisions.md)
 - Roadmap & sprint backlogs: [docs/development-roadmap.md](docs/development-roadmap.md)
 - Test strategy: [docs/test-strategy.md](docs/test-strategy.md)

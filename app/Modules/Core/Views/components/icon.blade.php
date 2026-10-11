@@ -28,6 +28,24 @@
         @case('menu')
             <path d="M4 6h16M4 12h16M4 18h16"/>
             @break
+        @case('box')
+            <path d="M21 8l-9-5-9 5v8l9 5 9-5V8z"/><path d="M3 8l9 5 9-5M12 13v8"/>
+            @break
+        @case('building')
+            <path d="M4 21V5a1 1 0 011-1h9a1 1 0 011 1v16M15 9h4a1 1 0 011 1v11M2 21h20"/><path d="M8 8h3M8 12h3M8 16h3"/>
+            @break
+        @case('truck')
+            <path d="M3 6h11v10H3zM14 9h4l3 3v4h-7"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>
+            @break
+        @case('tag')
+            <path d="M3 12V4a1 1 0 011-1h8l9 9-9 9-9-9z"/><circle cx="8" cy="8" r="1.2"/>
+            @break
+        @case('database')
+            <ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>
+            @break
+        @case('upload')
+            <path d="M12 16V4M7 9l5-5 5 5M4 20h16"/>
+            @break
         @default
             <circle cx="12" cy="12" r="8"/>
     @endswitch

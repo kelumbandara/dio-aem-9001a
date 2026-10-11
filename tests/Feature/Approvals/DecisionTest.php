@@ -10,6 +10,7 @@ use App\Modules\Approvals\Services\ApprovalEngine;
 use App\Modules\Core\Models\AuditLog;
 use App\Modules\Core\Models\OutboxEvent;
 use App\Support\Exceptions\BusinessException;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use Spatie\Permission\Models\Role;
@@ -384,7 +385,8 @@ describe('execution safety', function () {
 
         $tampered = $this->request->fresh()->payload;
         $tampered['amount'] = '9999999.0000';
-        DB::table('approval_requests')->where('id', $this->request->id)->update(['payload' => json_encode($tampered)]);
+        // payloads are encrypted at rest: an insider with the key could still re-encrypt altered data
+        DB::table('approval_requests')->where('id', $this->request->id)->update(['payload' => Crypt::encryptString(json_encode($tampered))]);
 
         app(ExecuteApprovedRequest::class)($this->request->id);
 

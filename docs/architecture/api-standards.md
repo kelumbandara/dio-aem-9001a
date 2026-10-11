@@ -53,7 +53,8 @@ Error (RFC 7807-style):
 
 Status codes: 200/201/204, 400 malformed, 401 unauthenticated, 403 forbidden, 404, 409
 conflict/stale, 422 validation/business-rule, 423 period closed, 429, 500 (no internals leaked).
-Business errors use stable machine codes (documented per module).
+Business errors use stable machine codes (documented per module; Master Data's are listed in [masterdata.md](masterdata.md) §7).
+PATCH is partial: fields not sent keep their value. Related records are referred to by code, not id, in request bodies.
 
 ## 4. Approval-aware endpoints
 

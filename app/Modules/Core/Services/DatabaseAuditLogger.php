@@ -70,7 +70,8 @@ final class DatabaseAuditLogger implements AuditLogger
         $words = explode('_', $key);
 
         foreach ($patterns as $pattern) {
-            if ($key === $pattern || in_array($pattern, $words, true)) {
+            // "account_no" must catch "bank_account_no"; single words only match whole words ("nic" != "technician").
+            if ($key === $pattern || in_array($pattern, $words, true) || (str_contains($pattern, '_') && str_contains($key, $pattern))) {
                 return true;
             }
         }

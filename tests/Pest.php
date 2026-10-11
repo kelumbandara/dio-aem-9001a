@@ -8,7 +8,16 @@ use App\Modules\Approvals\Models\ApprovalRequest;
 use App\Modules\Core\Database\Seeders\RolesAndPermissionsSeeder;
 use App\Modules\Core\Models\MfaSecret;
 use App\Modules\Core\Models\User;
+use App\Modules\MasterData\Actions\ApplyPriceChanges;
+use App\Modules\MasterData\Actions\SaveItem;
+use App\Modules\MasterData\Actions\SavePriceList;
+use App\Modules\MasterData\Database\Seeders\ReferenceDataSeeder;
+use App\Modules\MasterData\Models\Item;
+use App\Modules\MasterData\Models\PriceList;
+use App\Modules\MasterData\Support\InputMapper;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
+use Laravel\Sanctum\Sanctum;
 use PragmaRX\Google2FA\Google2FA;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -19,6 +28,7 @@ pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
     ->beforeEach(function () {
         $this->seed(RolesAndPermissionsSeeder::class);
+        $this->seed(ReferenceDataSeeder::class);
 
         // The gated action used by the approval tests.
         FakePayment::reset();
@@ -55,6 +65,17 @@ function userWithPermissions(string ...$permissions): User
     $role->syncPermissions($permissions);
 
     return User::factory()->withRole($role->name)->create();
+}
+
+/** A user whose role needs no MFA and holds every Master Data permission (plus any extra given). */
+function masterDataUser(string ...$extra): User
+{
+    return userWithPermissions(...[
+        'masterdata.reference.view', 'masterdata.reference.manage', 'masterdata.item.view', 'masterdata.item.manage',
+        'masterdata.customer.view', 'masterdata.customer.manage', 'masterdata.supplier.view', 'masterdata.supplier.manage',
+        'masterdata.supplier.bank.view', 'masterdata.supplier.bank.manage', 'masterdata.price_list.view',
+        'masterdata.price_list.manage', 'masterdata.import', ...$extra,
+    ]);
 }
 
 /** An active user holding the given business role (created on demand). Not an MFA role. */
@@ -110,4 +131,54 @@ function requestPayment(User $requester, string $amount = '5000.0000', array $ex
 function approvalRequest(GateDecision $decision): ApprovalRequest
 {
     return ApprovalRequest::query()->where('public_id', $decision->requestId)->firstOrFail();
+}
+
+/** Create an item through the same path the API uses (codes in, ids out). @param array<string, mixed> $overrides */
+function mdItem(array $overrides = []): Item
+{
+    static $n = 0;
+    $n++;
+
+    return app(SaveItem::class)(app(InputMapper::class)->item(array_merge([
+        'name' => "Test item {$n}", 'category' => 'GENERAL', 'base_uom' => 'PCS',
+    ], $overrides)));
+}
+
+/** @param array<string, mixed> $overrides */
+function mdPriceList(array $overrides = []): PriceList
+{
+    static $n = 0;
+    $n++;
+
+    return app(SavePriceList::class)(app(InputMapper::class)->priceList(array_merge([
+        'name' => "List {$n}", 'type' => 'sales', 'currency' => 'LKR',
+    ], $overrides)));
+}
+
+/**
+ * Set prices on a list directly (no approval path).
+ *
+ * @param  list<array<string, mixed>>  $rows  each {item: code, uom?: code, min_qty?, unit_price}
+ */
+function mdPrices(PriceList $list, array $rows): void
+{
+    app(ApplyPriceChanges::class)(
+        $list->id,
+        app(InputMapper::class)->priceChanges($rows),
+    );
+}
+
+/** Authenticate the next API call as this user (and drop any user cached from an earlier call in the same test). */
+function asApi(User $user)
+{
+    app('auth')->forgetGuards();
+    Sanctum::actingAs($user);
+
+    return test();
+}
+
+/** @return array<string, string> a fresh Idempotency-Key header */
+function idemKey(): array
+{
+    return ['Idempotency-Key' => (string) Str::uuid()];
 }

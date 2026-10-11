@@ -16,3 +16,4 @@ parameters:
         - database/migrations
         - app/Modules/Core/Database/Migrations
         - app/Modules/Approvals/Database/Migrations
+        - app/Modules/MasterData/Database/Migrations

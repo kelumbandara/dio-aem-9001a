@@ -99,6 +99,13 @@ for a new password. The seeder refuses to run outside `local`/`testing`.
 | `npm run dev` / `npm run build` | Vite dev server / production assets |
 | `php artisan idempotency:prune` | delete expired idempotency keys (scheduled daily; needs `schedule:run`) |
 
+Master Data commands (S3):
+
+| Command | Purpose |
+|---|---|
+| `php artisan db:seed` | roles/permissions plus starter reference data (units, LKR/USD/EUR/GBP/INR, payment terms, VAT 18 %); safe to re-run |
+| `php artisan masterdata:import items\|customers\|suppliers file.csv [--check]` | CSV import, all or nothing; `--check` saves nothing |
+
 ## 5. Troubleshooting
 
 - `Your Composer dependencies require a PHP version ">= 8.3"`: the terminal is using XAMPP's PHP;

@@ -2,6 +2,7 @@
 
 use App\Modules\Approvals\ApprovalsServiceProvider;
 use App\Modules\Core\CoreServiceProvider;
+use App\Modules\MasterData\MasterDataServiceProvider;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,6 +31,13 @@ return [
             'name' => 'Approvals',
             'provider' => ApprovalsServiceProvider::class,
             'depends_on' => ['core'],
+            'enabled' => true,
+            'required' => false,
+        ],
+        'masterdata' => [
+            'name' => 'Master Data',
+            'provider' => MasterDataServiceProvider::class,
+            'depends_on' => ['core', 'approvals'],
             'enabled' => true,
             'required' => false,
         ],

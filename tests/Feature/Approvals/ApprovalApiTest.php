@@ -4,22 +4,9 @@ use App\Modules\Approvals\Models\ApprovalAuthority;
 use App\Modules\Approvals\Models\ApprovalDecision;
 use App\Modules\Approvals\Models\ApprovalRequest;
 use App\Modules\Core\Contracts\ModuleRegistry;
+use App\Modules\Core\Exceptions\ModuleException;
 use App\Modules\Core\Models\User;
-use Laravel\Sanctum\Sanctum;
 use Tests\Support\Approvals\FakePayment;
-
-function asApi(User $user)
-{
-    app('auth')->forgetGuards();
-    Sanctum::actingAs($user);
-
-    return test();
-}
-
-function idemKey(): array
-{
-    return ['Idempotency-Key' => (string) Str::uuid()];
-}
 
 beforeEach(function () {
     $this->requester = userWithRole('sales');
@@ -203,7 +190,11 @@ describe('delegations', function () {
 });
 
 it('keeps the module switchable: a disabled Approvals module blocks its API', function () {
-    app(ModuleRegistry::class)->disable('approvals');
+    $modules = app(ModuleRegistry::class);
+    expect(fn () => $modules->disable('approvals'))->toThrow(ModuleException::class, 'still required by masterdata');
+
+    $modules->disable('masterdata');   // dependents first
+    $modules->disable('approvals');
 
     asApi($this->approver)->getJson('/api/v1/approvals')->assertForbidden()->assertJsonPath('error.code', 'core.module_disabled');
     expect(ApprovalRequest::count())->toBe(1);   // data is kept

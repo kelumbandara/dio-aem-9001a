@@ -5,6 +5,8 @@ use App\Modules\Approvals\Contracts\Approvable;
 use App\Modules\Approvals\Demo\DemoExpense;
 use App\Modules\Approvals\DTOs\ExecutionToken;
 use App\Modules\Approvals\Jobs\ExecuteApprovedRequestJob;
+use App\Modules\MasterData\Approvals\PriceListPriceChange;
+use App\Modules\MasterData\Approvals\SupplierBankAccountChange;
 use Illuminate\Database\Eloquent\Model;
 use Tests\Support\Approvals\FakePayment;
 use Tests\Support\ModuleBoundaryChecker;
@@ -60,6 +62,8 @@ arch('an approved action can only be executed through the approval engine')
         Approvable::class,
         FakePayment::class,   // test double that implements Approvable
         DemoExpense::class,   // local-only demo action that implements Approvable
+        PriceListPriceChange::class,         // real approvable actions (Master Data); each only
+        SupplierBankAccountChange::class,    // implements Approvable::execute(), the engine supplies the token
     ]);
 arch('approvals are never executed from controllers or commands')
     ->expect(ExecuteApprovedRequest::class)
