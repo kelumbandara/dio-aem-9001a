@@ -115,6 +115,13 @@ Inventory commands (S4):
 The full test run takes about six minutes (it includes real-process concurrency tests); Composer's script timeout is 20 minutes.
 For a quicker loop run a folder: `vendor/bin/pest tests/Feature/Inventory`.
 
+Finance commands (S5):
+
+| Command | Purpose |
+|---|---|
+| `php artisan db:seed --class="App\Modules\Finance\Database\Seeders\FinanceSeeder"` | chart of accounts, account mapping, bank/cash accounts, current fiscal year; safe to re-run (also part of `db:seed`) |
+| `php artisan finance:reconcile` | every journal balances; receivables/payables equal their control accounts; exit 1 on any difference (scheduled 02:45) |
+
 ## 5. Troubleshooting
 
 - `Your Composer dependencies require a PHP version ">= 8.3"`: the terminal is using XAMPP's PHP;

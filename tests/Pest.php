@@ -249,3 +249,11 @@ function docPayload(string $type, array $line, array $o = []): array
         'lines' => [$line],
     ], $o);
 }
+
+function finUser(string ...$extra): User
+{
+    return userWithPermissions(...[
+        'finance.view', 'finance.account.manage', 'finance.mapping.manage', 'finance.bank.manage', 'finance.period.manage', 'finance.period.lock',
+        'finance.journal.post', 'finance.reverse', 'finance.ar.view', 'finance.ar.receive', 'finance.ap.view', 'finance.ap.pay', 'finance.report.view', ...$extra,
+    ]);
+}

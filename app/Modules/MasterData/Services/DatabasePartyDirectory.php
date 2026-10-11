@@ -32,6 +32,29 @@ final class DatabasePartyDirectory implements PartyDirectory
         );
     }
 
+    public function customerByCode(string $code): ?PartyInfo
+    {
+        $id = Customer::query()->whereRaw('upper(code) = ?', [strtoupper(trim($code))])->value('id');
+
+        return $id === null ? null : $this->customer((int) $id);
+    }
+
+    public function supplierByCode(string $code): ?PartyInfo
+    {
+        $id = Supplier::query()->whereRaw('upper(code) = ?', [strtoupper(trim($code))])->value('id');
+
+        return $id === null ? null : $this->supplier((int) $id);
+    }
+
+    public function search(string $side, string $term, int $limit = 50): array
+    {
+        $model = $side === 'payable' || $side === 'supplier' ? Supplier::class : Customer::class;
+        $like = '%'.str_replace(['%', '_'], ['\%', '\_'], mb_strtolower(trim($term))).'%';
+        $ids = $model::query()->where(fn ($q) => $q->whereRaw('lower(code) like ?', [$like])->orWhereRaw('lower(name) like ?', [$like]))->orderBy('code')->limit($limit)->pluck('id');
+
+        return $ids->map(fn ($id) => $model === Supplier::class ? $this->supplier((int) $id) : $this->customer((int) $id))->filter()->values()->all();
+    }
+
     public function requireActiveCustomer(int $customerId): PartyInfo
     {
         $info = $this->customer($customerId) ?? throw MasterDataException::notFound('customer');

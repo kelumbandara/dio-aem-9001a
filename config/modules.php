@@ -2,6 +2,7 @@
 
 use App\Modules\Approvals\ApprovalsServiceProvider;
 use App\Modules\Core\CoreServiceProvider;
+use App\Modules\Finance\FinanceServiceProvider;
 use App\Modules\Inventory\InventoryServiceProvider;
 use App\Modules\MasterData\MasterDataServiceProvider;
 
@@ -45,6 +46,13 @@ return [
         'inventory' => [
             'name' => 'Inventory',
             'provider' => InventoryServiceProvider::class,
+            'depends_on' => ['core', 'approvals', 'masterdata'],
+            'enabled' => true,
+            'required' => false,
+        ],
+        'finance' => [
+            'name' => 'Finance',
+            'provider' => FinanceServiceProvider::class,
             'depends_on' => ['core', 'approvals', 'masterdata'],
             'enabled' => true,
             'required' => false,

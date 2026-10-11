@@ -126,6 +126,7 @@ final class StockPostingService implements StockPoster
             $posted = $this->persist($state, $slices, [
                 'type' => $original->doc_type, 'date' => $date, 'reason' => 'reversal', 'reference' => "Reversal of {$original->document_no}",
                 'notes' => $note, 'sourceType' => null, 'sourceId' => null, 'by' => $by, 'reverses' => $original->id,
+                'originalType' => $original->doc_type, 'originalReason' => $original->reason,
             ], $itemIds, $before);
 
             $original->forceFill(['status' => 'reversed', 'reversed_by_id' => $posted->documentId])->save();
@@ -655,8 +656,18 @@ final class StockPostingService implements StockPoster
         $this->audit->record('inventory.stock_posted', $doc, [], [
             'document_no' => $doc->document_no, 'type' => $type, 'reason' => $h['reason'], 'lines' => count($slices), 'total_value' => $doc->total_value,
         ]);
+        // Finance builds its journal from this alone (it never reads Inventory tables): the net change in stock value, and
+        // what kind of movement it was. A reversal says what it reverses, so its journal uses the original's counter account.
+        $delta = '0';
+        foreach ($slices as $s) {
+            foreach ($s['ops'] as $op) {
+                $delta = Decimal::add($delta, $op['value']);
+            }
+        }
         $this->outbox->record('inventory.stock.moved', [
-            'document_id' => $doc->id, 'document_no' => $doc->document_no, 'type' => $type, 'item_ids' => $itemIds, 'posting_date' => $doc->posting_date->toDateString(),
+            'document_id' => $doc->id, 'document_no' => $doc->document_no, 'type' => $type, 'reason' => $h['reason'], 'item_ids' => $itemIds,
+            'posting_date' => $doc->posting_date->toDateString(), 'inventory_delta' => Decimal::round($delta, 4),
+            'reverses_document_id' => $h['reverses'], 'counter_type' => $h['originalType'] ?? $type, 'counter_reason' => $h['originalReason'] ?? $h['reason'],
         ], 'stock_document', $doc->id);
         $this->reorder->announceCrossings($before, $itemIds);
 

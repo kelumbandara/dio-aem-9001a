@@ -18,3 +18,4 @@ parameters:
         - app/Modules/Approvals/Database/Migrations
         - app/Modules/MasterData/Database/Migrations
         - app/Modules/Inventory/Database/Migrations
+        - app/Modules/Finance/Database/Migrations

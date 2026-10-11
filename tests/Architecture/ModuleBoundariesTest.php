@@ -5,6 +5,13 @@ use App\Modules\Approvals\Contracts\Approvable;
 use App\Modules\Approvals\Demo\DemoExpense;
 use App\Modules\Approvals\DTOs\ExecutionToken;
 use App\Modules\Approvals\Jobs\ExecuteApprovedRequestJob;
+use App\Modules\Finance\Approvals\ManualJournalPost;
+use App\Modules\Finance\Approvals\SupplierPaymentPost;
+use App\Modules\Finance\Models\JournalEntry;
+use App\Modules\Finance\Models\JournalLine;
+use App\Modules\Finance\Models\OpenItem;
+use App\Modules\Finance\Models\Settlement;
+use App\Modules\Finance\Models\SettlementAllocation;
 use App\Modules\Inventory\Approvals\StockAdjustmentPost;
 use App\Modules\Inventory\Models\ItemCost;
 use App\Modules\Inventory\Models\StockBalance;
@@ -69,6 +76,8 @@ arch('an approved action can only be executed through the approval engine')
         PriceListPriceChange::class,         // real approvable actions (Master Data); each only
         SupplierBankAccountChange::class,    // implements Approvable::execute(), the engine supplies the token
         StockAdjustmentPost::class,          // Inventory's approval-gated adjustment, same pattern
+        ManualJournalPost::class,            // Finance's approval-gated manual journal
+        SupplierPaymentPost::class,          // Finance's approval-gated supplier payment
     ]);
 arch('approvals are never executed from controllers or commands')
     ->expect(ExecuteApprovedRequest::class)
@@ -86,3 +95,17 @@ arch('only Inventory writes the stock ledger, balances and item costs')
         ItemCost::class,
     ])
     ->toOnlyBeUsedIn('App\Modules\Inventory');
+
+arch('only Finance writes journals, receipts/payments and open items')
+    ->expect([
+        JournalEntry::class,
+        JournalLine::class,
+        Settlement::class,
+        SettlementAllocation::class,
+        OpenItem::class,
+    ])
+    ->toOnlyBeUsedIn('App\Modules\Finance');
+
+arch('Finance never reads Inventory: it learns about stock only from events')
+    ->expect('App\Modules\Finance')
+    ->not->toUse('App\Modules\Inventory');

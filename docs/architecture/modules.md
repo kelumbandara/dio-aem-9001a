@@ -8,7 +8,7 @@
 | 2 | **Approvals** | Approval policies, requests, steps, delegation, execution status | MVP S2 |
 | 3 | **MasterData** | Customers, suppliers (incl. bank accounts), items, UoM, categories, currencies and exchange rates, tax codes and rates, payment terms, price lists; CSV import ([detail](masterdata.md)) | MVP S3 |
 | 4 | **Inventory** | Warehouses/locations, stock ledger, balances, lots, reservations, transfers, adjustments, reorder, weighted-average cost ([detail](inventory.md)) | MVP S4 |
-| 5 | **Finance** | Chart of accounts, periods, journals, AR, AP, receipts, payments, reports | MVP |
+| 5 | **Finance** | Chart of accounts, periods, journals, posting rules, AR, AP, receipts, payments, reports ([detail](finance.md)) | MVP S5 |
 | 6 | **Sales** | Leads, activities, quotations, sales orders, invoices, deliveries, returns | MVP |
 | 7 | **Procurement** | Requisitions, POs, goods receipts, supplier invoice linkage, returns | MVP |
 | 8 | **Manufacturing** | BOM, routing, work centers, machines, lines, shifts, production orders, material issue/return, output, rejects, rework, downtime, QC, FG receipt | MVP (after ERP core) |

@@ -51,11 +51,12 @@ qty and value, `reverses_id`), `stock_balances` (CHECK on_hand ≥ 0, always —
 not stored on balances), `reorder_rules`. Not built: `stock_counts` (post-MVP), `inventory_valuation_layers` (FIFO is post-MVP; average cost is used).
 
 ### Finance
-`accounts` (chart, type, parent), `fiscal_years`, `fiscal_periods` (open/closed/locked),
-`journal_entries` (status draft/posted/reversed, source), `journal_lines` (account, debit, credit,
-dimension: branch/department/cost center, partner), `posting_rules` (event → account mapping),
-`ar_invoices`/`ap_bills` (or reuse sales/purchase docs with `open_amount`), `receipts`,
-`receipt_allocations`, `payments`, `payment_allocations`, `bank_accounts`, `tax_transactions`.
+Built in S5 (columns and rules: [finance.md](finance.md)): `accounts` (chart: groups and accounts in one tree), `account_mappings`
+(the posting rules: key → account), `fiscal_years`, `fiscal_periods` (open/closed/locked; locked is immutable), `journal_entries`
+(posted/reversed, kind, source; no drafts), `journal_lines` (debit XOR credit, optional customer/supplier tag; balance enforced by a
+deferred trigger), `bank_accounts` (encrypted number), `open_items` (customer invoices and supplier bills, one table with `side`),
+`settlements` (receipts and payments) and `settlement_allocations`. Not built: `tax_transactions` (S6, where tax is calculated),
+dimensions (branch/department/cost centre) on lines, separate `ar_invoices`/`ap_bills` tables.
 
 ### Sales
 `leads`, `customer_activities`, `quotations`(+lines), `sales_orders`(+lines), `deliveries`(+lines),
@@ -141,6 +142,12 @@ API or screens yet (shell, as in the roadmap). `company_profile` is constrained 
 Master Data (S3) and Inventory (S4) tables are described in [masterdata.md](masterdata.md) and [inventory.md](inventory.md).
 Both add only new tables; the one change to an existing table is that `approval_requests.payload` became encrypted text (S3).
 New immutability triggers (S4): `stock_ledger` and `stock_document_lines` are append-only; `stock_documents` rows may only change `status`/`reversed_by_id`.
+
+## 3d. Sprint 5 notes
+
+Finance adds only new tables. New immutability triggers: `journal_lines` and `settlement_allocations` are append-only; `journal_entries` may only
+change `status`/`reversed_by_id`; `settlements` may only change `status`; `fiscal_periods` rows cannot change once `locked`. A deferred constraint
+trigger checks every journal balances when the transaction commits.
 
 ## 4. Migration policy
 

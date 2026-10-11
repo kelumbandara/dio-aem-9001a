@@ -39,7 +39,7 @@
 | `procurement.po.approved` | Procurement | Communications (send to supplier, approval-gated) |
 | `procurement.goods.received` | Procurement | Inventory (stock in), Finance (GRNI) |
 | `procurement.supplier_invoice.posted` | Procurement | Finance (AP) |
-| `finance.journal.posted/reversed` | Finance | Reporting |
+| `finance.journal.posted` | Finance (built S5; payload `journal_id, journal_no, entry_date, kind, total, source_type, source_id`) | Reporting |
 | `finance.period.closed` | Finance | all posting modules (block) |
 | `mfg.order.released` | Manufacturing | Inventory (reserve) |
 | `mfg.material.issued/returned` | Manufacturing | Inventory, Finance (WIP) |

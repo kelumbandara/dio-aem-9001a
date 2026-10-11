@@ -52,6 +52,12 @@
         @case('clock')
             <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>
             @break
+        @case('book')
+            <path d="M5 4h11a3 3 0 013 3v13H8a3 3 0 01-3-3V4z"/><path d="M5 17a3 3 0 013-3h11"/>
+            @break
+        @case('chart')
+            <path d="M4 20V4M4 20h16"/><path d="M8 16v-5M12 16V8M16 16v-3"/>
+            @break
         @case('upload')
             <path d="M12 16V4M7 9l5-5 5 5M4 20h16"/>
             @break
