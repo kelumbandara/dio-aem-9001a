@@ -92,7 +92,7 @@ it('has an idempotent seeder', function () {
     $this->seed(RolesAndPermissionsSeeder::class);
     $this->seed(RolesAndPermissionsSeeder::class);
 
-    expect(Role::count())->toBe(4);   // super-admin, admin, accountant, user
+    expect(Role::count())->toBe(5);   // super-admin, admin, accountant, sales, user
 });
 
 it('only seeds the demo admin in local or testing environments', function () {

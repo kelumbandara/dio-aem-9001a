@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $id
+ * @property bool $prices_include_vat
  * @property string $public_id
  * @property string $document_no
  * @property int $customer_id
@@ -29,7 +30,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int|null $created_by
  */
 #[RouteKey('public_id')]
-#[Fillable(['document_no', 'customer_id', 'quote_date', 'valid_until', 'status', 'reference', 'notes', 'terms', 'net_total', 'vat_total', 'levy_total', 'gross_total', 'version', 'created_by'])]
+#[Fillable(['document_no', 'customer_id', 'quote_date', 'valid_until', 'status', 'reference', 'notes', 'terms', 'net_total', 'vat_total', 'levy_total', 'gross_total', 'version', 'created_by', 'prices_include_vat'])]
 class Quotation extends Model
 {
     use Auditable, HasPublicId;
@@ -41,6 +42,7 @@ class Quotation extends Model
     protected function casts(): array
     {
         return [
+            'prices_include_vat' => 'boolean',
             'quote_date' => 'immutable_date', 'valid_until' => 'immutable_date', 'version' => 'integer',
             'net_total' => 'decimal:4', 'vat_total' => 'decimal:4', 'levy_total' => 'decimal:4', 'gross_total' => 'decimal:4',
         ];

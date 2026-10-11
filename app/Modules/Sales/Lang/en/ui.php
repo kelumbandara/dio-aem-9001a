@@ -28,6 +28,8 @@ return [
     ],
 
     'common' => [
+        'unit_price_incl' => 'Unit price (incl. VAT)',
+        'net_amount' => 'Net amount',
         'search' => 'Search',
         'search_hint' => 'Document number',
         'status' => 'Status',
@@ -75,6 +77,7 @@ return [
     ],
 
     'form' => [
+        'lines_hint_incl' => 'Prices include VAT. VAT is taken out of each line total; SSCL/NBT are added on the net value of the lines that are not exempt.',
         'intro_quotation' => 'An offer to a customer. Leave the price empty to use the customer’s price list; the tax code comes from the item unless you choose another. Nothing is reserved or posted until it becomes an order.',
         'intro_order' => 'What the customer has ordered. Confirming the order checks the customer’s credit limit and reserves the stock that is available; deliveries and invoices are made from the confirmed order.',
         'required_date' => 'Required by',
@@ -139,6 +142,8 @@ return [
     ],
 
     'print' => [
+        'line_total_incl' => 'Line total (incl. VAT)',
+        'included' => 'included',
         'title' => 'Tax invoice',
         'print' => 'Print',
         'tax_id' => 'VAT / TIN',

@@ -81,3 +81,11 @@ Defects found by the tests during the sprint and fixed: quantities were written 
 ## 7. How to try it
 
 The local app is at <http://127.0.0.1:8000> (start with `.\scripts\dev\run.ps1`; the demo admin holds every Sales permission). In the sidebar: **Quotations** (draft and sent examples), **Sales orders** (a completed one, one half-delivered, and a draft for *Small Shop* whose credit limit is LKR 1,000 — press *Confirm order* to see the block), **Deliveries**, **Invoices** (open `INV/2026-27/00001`: VAT 765.00 + SSCL 136.25 on net 5,450.00 = 6,351.25; press *Print / PDF*), **Credit notes** (issue one from the invoice screen). **Administration → Company profile** sets the name, address and VAT/TIN printed on invoices. The demo SSCL rate (2.5 % from 2024-01-01) was entered on the Tax codes screen's data, NBT is left inactive. Commands: `php artisan finance:reconcile`, `php artisan inventory:reconcile`.
+
+## 8. Update after your reply (2026-10-12): VAT-inclusive prices, sales staff role, SSCL confirmed
+
+- **All prices include VAT**: built as a setting that defaults on (details in sales.md §2). A typed 118.00 is 100.00 net + 18.00 VAT; SSCL 2.5 % is added on the net 100.00. Lines are rounded on the line total so the customer pays exactly what was typed. The invoice prints "Unit price (incl. VAT)" and the line total including VAT. I read your sentence as *prices* being VAT-inclusive and *no item being VAT-exempt*; if you meant something else, tell me (the old net-price behaviour is one environment setting, `SALES_PRICES_INCLUDE_VAT=false`).
+- **Items without a tax code are now sold with VAT** (default code `VAT`); only items set to EXEMPT are outside VAT and SSCL.
+- **Separate `sales` role** (not admin, not accountant): quotations, orders, confirming, deliveries, read-only master data and stock. Invoicing stays with the accountant; delivery reversal and credit-limit override stay with admin. Demo user `requester@dio.test` already has this role name.
+- **SSCL base confirmed** (net sales excluding exempt lines) — as built.
+- Tests: new VAT-inclusive tests (6), the random scenarios now run half inclusive / half net, and the role split is tested; the full suite was re-run before this was pushed (see the commit).

@@ -87,7 +87,7 @@ final class SalesPresenter
     public function quotation(Quotation $q): array
     {
         return $this->headers(collect([$q]))[0] + [
-            'reference' => $q->reference, 'notes' => $q->notes, 'terms' => $q->terms, 'version' => $q->version, 'raw_status' => $q->status,
+            'prices_include_vat' => $q->prices_include_vat, 'reference' => $q->reference, 'notes' => $q->notes, 'terms' => $q->terms, 'version' => $q->version, 'raw_status' => $q->status,
             'lines' => $this->lines($q->lines), 'totals' => $this->totals($q),
         ];
     }
@@ -96,7 +96,7 @@ final class SalesPresenter
     public function order(Order $o): array
     {
         $base = $this->headers(collect([$o]))[0] + [
-            'customer_ref' => $o->customer_ref, 'payment_terms_days' => $o->payment_terms_days, 'notes' => $o->notes, 'version' => $o->version,
+            'prices_include_vat' => $o->prices_include_vat, 'customer_ref' => $o->customer_ref, 'payment_terms_days' => $o->payment_terms_days, 'notes' => $o->notes, 'version' => $o->version,
             'quotation' => $o->quotation_id ? Quotation::query()->whereKey($o->quotation_id)->value('document_no') : null,
             'confirmed_at' => $o->confirmed_at?->toIso8601String(), 'credit_override_reason' => $o->credit_override_reason, 'cancel_reason' => $o->cancel_reason,
             'lines' => $this->lines($o->lines, true), 'totals' => $this->totals($o),
@@ -127,7 +127,7 @@ final class SalesPresenter
         $order = Order::query()->find($i->order_id);
 
         return $this->headers(collect([$i]))[0] + [
-            'order' => $order?->document_no, 'order_id' => $order?->public_id, 'customer_ref' => $i->customer_ref, 'notes' => $i->notes,
+            'order' => $order?->document_no, 'order_id' => $order?->public_id, 'prices_include_vat' => $i->prices_include_vat, 'customer_ref' => $i->customer_ref, 'notes' => $i->notes,
             'lines' => $this->invoiceLines($i), 'taxes' => $this->taxRows($i->taxes), 'totals' => $this->totals($i),
             'credit_notes' => CreditNote::query()->where('invoice_id', $i->id)->orderBy('id')->get()->map(fn (CreditNote $c) => ['id' => $c->public_id, 'document_no' => $c->document_no, 'date' => $c->note_date->toDateString(), 'gross_total' => $c->gross_total])->all(),
         ];

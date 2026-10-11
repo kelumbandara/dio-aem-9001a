@@ -20,6 +20,7 @@ use Illuminate\Support\Arr;
 const SALES_PERMISSIONS = ['sales.view', 'sales.quotation.manage', 'sales.order.manage', 'sales.order.confirm', 'sales.delivery.post', 'sales.reverse', 'sales.invoice.post', 'sales.credit_note.post'];
 
 beforeEach(function () {
+    config(['sales.prices_include_vat' => false]);   // these tests work in net prices; VAT-inclusive pricing has its own tests
     $this->seed(FinanceSeeder::class);
     TaxCode::where('code', 'SSCL')->update(['is_active' => true]);
     app(AddTaxRate::class)(TaxCode::where('code', 'SSCL')->first(), '2.5', '2024-01-01');

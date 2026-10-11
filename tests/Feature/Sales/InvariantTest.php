@@ -24,6 +24,7 @@ use App\Support\Decimal;
  * pieces always add up to the whole, and a document that is credited in full is cancelled to the cent.
  */
 beforeEach(function () {
+    config(['sales.prices_include_vat' => false]);   // these tests work in net prices; VAT-inclusive pricing has its own tests
     $this->seed(FinanceSeeder::class);
     TaxCode::where('code', 'SSCL')->update(['is_active' => true]);
     TaxCode::where('code', 'NBT')->update(['is_active' => true]);
@@ -35,6 +36,7 @@ beforeEach(function () {
 
 it('keeps invoices, credit notes and ledgers consistent for random orders', function (int $seed) {
     mt_srand($seed);
+    config(['sales.prices_include_vat' => $seed % 2 === 0]);   // half the scenarios price with VAT inside, half without
     $rand = fn (int $a, int $b) => mt_rand($a, $b);
 
     $items = [];

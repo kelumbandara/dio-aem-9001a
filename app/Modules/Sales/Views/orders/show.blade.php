@@ -43,7 +43,7 @@
         @endcan
     @endif
 
-    @include('sales::docs.lines', ['lines' => $doc['lines'], 'totals' => $doc['totals'], 'progress' => true])
+    @include('sales::docs.lines', ['lines' => $doc['lines'], 'totals' => $doc['totals'], 'progress' => true, 'inclusive' => $doc['prices_include_vat']])
 
     @if ($st === 'confirmed')
         <div class="mt-8 grid gap-6 lg:grid-cols-2">

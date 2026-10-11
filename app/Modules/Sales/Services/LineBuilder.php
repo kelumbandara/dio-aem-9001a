@@ -33,7 +33,7 @@ final class LineBuilder
      *
      * @throws BusinessException
      */
-    public function build(array $raw, int $customerId, string $date): array
+    public function build(array $raw, int $customerId, string $date, bool $inclusive = false): array
     {
         if ($raw === []) {
             throw SalesException::make('sales.lines_required', 'Add at least one line.', 422, 'lines');
@@ -71,7 +71,7 @@ final class LineBuilder
                 throw SalesException::make('sales.discount_invalid', 'A discount is between 0 and 100 percent.', 422, "{$field}.discount_pct");
             }
 
-            $taxCodeId = $item->defaultTaxCodeId;
+            $taxCodeId = $item->defaultTaxCodeId ?? $this->defaultVatCodeId();
             if (isset($row['tax_code_id']) && $row['tax_code_id'] !== '') {
                 $taxCodeId = (int) $row['tax_code_id'];
             } elseif (isset($row['tax_code']) && trim((string) $row['tax_code']) !== '') {
@@ -87,19 +87,20 @@ final class LineBuilder
 
             $price = isset($row['unit_price']) && trim((string) $row['unit_price']) !== '' ? trim((string) $row['unit_price']) : null;
             if ($price === null) {
-                $price = $this->priceFor($item, $qty, $uomId, $customerId, $taxCodeId, $on, $field);
+                $price = $this->priceFor($item, $qty, $uomId, $customerId, $taxCodeId, $on, $field, $inclusive);
             } elseif (! Decimal::isDecimal($price, 4) || Decimal::compare($price, '0') < 0) {
                 throw SalesException::make('sales.price_invalid', 'A price is zero or more, with at most 4 decimal places.', 422, "{$field}.unit_price");
             }
 
-            $net = $this->calculator->lineNet($qty, $price, $discount);
+            $amounts = $this->calculator->lineAmounts($qty, $price, $discount, $taxCodeId, $inclusive, $on);
+            $net = $amounts['net'];
             $description = isset($row['description']) ? trim((string) $row['description']) : '';
             $lines[] = [
                 'line_no' => $i + 1, 'item_id' => $item->id, 'description' => $description !== '' ? mb_substr($description, 0, 255) : $item->name,
                 'uom_id' => $uomId, 'qty' => $qty, 'unit_price' => Decimal::round($price, 4), 'discount_pct' => Decimal::round($discount, 4),
                 'tax_code_id' => $taxCodeId, 'net_amount' => $net,
             ];
-            $forTax[] = ['net' => $net, 'tax_code_id' => $taxCodeId];
+            $forTax[] = ['net' => $net, 'tax_code_id' => $taxCodeId, 'gross' => $amounts['gross']];
         }
 
         $computed = $this->calculator->compute($forTax, $on);
@@ -122,7 +123,7 @@ final class LineBuilder
         return $item;
     }
 
-    private function priceFor(ItemInfo $item, string $qty, int $uomId, int $customerId, ?int $taxCodeId, CarbonImmutable $on, string $field): string
+    private function priceFor(ItemInfo $item, string $qty, int $uomId, int $customerId, ?int $taxCodeId, CarbonImmutable $on, string $field, bool $inclusive): string
     {
         $quote = $this->prices->quote($item->id, $qty, $uomId, 'sales', null, $customerId, $on);
         if ($quote === null) {
@@ -131,13 +132,23 @@ final class LineBuilder
         if ($quote->currencyCode !== 'LKR') {
             throw SalesException::make('sales.price_currency', "The price list for {$item->code} is in {$quote->currencyCode}; enter the LKR price.", 422, "{$field}.unit_price");
         }
-        if (! $quote->taxInclusive || $taxCodeId === null || $this->taxCatalog->kind($taxCodeId) !== 'vat') {
-            return $quote->unitPrice;
+        $vat = $taxCodeId !== null && $this->taxCatalog->kind($taxCodeId) === 'vat';
+        if (! $vat || $quote->taxInclusive === $inclusive) {
+            return $quote->unitPrice;   // the list and the document agree on whether VAT is in the price
         }
 
-        // A tax-inclusive list: the document carries the price without VAT.
-        $rate = $this->rates->rate($taxCodeId, $on);
+        // Convert between the list's basis and the document's.
+        $factor = Decimal::add('1', Decimal::div($this->rates->rate($taxCodeId, $on), '100'));
 
-        return Decimal::round(Decimal::div($quote->unitPrice, Decimal::add('1', Decimal::div($rate, '100'))), 4);
+        return Decimal::round($inclusive ? Decimal::mul($quote->unitPrice, $factor) : Decimal::div($quote->unitPrice, $factor), 4);
+    }
+
+    /** Items without a tax code are sold with VAT: the configured default VAT code (empty when it does not exist). */
+    private function defaultVatCodeId(): ?int
+    {
+        $code = (string) config('sales.default_vat_code');
+        $found = collect($this->taxCatalog->codes(['vat']))->first(fn ($c) => strcasecmp($c['code'], $code) === 0);
+
+        return $found['id'] ?? null;
     }
 }

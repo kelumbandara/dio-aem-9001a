@@ -37,6 +37,7 @@ function salesFails(Closure $fn, string $code): void
 }
 
 beforeEach(function () {
+    config(['sales.prices_include_vat' => false]);   // these tests work in net prices; VAT-inclusive pricing has its own tests
     $this->seed(FinanceSeeder::class);
     // Levies are created inactive and without a rate: the accountant switches them on.
     TaxCode::where('code', 'SSCL')->update(['is_active' => true]);

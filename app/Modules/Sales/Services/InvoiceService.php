@@ -12,7 +12,6 @@ use App\Modules\MasterData\Contracts\ItemCatalog;
 use App\Modules\MasterData\DTOs\ItemInfo;
 use App\Modules\Sales\Exceptions\SalesException;
 use App\Modules\Sales\Models\Invoice;
-use App\Modules\Sales\Models\InvoiceLine;
 use App\Modules\Sales\Models\Order;
 use App\Modules\Sales\Models\OrderLine;
 use App\Support\Decimal;
@@ -67,17 +66,28 @@ final class InvoiceService
                 throw SalesException::make('sales.nothing_to_invoice', 'There is nothing delivered and not yet invoiced on this order.', 422, 'lines');
             }
 
+            $inclusive = $order->prices_include_vat;
+            $on = CarbonImmutable::parse($date, config('core.display_timezone'));
             $rows = [];
             foreach ($picked as $p) {
                 /** @var OrderLine $line */
                 $line = $p['line'];
                 $completes = Decimal::compare(Decimal::add($line->qty_invoiced, $p['qty']), $line->qty) === 0;
-                $net = $completes
-                    ? Decimal::sub($line->net_amount, (string) InvoiceLine::query()->where('order_line_id', $line->id)->sum('net_amount'))
-                    : $this->calculator->lineNet($p['qty'], $line->unit_price, $line->discount_pct);
-                $rows[] = ['line' => $line, 'qty' => $p['qty'], 'net' => Decimal::round($net, 2)];
+                $part = $this->calculator->lineAmounts($p['qty'], $line->unit_price, $line->discount_pct, $line->tax_code_id, $inclusive, $on);
+                $net = $part['net'];
+                $gross = $part['gross'];
+                if ($completes) {
+                    // The invoice that completes a line takes the exact remainder, so slices always add up to the order.
+                    $before = DB::table('sales_invoice_lines')->where('order_line_id', $line->id)->selectRaw('coalesce(sum(net_amount), 0) as net, coalesce(sum(net_amount + vat_amount), 0) as gross')->first();
+                    $net = Decimal::sub($line->net_amount, (string) $before?->net);
+                    if ($gross !== null) {
+                        $total = $this->calculator->lineNet($line->qty, $line->unit_price, $line->discount_pct);
+                        $gross = Decimal::sub($total, (string) $before?->gross);
+                    }
+                }
+                $rows[] = ['line' => $line, 'qty' => $p['qty'], 'net' => Decimal::round($net, 2), 'gross' => $gross !== null ? Decimal::round($gross, 2) : null];
             }
-            $computed = $this->calculator->compute(array_map(fn (array $r) => ['net' => $r['net'], 'tax_code_id' => $r['line']->tax_code_id], $rows), CarbonImmutable::parse($date, config('core.display_timezone')));
+            $computed = $this->calculator->compute(array_map(fn (array $r) => ['net' => $r['net'], 'tax_code_id' => $r['line']->tax_code_id, 'gross' => $r['gross']], $rows), $on);
             if (Decimal::compare($computed['gross'], '0', 2) <= 0) {
                 throw SalesException::make('sales.invoice_zero', 'An invoice must be for more than zero.', 422);
             }
@@ -96,7 +106,7 @@ final class InvoiceService
                 'document_no' => $documentNo, 'order_id' => $order->id, 'customer_id' => $order->customer_id, 'invoice_date' => $date, 'due_date' => $due,
                 'customer_ref' => $order->customer_ref, 'notes' => isset($data['notes']) && trim((string) $data['notes']) !== '' ? mb_substr(trim((string) $data['notes']), 0, 2000) : null,
                 'net_total' => $computed['net'], 'vat_total' => $computed['vat'], 'levy_total' => $computed['levy'], 'gross_total' => $computed['gross'],
-                'journal_id' => $posted->id, 'created_by' => $by,
+                'journal_id' => $posted->id, 'created_by' => $by, 'prices_include_vat' => $inclusive,
             ]);
             $invoice->public_id = $publicId;
             $invoice->save();

@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * A posted tax invoice. Immutable (the database refuses changes): corrections are credit notes.
  *
  * @property int $id
+ * @property bool $prices_include_vat
  * @property string $public_id
  * @property string $document_no
  * @property int $order_id
@@ -30,7 +31,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int|null $created_by
  */
 #[RouteKey('public_id')]
-#[Fillable(['document_no', 'order_id', 'customer_id', 'invoice_date', 'due_date', 'customer_ref', 'notes', 'net_total', 'vat_total', 'levy_total', 'gross_total', 'journal_id', 'created_by'])]
+#[Fillable(['document_no', 'order_id', 'customer_id', 'invoice_date', 'due_date', 'customer_ref', 'notes', 'net_total', 'vat_total', 'levy_total', 'gross_total', 'journal_id', 'created_by', 'prices_include_vat'])]
 class Invoice extends Model
 {
     use Auditable, HasPublicId;
@@ -42,6 +43,7 @@ class Invoice extends Model
     protected function casts(): array
     {
         return [
+            'prices_include_vat' => 'boolean',
             'invoice_date' => 'immutable_date', 'due_date' => 'immutable_date',
             'net_total' => 'decimal:4', 'vat_total' => 'decimal:4', 'levy_total' => 'decimal:4', 'gross_total' => 'decimal:4',
         ];

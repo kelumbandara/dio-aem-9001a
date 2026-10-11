@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $id
+ * @property bool $prices_include_vat
  * @property string $public_id
  * @property string $document_no
  * @property int $customer_id
@@ -36,7 +37,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int|null $created_by
  */
 #[RouteKey('public_id')]
-#[Fillable(['document_no', 'customer_id', 'quotation_id', 'warehouse_id', 'order_date', 'required_date', 'status', 'customer_ref', 'payment_terms_days', 'notes', 'net_total', 'vat_total', 'levy_total', 'gross_total', 'confirmed_at', 'confirmed_by', 'credit_override_reason', 'credit_override_by', 'cancel_reason', 'version', 'created_by'])]
+#[Fillable(['document_no', 'customer_id', 'quotation_id', 'warehouse_id', 'order_date', 'required_date', 'status', 'customer_ref', 'payment_terms_days', 'notes', 'net_total', 'vat_total', 'levy_total', 'gross_total', 'confirmed_at', 'confirmed_by', 'credit_override_reason', 'credit_override_by', 'cancel_reason', 'version', 'created_by', 'prices_include_vat'])]
 class Order extends Model
 {
     use Auditable, HasPublicId;
@@ -48,6 +49,7 @@ class Order extends Model
     protected function casts(): array
     {
         return [
+            'prices_include_vat' => 'boolean',
             'order_date' => 'immutable_date', 'required_date' => 'immutable_date', 'confirmed_at' => 'immutable_datetime', 'version' => 'integer', 'payment_terms_days' => 'integer',
             'net_total' => 'decimal:4', 'vat_total' => 'decimal:4', 'levy_total' => 'decimal:4', 'gross_total' => 'decimal:4',
         ];

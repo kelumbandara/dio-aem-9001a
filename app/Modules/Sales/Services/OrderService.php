@@ -70,7 +70,8 @@ final class OrderService
             if ($terms < 0 || $terms > 365) {
                 throw SalesException::make('sales.terms_invalid', 'Payment terms are between 0 and 365 days.', 422, 'payment_terms_days');
             }
-            $built = $this->builder->build((array) ($data['lines'] ?? []), $customer->id, $orderDate);
+            $inclusive = $order !== null ? $order->prices_include_vat : ($from !== null ? $from->prices_include_vat : (bool) config('sales.prices_include_vat'));
+            $built = $this->builder->build((array) ($data['lines'] ?? []), $customer->id, $orderDate, $inclusive);
 
             $values = [
                 'customer_id' => $customer->id, 'warehouse_id' => $warehouseId, 'order_date' => $orderDate, 'required_date' => $required,
@@ -82,7 +83,7 @@ final class OrderService
                 $this->numbering->define('sales.order', 'SO/{FY}/{SEQ}', 5, 'fiscal_yearly');
                 $order = Order::query()->create($values + [
                     'document_no' => $this->numbering->next('sales.order', null, CarbonImmutable::parse($orderDate)), 'status' => 'draft', 'version' => 1,
-                    'quotation_id' => $from?->id, 'created_by' => $by,
+                    'quotation_id' => $from?->id, 'created_by' => $by, 'prices_include_vat' => $inclusive,
                 ]);
             } else {
                 $order->forceFill($values + ['version' => $order->version + 1])->save();

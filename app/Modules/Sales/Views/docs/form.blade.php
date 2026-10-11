@@ -2,6 +2,7 @@
     $field = 'block w-full rounded-lg border-0 px-3 py-2 text-sm shadow-sm ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-indigo-600';
     $isOrder = $kind === 'order';
     $editing = $doc !== null;
+    $inclusive = $editing ? $doc['prices_include_vat'] : (bool) config('sales.prices_include_vat');
     $today = now(config('core.display_timezone'))->toDateString();
     $num = fn ($v) => $v === null ? '' : (str_contains((string) $v, '.') ? rtrim(rtrim((string) $v, '0'), '.') : (string) $v);
     $blank = ['item' => '', 'qty' => '', 'uom' => '', 'unit_price' => '', 'discount_pct' => '', 'tax_code' => '', 'description' => ''];
@@ -54,7 +55,7 @@
 
         <section class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
             <h2 class="text-base font-semibold text-slate-900">{{ __('sales::ui.common.lines') }}</h2>
-            <p class="mt-1 text-xs text-slate-500">{{ __('sales::ui.form.lines_hint') }}</p>
+            <p class="mt-1 text-xs text-slate-500">{{ $inclusive ? __('sales::ui.form.lines_hint_incl') : __('sales::ui.form.lines_hint') }}</p>
             @error('lines') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
             <datalist id="item-codes">@foreach ($options['items'] as $i) <option value="{{ $i['code'] }}">{{ $i['name'] }}</option> @endforeach</datalist>
             <datalist id="tax-codes">@foreach ($options['taxCodes'] as $t) <option value="{{ $t['code'] }}">{{ $t['name'] }}</option> @endforeach</datalist>
@@ -75,7 +76,7 @@
                             <input :name="`lines[${i}][uom]`" x-model="row.uom" class="{{ $field }}" placeholder="{{ __('sales::ui.form.base') }}">
                         </div>
                         <div class="sm:col-span-2 lg:col-span-2">
-                            <label class="mb-1 block text-xs font-medium text-slate-600">{{ __('sales::ui.common.unit_price') }}</label>
+                            <label class="mb-1 block text-xs font-medium text-slate-600">{{ $inclusive ? __('sales::ui.common.unit_price_incl') : __('sales::ui.common.unit_price') }}</label>
                             <input :name="`lines[${i}][unit_price]`" x-model="row.unit_price" inputmode="decimal" class="{{ $field }}" placeholder="{{ __('sales::ui.form.price_list') }}">
                         </div>
                         <div class="sm:col-span-1 lg:col-span-1">

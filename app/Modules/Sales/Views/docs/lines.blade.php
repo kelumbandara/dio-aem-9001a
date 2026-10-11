@@ -1,6 +1,7 @@
 @php
     $num = fn ($v) => $v === null ? '' : (str_contains((string) $v, '.') ? rtrim(rtrim((string) $v, '0'), '.') : (string) $v);
     $progress = $progress ?? false;
+    $inclusive = $inclusive ?? false;
     $taxes = $taxes ?? [];
 @endphp
 <x-core::table>
@@ -13,10 +14,10 @@
                 <th class="px-3 py-2 text-end font-medium">{{ __('sales::ui.common.delivered') }}</th>
                 <th class="px-3 py-2 text-end font-medium">{{ __('sales::ui.common.invoiced') }}</th>
             @endif
-            <th class="px-3 py-2 text-end font-medium">{{ __('sales::ui.common.unit_price') }}</th>
+            <th class="px-3 py-2 text-end font-medium">{{ $inclusive ? __('sales::ui.common.unit_price_incl') : __('sales::ui.common.unit_price') }}</th>
             <th class="px-3 py-2 text-end font-medium">{{ __('sales::ui.common.discount') }}</th>
             <th class="px-3 py-2 text-start font-medium">{{ __('sales::ui.common.tax') }}</th>
-            <th class="px-3 py-2 text-end font-medium">{{ __('sales::ui.common.amount') }}</th>
+            <th class="px-3 py-2 text-end font-medium">{{ $inclusive ? __('sales::ui.common.net_amount') : __('sales::ui.common.amount') }}</th>
         </tr>
     </thead>
     <tbody class="divide-y divide-slate-100">

@@ -10,6 +10,7 @@
     $q = fn ($v) => str_contains((string) $v, '.') ? rtrim(rtrim((string) $v, '0'), '.') : (string) $v;
     $c = $doc['company'];
     $name = $c['trade_name'] ?: $c['legal_name'];
+    $incl = $doc['prices_include_vat'];
 @endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
@@ -108,8 +109,8 @@
         <thead>
             <tr>
                 <th style="width:24px">#</th><th>{{ __('sales::ui.print.description') }}</th>
-                <th class="r">{{ __('sales::ui.common.qty') }}</th><th class="r">{{ __('sales::ui.common.unit_price') }}</th>
-                <th class="r">{{ __('sales::ui.common.discount') }}</th><th class="r">{{ __('sales::ui.common.vat') }}</th><th class="r">{{ __('sales::ui.common.amount') }}</th>
+                <th class="r">{{ __('sales::ui.common.qty') }}</th><th class="r">{{ $incl ? __('sales::ui.common.unit_price_incl') : __('sales::ui.common.unit_price') }}</th>
+                <th class="r">{{ __('sales::ui.common.discount') }}</th><th class="r">{{ __('sales::ui.common.vat') }}</th><th class="r">{{ $incl ? __('sales::ui.print.line_total_incl') : __('sales::ui.common.amount') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -121,7 +122,7 @@
                     <td class="r">{{ $m($l['unit_price']) }}</td>
                     <td class="r">{{ (float) $l['discount_pct'] > 0 ? $q($l['discount_pct']).'%' : '' }}</td>
                     <td class="r">{{ $l['tax_code'] === null ? '' : ((float) $l['vat_rate'] > 0 ? $q($l['vat_rate']).'%' : $l['tax_code']) }}</td>
-                    <td class="r">{{ $m($l['net_amount']) }}</td>
+                    <td class="r">{{ $m($incl ? bcadd($l['net_amount'], $l['vat_amount'], 4) : $l['net_amount']) }}</td>
                 </tr>
             @endforeach
         </tbody>
@@ -133,7 +134,7 @@
             <tr><td>{{ __('sales::ui.common.subtotal') }}</td><td class="r">{{ $m($doc['totals']['net']) }}</td></tr>
             @foreach ($doc['taxes'] as $t)
                 <tr>
-                    <td>{{ $t['name'] ?: $t['code'] }} ({{ $q($t['rate']) }}%)@if ($t['kind'] !== 'vat')<div class="base">{{ __('sales::ui.print.on_liable', ['base' => $m($t['base_amount'])]) }}</div>@endif</td>
+                    <td>{{ $t['name'] ?: $t['code'] }} ({{ $q($t['rate']) }}%@if ($incl && $t['kind'] === 'vat') {{ __('sales::ui.print.included') }}@endif)@if ($t['kind'] !== 'vat')<div class="base">{{ __('sales::ui.print.on_liable', ['base' => $m($t['base_amount'])]) }}</div>@endif</td>
                     <td class="r">{{ $m($t['amount']) }}</td>
                 </tr>
             @endforeach

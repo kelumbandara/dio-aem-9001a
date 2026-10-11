@@ -47,7 +47,7 @@
         @endcan
     @endif
 
-    @include('sales::docs.lines', ['lines' => $doc['lines'], 'totals' => $doc['totals']])
+    @include('sales::docs.lines', ['lines' => $doc['lines'], 'totals' => $doc['totals'], 'inclusive' => $doc['prices_include_vat']])
     @if ($doc['notes'] || $doc['terms'])
         <div class="mt-6 grid gap-4 text-sm text-slate-600 sm:grid-cols-2">
             @if ($doc['notes']) <div><div class="font-medium text-slate-800">{{ __('sales::ui.form.notes') }}</div>{{ $doc['notes'] }}</div> @endif

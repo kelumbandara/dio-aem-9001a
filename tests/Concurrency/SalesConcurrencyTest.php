@@ -17,6 +17,7 @@ use Symfony\Component\Process\Process;
  * once" cannot be shown inside one transaction, so the data is committed and truncated afterwards.
  */
 beforeEach(function () {
+    config(['sales.prices_include_vat' => false]);   // these tests work in net prices; VAT-inclusive pricing has its own tests
     Artisan::call('migrate', ['--force' => true]);
     cleanSalesData();
     (new ReferenceDataSeeder)->run();
@@ -38,7 +39,7 @@ function salesRace(int $workers, array $args): array
     for ($i = 0; $i < $workers; $i++) {
         $mine = array_map(fn ($a) => is_callable($a) ? $a($i) : $a, $args);
         $p = new Process([PHP_BINARY, base_path('tests/Support/sales-worker.php'), $mine[0], $mine[1], (string) $startAt, ...array_slice($mine, 2)],
-            base_path(), ['APP_ENV' => 'testing', 'DB_DATABASE' => config('database.connections.pgsql.database')]);
+            base_path(), ['APP_ENV' => 'testing', 'DB_DATABASE' => config('database.connections.pgsql.database'), 'SALES_PRICES_INCLUDE_VAT' => 'false']);
         $p->start();
         $processes[] = $p;
     }

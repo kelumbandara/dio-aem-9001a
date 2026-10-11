@@ -55,7 +55,8 @@ final class QuotationService
             if ($validUntil < $quoteDate) {
                 throw SalesException::make('sales.valid_until_invalid', 'A quotation cannot expire before its date.', 422, 'valid_until');
             }
-            $built = $this->builder->build((array) ($data['lines'] ?? []), $customer->id, $quoteDate);
+            $inclusive = $quotation !== null ? $quotation->prices_include_vat : (bool) config('sales.prices_include_vat');
+            $built = $this->builder->build((array) ($data['lines'] ?? []), $customer->id, $quoteDate, $inclusive);
 
             $values = [
                 'customer_id' => $customer->id, 'quote_date' => $quoteDate, 'valid_until' => $validUntil,
@@ -66,7 +67,7 @@ final class QuotationService
             if ($quotation === null) {
                 $this->numbering->define('sales.quotation', 'QUO/{FY}/{SEQ}', 5, 'fiscal_yearly');
                 $quotation = Quotation::query()->create($values + [
-                    'document_no' => $this->numbering->next('sales.quotation', null, CarbonImmutable::parse($quoteDate)), 'status' => 'draft', 'version' => 1, 'created_by' => $by,
+                    'document_no' => $this->numbering->next('sales.quotation', null, CarbonImmutable::parse($quoteDate)), 'status' => 'draft', 'version' => 1, 'created_by' => $by, 'prices_include_vat' => $inclusive,
                 ]);
             } else {
                 $quotation->forceFill($values + ['version' => $quotation->version + 1])->save();

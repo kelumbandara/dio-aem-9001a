@@ -34,7 +34,25 @@ final class SalesCalculator
     }
 
     /**
-     * @param  list<array{net: string, tax_code_id: int|null}>  $lines
+     * Net value of a line and, when the typed price includes VAT, the line total including VAT (null otherwise).
+     * With VAT-inclusive prices the typed total is what the customer pays for the line; net is that total divided
+     * by (1 + rate), rounded to 2 places, and the VAT is whatever is left of the total.
+     *
+     * @return array{net: string, gross: string|null}
+     */
+    public function lineAmounts(string $qty, string $unitPrice, string $discountPct, ?int $taxCodeId, bool $inclusive, ?CarbonInterface $on = null): array
+    {
+        $typed = $this->lineNet($qty, $unitPrice, $discountPct);
+        if (! $inclusive || $taxCodeId === null || $this->catalog->kind($taxCodeId) !== 'vat') {
+            return ['net' => $typed, 'gross' => null];
+        }
+        $rate = $this->rates->rate($taxCodeId, $on);
+
+        return ['net' => Decimal::round(Decimal::div($typed, Decimal::add('1', Decimal::div($rate, '100'))), 2), 'gross' => $typed];
+    }
+
+    /**
+     * @param  list<array{net: string, tax_code_id: int|null, gross?: string|null}>  $lines
      * @return array{lines: list<array{vat_rate: string, vat_amount: string, levy_liable: bool}>, taxes: list<array{tax_code_id: int, kind: string, rate: string, base_amount: string, amount: string}>, net: string, vat: string, levy: string, gross: string}
      */
     public function compute(array $lines, ?CarbonInterface $on = null): array
@@ -55,7 +73,9 @@ final class SalesCalculator
             $amount = '0';
             if ($kind === 'vat') {
                 $rate = $this->rates->rate($line['tax_code_id'], $on);
-                $amount = Decimal::round(Decimal::div(Decimal::mul($line['net'], $rate), '100'), 2);
+                $amount = isset($line['gross'])
+                    ? Decimal::round(Decimal::sub($line['gross'], $line['net']), 2)
+                    : Decimal::round(Decimal::div(Decimal::mul($line['net'], $rate), '100'), 2);
                 $vatRows[$line['tax_code_id']] ??= ['tax_code_id' => $line['tax_code_id'], 'kind' => 'vat', 'rate' => $rate, 'base_amount' => '0', 'amount' => '0'];
                 $vatRows[$line['tax_code_id']]['base_amount'] = Decimal::add($vatRows[$line['tax_code_id']]['base_amount'], $line['net']);
                 $vatRows[$line['tax_code_id']]['amount'] = Decimal::add($vatRows[$line['tax_code_id']]['amount'], $amount);

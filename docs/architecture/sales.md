@@ -38,9 +38,13 @@ Quotation ──accepted──▶ Sales order ──confirm──▶ Delivery (s
   Example: net 1,000 → VAT 180 (18 %) + SSCL 25 (2.5 %) = 1,205.
 - SSCL/NBT are created **inactive with no rate**; the accountant switches them on and enters the rate in Master data → Tax codes (no code change).
   NBT (abolished) is simply left inactive. A levy with no rate for the date is not charged.
-- Lines with an **exempt** tax code carry no VAT and are outside the levy base. An item with **no** tax code is zero-rated *and* levy-liable —
-  give your items a VAT code (see risks).
-- Prices on documents are **net of tax**. A tax-inclusive price list is converted to net using the line's VAT rate.
+- Lines with an **exempt** tax code carry no VAT and are outside the levy base. An item with **no** tax code gets the default VAT code (above).
+- **Prices include VAT** (owner's rule, `config/sales.php` → `prices_include_vat`, default on). The price typed on a line is what the customer pays for
+  one unit; the line total (qty × price − discount, 2 places) is split into net = total ÷ (1 + rate) and VAT = the rest, so the customer pays exactly the
+  typed total plus any SSCL/NBT. SSCL is then charged on the **net** values. The setting is copied onto every quotation, order and invoice when it is
+  created, so changing it later never reinterprets old documents (documents made before 2026-10-12 are net-priced). A price list's own tax-inclusive flag is
+  converted to the document's basis. Exempt lines have no VAT in the price.
+- **Every item is sold with VAT unless it is set to EXEMPT**: a line whose item has no tax code gets the code named in `sales.default_vat_code` (`VAT`).
 - Each invoice stores, per tax code, the rate used, the base and the amount (`sales_invoice_taxes`), so old invoices never change when rates
   change, and credit notes use the **invoice's** rates.
 - Postings: credit `sales_revenue` (net), `vat_output`, `sscl_payable`, `nbt_payable`; debit receivables control (added by Finance, tagged with the customer).
@@ -98,9 +102,9 @@ must be received in Inventory with their lot number instead.
 ## 8. Permissions and roles
 
 `sales.view`, `sales.quotation.manage`, `sales.order.manage`, `sales.order.confirm`, `sales.credit.override`, `sales.delivery.post`,
-`sales.reverse`, `sales.invoice.post`, `sales.credit_note.post`. **Admin** has all. **Accountant** (new role from Sprint 5, plus MFA required) can
-see all sales documents and issue invoices and credit notes, in addition to Finance. There is no ready-made "sales" role: the administrator gives sales staff the
-permissions they need (a roles screen is not part of this sprint; roles are managed from the command line / seeder today).
+`sales.reverse`, `sales.invoice.post`, `sales.credit_note.post`. **Admin** has all.
+**Sales staff** (`sales` role, separate from admin and accountant): view, create/edit quotations and orders, confirm orders, post deliveries, and read customers, items, prices and stock — no invoicing, no delivery reversal, no credit override. **Accountant** (new role from Sprint 5, plus MFA required) can
+see all sales documents and issue invoices and credit notes, in addition to Finance. Roles are seeded (`RolesAndPermissionsSeeder`); there is no roles screen yet.
 
 ## 9. API (all under `/api/v1`, idempotent POSTs need an `Idempotency-Key`)
 

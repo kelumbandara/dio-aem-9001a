@@ -34,10 +34,16 @@ class RolesAndPermissionsSeeder extends Seeder
         $readable = ['masterdata.reference.view', 'masterdata.item.view', 'masterdata.customer.view', 'masterdata.supplier.view', 'masterdata.price_list.view', 'inventory.stock.view', 'inventory.warehouse.view',
             // Sales: sees every document and issues invoices and credit notes; quotations, orders, deliveries and credit-limit overrides stay with sales staff and admins.
             'sales.view', 'sales.invoice.post', 'sales.credit_note.post'];
+        $salesStaff = ['sales.view', 'sales.quotation.manage', 'sales.order.manage', 'sales.order.confirm', 'sales.delivery.post',
+            'masterdata.reference.view', 'masterdata.item.view', 'masterdata.customer.view', 'masterdata.price_list.view', 'inventory.stock.view', 'inventory.warehouse.view'];
         Role::findOrCreate('accountant', 'web')->syncPermissions(array_values(array_filter(
             $names,
             fn (string $name) => str_starts_with($name, 'finance.') || in_array($name, $readable, true),
         )));
+
+        // Sales staff quote, take and confirm orders and send goods out; they see customers, items, prices and stock but change none of
+        // them, do not invoice (the accountant does), cannot reverse a delivery and cannot override a credit limit (admin only).
+        Role::findOrCreate('sales', 'web')->syncPermissions(array_values(array_filter($names, fn (string $name) => in_array($name, $salesStaff, true))));
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
