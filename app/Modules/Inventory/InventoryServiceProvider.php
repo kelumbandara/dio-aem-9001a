@@ -9,12 +9,14 @@ use App\Modules\Inventory\Console\ReconcileStock;
 use App\Modules\Inventory\Contracts\StockAvailability;
 use App\Modules\Inventory\Contracts\StockPoster;
 use App\Modules\Inventory\Contracts\StockReserver;
+use App\Modules\Inventory\Contracts\WarehouseDirectory;
 use App\Modules\Inventory\Models\StockDocument;
 use App\Modules\Inventory\Models\Warehouse;
 use App\Modules\Inventory\Policies\StockDocumentPolicy;
 use App\Modules\Inventory\Policies\WarehousePolicy;
 use App\Modules\Inventory\Services\DatabaseStockAvailability;
 use App\Modules\Inventory\Services\DatabaseStockReserver;
+use App\Modules\Inventory\Services\EloquentWarehouseDirectory;
 use App\Modules\Inventory\Services\StockPostingService;
 use App\Support\ModuleServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
@@ -54,6 +56,7 @@ class InventoryServiceProvider extends ModuleServiceProvider
         $this->app->singleton(StockPoster::class, StockPostingService::class);
         $this->app->singleton(StockAvailability::class, DatabaseStockAvailability::class);
         $this->app->singleton(StockReserver::class, DatabaseStockReserver::class);
+        $this->app->singleton(WarehouseDirectory::class, EloquentWarehouseDirectory::class);
     }
 
     public function boot(): void

@@ -7,10 +7,29 @@ return [
     'menu' => [
         'dashboard' => 'Dashboard',
         'modules' => 'Modules',
+        'company' => 'Company profile',
         'audit_log' => 'Audit log',
     ],
 
+    'company' => [
+        'title' => 'Company details',
+        'hint' => 'Printed on invoices and reports. Keep the tax registration number (VAT/TIN) up to date.',
+        'saved' => 'Company details saved.',
+        'legal_name' => 'Legal name',
+        'trade_name' => 'Trade name',
+        'registration_no' => 'Registration no.',
+        'tax_id' => 'Tax ID (TIN / VAT)',
+        'address_line1' => 'Address line 1',
+        'address_line2' => 'Address line 2',
+        'city' => 'City',
+        'country' => 'Country',
+        'phone' => 'Phone',
+        'email' => 'Email',
+        'website' => 'Website',
+    ],
+
     'common' => [
+        'save' => 'Save',
         'sign_out' => 'Sign out',
         'cancel' => 'Cancel',
         'confirm' => 'Confirm',

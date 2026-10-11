@@ -161,3 +161,9 @@ The scheduler (`schedule:work` / the scheduler container) runs: `outbox:relay` (
 `approvals.execution_error` · `approvals.unknown_action` · `approvals.unknown_role` · `approvals.unknown_user` ·
 `approvals.invalid_step` · `approvals.steps_required` · `approvals.invalid_range` · `approvals.invalid_holder` ·
 `approvals.invalid_delegation` · `approvals.delegation_too_long`.
+
+## Company profile (added in Sprint 6)
+
+`CompanyInfo::profile()` gives other modules the legal name, trade name, tax ID (VAT/TIN), registration number, address lines, phone, email and website for
+document headers (today: the printed tax invoice). It is edited at **Administration → Company profile** (`core.company.manage`, admin only) through the
+`SaveCompanyProfile` action; until it is filled the placeholder name "My Company (Pvt) Ltd" is printed.

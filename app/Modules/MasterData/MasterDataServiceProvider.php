@@ -12,6 +12,7 @@ use App\Modules\MasterData\Contracts\ItemCatalog;
 use App\Modules\MasterData\Contracts\PartyDirectory;
 use App\Modules\MasterData\Contracts\PriceResolver;
 use App\Modules\MasterData\Contracts\TaxCalculator;
+use App\Modules\MasterData\Contracts\TaxCatalog;
 use App\Modules\MasterData\Contracts\UomConverter;
 use App\Modules\MasterData\Models\Currency;
 use App\Modules\MasterData\Models\Customer;
@@ -32,6 +33,7 @@ use App\Modules\MasterData\Services\DatabaseItemCatalog;
 use App\Modules\MasterData\Services\DatabasePartyDirectory;
 use App\Modules\MasterData\Services\DatabasePriceResolver;
 use App\Modules\MasterData\Services\DatabaseTaxCalculator;
+use App\Modules\MasterData\Services\DatabaseTaxCatalog;
 use App\Modules\MasterData\Services\ItemUomConverter;
 use App\Support\ModuleServiceProvider;
 use Illuminate\Support\Facades\Gate;
@@ -75,6 +77,7 @@ class MasterDataServiceProvider extends ModuleServiceProvider
         $this->app->singleton(UomConverter::class, ItemUomConverter::class);
         $this->app->singleton(CurrencyConverter::class, DatabaseCurrencyConverter::class);
         $this->app->singleton(TaxCalculator::class, DatabaseTaxCalculator::class);
+        $this->app->singleton(TaxCatalog::class, DatabaseTaxCatalog::class);
         $this->app->singleton(PriceResolver::class, DatabasePriceResolver::class);
     }
 

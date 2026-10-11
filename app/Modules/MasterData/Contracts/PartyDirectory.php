@@ -24,6 +24,14 @@ interface PartyDirectory
      */
     public function search(string $side, string $term, int $limit = 50): array;
 
+    /**
+     * The address lines for a document header: the default billing address, else the first address on file.
+     *
+     * @param  'customer'|'supplier'  $side
+     * @return list<string>
+     */
+    public function billingAddress(string $side, int $partyId): array;
+
     /** @throws BusinessException masterdata.customer_not_found | masterdata.customer_inactive */
     public function requireActiveCustomer(int $customerId): PartyInfo;
 

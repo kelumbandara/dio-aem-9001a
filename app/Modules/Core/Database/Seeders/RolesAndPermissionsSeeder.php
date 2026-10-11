@@ -29,9 +29,11 @@ class RolesAndPermissionsSeeder extends Seeder
         Role::findOrCreate('admin', 'web')->syncPermissions($names);
         Role::findOrCreate('user', 'web');
 
-        // The accountant runs Finance (every finance.* permission, including locking a period) and can read what Finance
-        // reports on: master data, stock and warehouses. It cannot change them. Permissions that do not exist yet are skipped.
-        $readable = ['masterdata.reference.view', 'masterdata.item.view', 'masterdata.customer.view', 'masterdata.supplier.view', 'masterdata.price_list.view', 'inventory.stock.view', 'inventory.warehouse.view'];
+        // The accountant runs Finance (every finance.* permission, including locking a period), reads what Finance reports on
+        // (master data, stock, warehouses) and issues sales invoices and credit notes. It cannot change master data or stock. Permissions that do not exist yet are skipped.
+        $readable = ['masterdata.reference.view', 'masterdata.item.view', 'masterdata.customer.view', 'masterdata.supplier.view', 'masterdata.price_list.view', 'inventory.stock.view', 'inventory.warehouse.view',
+            // Sales: sees every document and issues invoices and credit notes; quotations, orders, deliveries and credit-limit overrides stay with sales staff and admins.
+            'sales.view', 'sales.invoice.post', 'sales.credit_note.post'];
         Role::findOrCreate('accountant', 'web')->syncPermissions(array_values(array_filter(
             $names,
             fn (string $name) => str_starts_with($name, 'finance.') || in_array($name, $readable, true),

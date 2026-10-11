@@ -193,7 +193,8 @@ it('keeps the module switchable: a disabled Approvals module blocks its API', fu
     $modules = app(ModuleRegistry::class);
     expect(fn () => $modules->disable('approvals'))->toThrow(ModuleException::class, 'still required by');
 
-    $modules->disable('finance');      // dependents first
+    $modules->disable('sales');       // dependents first
+    $modules->disable('finance');
     $modules->disable('inventory');
     $modules->disable('masterdata');
     $modules->disable('approvals');

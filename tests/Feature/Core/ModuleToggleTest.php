@@ -123,5 +123,5 @@ it('manages modules from the admin page', function () {
 it('registers the shipped modules, each below the ones that use it', function () {
     $keys = array_keys(config('modules.modules'));
 
-    expect($keys)->toBe(['core', 'approvals', 'masterdata', 'inventory', 'finance']);
+    expect($keys)->toBe(['core', 'approvals', 'masterdata', 'inventory', 'finance', 'sales']);
 });

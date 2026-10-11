@@ -6,7 +6,9 @@ use App\Modules\MasterData\Contracts\PartyDirectory;
 use App\Modules\MasterData\DTOs\PartyInfo;
 use App\Modules\MasterData\Exceptions\MasterDataException;
 use App\Modules\MasterData\Models\Customer;
+use App\Modules\MasterData\Models\CustomerAddress;
 use App\Modules\MasterData\Models\Supplier;
+use App\Modules\MasterData\Models\SupplierAddress;
 
 final class DatabasePartyDirectory implements PartyDirectory
 {
@@ -53,6 +55,17 @@ final class DatabasePartyDirectory implements PartyDirectory
         $ids = $model::query()->where(fn ($q) => $q->whereRaw('lower(code) like ?', [$like])->orWhereRaw('lower(name) like ?', [$like]))->orderBy('code')->limit($limit)->pluck('id');
 
         return $ids->map(fn ($id) => $model === Supplier::class ? $this->supplier((int) $id) : $this->customer((int) $id))->filter()->values()->all();
+    }
+
+    public function billingAddress(string $side, int $partyId): array
+    {
+        $query = $side === 'supplier' ? SupplierAddress::query()->where('supplier_id', $partyId) : CustomerAddress::query()->where('customer_id', $partyId);
+        $address = $query->orderByRaw("case when type = 'billing' then 0 else 1 end")->orderByDesc('is_default')->orderBy('id')->first();
+        if ($address === null) {
+            return [];
+        }
+
+        return array_values(array_filter([$address->line1, $address->line2, trim(($address->city ?? '').' '.($address->postal_code ?? '')), $address->district], fn ($v) => $v !== null && trim((string) $v) !== ''));
     }
 
     public function requireActiveCustomer(int $customerId): PartyInfo

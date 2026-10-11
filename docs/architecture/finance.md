@@ -55,7 +55,7 @@ Journals are created when the outbox relay delivers the event (every minute with
 
 - **Open items** (`open_items`): a customer invoice (`receivable`) or a supplier bill (`payable`) waiting to be settled, with `amount` and `open_amount`. Sales (S6) and Procurement (S7) post them through the `OpenItemPoster` contract: they give the revenue/VAT/SSCL/NBT lines (or expense/GRNI/input-VAT lines); Finance adds the control-account line tagged with the party, posts the journal and records the open item — atomically and once per source.
 - **Receipts and payments** (`settlements`): money in/out through a bank or cash account, optionally settling several open items fully or partly; money not allocated stays *on account* and can be allocated later. Open items are locked in id order, so simultaneous settlements can never settle more than an invoice is worth (tested with real parallel processes). Reversing a receipt/payment reverses its journal and gives the amounts back to the invoices.
-- **Limits**: LKR bank/cash accounts only — receipts/payments into the USD account are refused (`finance.foreign_bank_not_supported`) until multi-currency is designed; no credit notes yet (S6); no cheque register or bank reconciliation.
+- **Limits**: LKR bank/cash accounts only — receipts/payments into the USD account are refused (`finance.foreign_bank_not_supported`) until multi-currency is designed; credit notes exist since S6 (section 6); no cheque register or bank reconciliation.
 - **Reports**: ageing by days overdue (as at today, from what is still open), a party's ledger with running balance, unallocated money, and a **tie-out** (open items less unallocated money must equal the control account in the ledger).
 
 ## 6. Fiscal years and periods
@@ -94,3 +94,9 @@ Chart of accounts (grouped, balances, edit), Journals (list, show, manual journa
 ## 12. Reconciliation
 
 `php artisan finance:reconcile` (scheduled 02:45; exit 1 and a critical log on any difference): every journal balances and equals its total; the whole ledger balances; each open item equals its amount less its settlements; receivables and payables equal their control accounts.
+
+## 6. Credit notes and what Sales reads (added in Sprint 6)
+
+- **Credit notes** (`CreditNotePoster`): Sales gives the *debit* lines (revenue, VAT, SSCL, NBT given back); Finance adds the receivables credit tagged with the customer, posts the journal and records a **non-cash settlement** (`method = credit_note`, no bank account — the database allows a missing bank account only for that method). If an invoice is named the settlement is allocated to it (up to its open amount); any excess stays as credit on account and can be allocated later like a receipt. Numbers come from Sales (`CN/…`) and share the settlements' unique document-number space. A credit note is idempotent by source.
+- **`ReceivablePosition`**: what a customer owes (`outstanding` = open invoices less unallocated receipts and credits, never below zero), what is overdue, and the bank accounts flagged *show on invoices* (`bank_accounts.show_on_invoices`) for the printed invoice. Sales uses it for the credit-limit check.
+- **Accountant role** (seeded): every `finance.*` permission, read-only master data and stock, and `sales.view` + posting invoices/credit notes; authenticator (MFA) required like admins.

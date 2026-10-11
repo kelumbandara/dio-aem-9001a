@@ -57,6 +57,7 @@ class CoreServiceProvider extends ModuleServiceProvider
             'core.branch.delete',
             'core.module.manage',
             'core.audit.view',
+            'core.company.manage',
         ];
     }
 
@@ -65,6 +66,7 @@ class CoreServiceProvider extends ModuleServiceProvider
         return [
             new MenuItem('core::ui.menu.dashboard', 'dashboard', null, 'home', 10),
             new MenuItem('core::ui.menu.modules', 'modules.index', 'core.module.manage', 'puzzle', 900),
+            new MenuItem('core::ui.menu.company', 'company.edit', 'core.company.manage', 'building', 905),
             new MenuItem('core::ui.menu.audit_log', 'audit-log.index', 'core.audit.view', 'shield', 910),
         ];
     }

@@ -3,11 +3,12 @@
 AI-powered ERP and manual MES (IoT-ready) for Sri Lankan SMEs — manufacturing and trading.
 One shared codebase, independent deployment per customer (Coolify).
 
-**Status:** Sprint 5 (Finance: chart of accounts, fiscal periods, journals, automatic stock journals, receivables
-and payables, financial reports) complete and awaiting owner review — see
-[docs/handover/sprint-5.md](docs/handover/sprint-5.md); earlier handovers: [Sprint 4](docs/handover/sprint-4.md),
-[Sprint 3](docs/handover/sprint-3.md), [Sprint 2](docs/handover/sprint-2.md), [Sprint 1](docs/handover/sprint-1.md).
-Everything beyond Core, Approvals, Master Data, Inventory and Finance (sales, procurement, manufacturing, AI, mobile)
+**Status:** Sprint 6 (Sales: quotations, sales orders with credit-limit block and stock reservation, deliveries, tax
+invoices with VAT/SSCL/NBT, credit notes and returns) complete and awaiting owner review — see
+[docs/handover/sprint-6.md](docs/handover/sprint-6.md); earlier handovers: [Sprint 5](docs/handover/sprint-5.md),
+[Sprint 4](docs/handover/sprint-4.md), [Sprint 3](docs/handover/sprint-3.md), [Sprint 2](docs/handover/sprint-2.md),
+[Sprint 1](docs/handover/sprint-1.md).
+Everything beyond Core, Approvals, Master Data, Inventory, Finance and Sales (procurement, manufacturing, AI, mobile)
 is still design.
 
 ## Documentation
@@ -18,6 +19,7 @@ is still design.
 - What Master Data does today: [docs/architecture/masterdata.md](docs/architecture/masterdata.md)
 - What Inventory does today: [docs/architecture/inventory.md](docs/architecture/inventory.md)
 - What Finance does today: [docs/architecture/finance.md](docs/architecture/finance.md)
+- What Sales does today: [docs/architecture/sales.md](docs/architecture/sales.md)
 - Open decisions: [docs/architecture/decisions/0000-open-decisions.md](docs/architecture/decisions/0000-open-decisions.md)
 - Roadmap & sprint backlogs: [docs/development-roadmap.md](docs/development-roadmap.md)
 - Test strategy: [docs/test-strategy.md](docs/test-strategy.md)

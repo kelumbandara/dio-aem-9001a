@@ -71,4 +71,12 @@ final class Decimal
 
         return ($negative && bccomp($rounded, '0', $places) !== 0 ? '-' : '').$rounded;
     }
+
+    /** Drop trailing zeros of the fraction ("10.500000" -> "10.5", "10.000000" -> "10"): the form unit decimals are checked against. */
+    public static function trim(string $value): string
+    {
+        self::assert($value);
+
+        return str_contains($value, '.') ? rtrim(rtrim($value, '0'), '.') : $value;
+    }
 }

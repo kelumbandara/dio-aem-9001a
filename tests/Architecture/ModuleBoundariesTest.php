@@ -18,6 +18,18 @@ use App\Modules\Inventory\Models\StockBalance;
 use App\Modules\Inventory\Models\StockLedgerEntry;
 use App\Modules\MasterData\Approvals\PriceListPriceChange;
 use App\Modules\MasterData\Approvals\SupplierBankAccountChange;
+use App\Modules\Sales\Models\CreditNote;
+use App\Modules\Sales\Models\CreditNoteLine;
+use App\Modules\Sales\Models\CreditNoteTax;
+use App\Modules\Sales\Models\Delivery;
+use App\Modules\Sales\Models\DeliveryLine;
+use App\Modules\Sales\Models\Invoice;
+use App\Modules\Sales\Models\InvoiceLine;
+use App\Modules\Sales\Models\InvoiceTax;
+use App\Modules\Sales\Models\Order;
+use App\Modules\Sales\Models\OrderLine;
+use App\Modules\Sales\Models\Quotation;
+use App\Modules\Sales\Models\QuotationLine;
 use Illuminate\Database\Eloquent\Model;
 use Tests\Support\Approvals\FakePayment;
 use Tests\Support\ModuleBoundaryChecker;
@@ -109,3 +121,10 @@ arch('only Finance writes journals, receipts/payments and open items')
 arch('Finance never reads Inventory: it learns about stock only from events')
     ->expect('App\Modules\Finance')
     ->not->toUse('App\Modules\Inventory');
+
+arch('only Sales writes quotations, orders, deliveries, invoices and credit notes')
+    ->expect([
+        Quotation::class, QuotationLine::class, Order::class, OrderLine::class, Delivery::class, DeliveryLine::class,
+        Invoice::class, InvoiceLine::class, InvoiceTax::class, CreditNote::class, CreditNoteLine::class, CreditNoteTax::class,
+    ])
+    ->toOnlyBeUsedIn('App\Modules\Sales');

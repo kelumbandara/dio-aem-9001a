@@ -2,6 +2,7 @@
 
 use App\Modules\Core\Http\Controllers\Web\AttachmentController;
 use App\Modules\Core\Http\Controllers\Web\AuditLogController;
+use App\Modules\Core\Http\Controllers\Web\CompanyController;
 use App\Modules\Core\Http\Controllers\Web\DashboardController;
 use App\Modules\Core\Http\Controllers\Web\LocaleController;
 use App\Modules\Core\Http\Controllers\Web\LoginController;
@@ -30,6 +31,9 @@ Route::middleware('auth')->group(function () {
         Route::get('admin/modules', [ModuleController::class, 'index'])->name('modules.index');
         Route::post('admin/modules/{module}/enable', [ModuleController::class, 'enable'])->name('modules.enable');
         Route::post('admin/modules/{module}/disable', [ModuleController::class, 'disable'])->name('modules.disable');
+
+        Route::get('admin/company', [CompanyController::class, 'edit'])->name('company.edit');
+        Route::put('admin/company', [CompanyController::class, 'update'])->name('company.update');
 
         Route::get('admin/audit-log', [AuditLogController::class, 'index'])->name('audit-log.index');
 

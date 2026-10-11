@@ -32,10 +32,10 @@
 | `masterdata.item.changed` | MasterData | Inventory, Reporting cache |
 | `inventory.stock.moved` | Inventory (built S4; payload `document_id, document_no, type, item_ids, posting_date`) | Finance (valuation), Reporting |
 | `inventory.stock.below_reorder` | Inventory (built S4; once per crossing; payload `item_id, warehouse_id, available, min_qty, reorder_qty`) | Procurement (suggest requisition), Notifications, AI |
-| `sales.order.confirmed` | Sales | Inventory (reserve), Notifications |
-| `sales.delivery.posted` | Sales | Inventory (issue), Finance (COGS) |
-| `sales.invoice.posted` | Sales | Finance (AR journal + tax) |
-| `sales.return.posted` | Sales | Inventory, Finance |
+| `sales.order.confirmed` | Sales (built S6; payload `order_id, document_no, customer_id, gross_total`) | Notifications, Reporting |
+| `sales.delivery.posted` | Sales (built S6; `delivery_id, document_no, order_id, customer_id`) | Reporting (stock and COGS are posted synchronously in the same transaction, not by this event) |
+| `sales.invoice.posted` | Sales (built S6; `invoice_id, document_no, customer_id, gross_total`) | Reporting (the receivable and tax journal are posted synchronously through `OpenItemPoster`) |
+| `sales.credit_note.posted` | Sales (built S6; `credit_note_id, document_no, invoice_id, customer_id, gross_total`) | Reporting |
 | `procurement.po.approved` | Procurement | Communications (send to supplier, approval-gated) |
 | `procurement.goods.received` | Procurement | Inventory (stock in), Finance (GRNI) |
 | `procurement.supplier_invoice.posted` | Procurement | Finance (AP) |

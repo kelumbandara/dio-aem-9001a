@@ -59,6 +59,8 @@ deferred trigger), `bank_accounts` (encrypted number), `open_items` (customer in
 dimensions (branch/department/cost centre) on lines, separate `ar_invoices`/`ap_bills` tables.
 
 ### Sales
+Built in S6 (columns and rules: [sales.md](sales.md)): `sales_quotations`(+`_lines`), `sales_orders`(+`_lines`: delivered/invoiced quantities and reservation id), `sales_deliveries`(+`_lines`), `sales_invoices`(+`_lines`, `sales_invoice_taxes`), `sales_credit_notes`(+`_lines`, `sales_credit_note_taxes`). Not built: `leads`, `customer_activities`, `discount_rules`. Original sketch:
+
 `leads`, `customer_activities`, `quotations`(+lines), `sales_orders`(+lines), `deliveries`(+lines),
 `sales_invoices`(+lines), `sales_returns`(+lines), `discount_rules`.
 
@@ -148,6 +150,12 @@ New immutability triggers (S4): `stock_ledger` and `stock_document_lines` are ap
 Finance adds only new tables. New immutability triggers: `journal_lines` and `settlement_allocations` are append-only; `journal_entries` may only
 change `status`/`reversed_by_id`; `settlements` may only change `status`; `fiscal_periods` rows cannot change once `locked`. A deferred constraint
 trigger checks every journal balances when the transaction commits.
+
+## 3e. Sprint 6 notes
+
+Sales adds only new tables (`sales_*`) plus, in Finance, `bank_accounts.show_on_invoices` and a relaxed `settlements` rule (`method = 'credit_note'` has no bank
+account; every other method must). New immutability triggers: posted invoices, credit notes (with their lines and tax rows) and delivery lines reject UPDATE and
+DELETE; deliveries may only change `status`/`reversal_document_id` (no delete). Order lines carry `qty_delivered`/`qty_invoiced` with CHECKs (never above the ordered quantity).
 
 ## 4. Migration policy
 

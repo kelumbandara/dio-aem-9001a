@@ -140,6 +140,7 @@ describe('journals from stock movements', function () {
     });
 
     it('leaves stock alone when accounting is switched off', function () {
+        app(ModuleRegistry::class)->disable('sales');
         app(ModuleRegistry::class)->disable('finance');
         invReceive($this->item, $this->wh, '5', '10');
 
