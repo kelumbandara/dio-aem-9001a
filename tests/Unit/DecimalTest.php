@@ -1,6 +1,6 @@
 <?php
 
-use App\Modules\MasterData\Support\Decimal;
+use App\Support\Decimal;
 
 it('rounds half away from zero', function (string $in, int $places, string $out) {
     expect(Decimal::round($in, $places))->toBe($out);
@@ -24,4 +24,9 @@ it('refuses anything that is not a plain decimal string', function (string $bad)
 
 it('refuses to divide by zero', function () {
     expect(fn () => Decimal::div('1', '0.000'))->toThrow(InvalidArgumentException::class);
+});
+
+it('accepts whole numbers only when zero decimal places are allowed', function () {
+    expect(Decimal::isDecimal('12', 0))->toBeTrue()->and(Decimal::isDecimal('12.0', 0))->toBeFalse()
+        ->and(Decimal::isDecimal('-3', 0))->toBeTrue()->and(Decimal::isDecimal('1.5', 1))->toBeTrue()->and(Decimal::isDecimal('1.55', 1))->toBeFalse();
 });

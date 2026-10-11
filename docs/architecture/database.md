@@ -44,11 +44,11 @@ number encrypted), `items`, `item_categories`, `item_uoms` (conversion), `units_
 Not built: `item_variants` (post-MVP). Approval payloads (`approval_requests.payload`) are encrypted text since S3.
 
 ### Inventory
-`warehouses`, `locations`, `lots` (batch no, expiry, item), `stock_ledger` (immutable: item, location,
-lot, qty_in/out, unit_cost, value, source_type/id, posting_date, reverses_id),
-`stock_balances` (item, location, lot → on_hand, reserved; CHECK on_hand ≥ 0 unless allowed),
-`stock_reservations`, `stock_transfers` (+lines), `stock_adjustments` (+lines),
-`stock_counts` (post-MVP), `reorder_rules`, `inventory_valuation_layers` (FIFO/avg cost).
+Built in S4 (columns and rules: [inventory.md](inventory.md)): `warehouses`, `locations`, `lots`, `stock_documents` +
+`stock_document_lines` (one typed table instead of separate transfer/adjustment tables), `stock_ledger` (immutable; signed
+qty and value, `reverses_id`), `stock_balances` (CHECK on_hand ≥ 0, always — no "allow negative" flag), `item_costs`
+(weighted-average quantity and value per item, the per-item posting lock), `stock_reservations` (reserved is computed,
+not stored on balances), `reorder_rules`. Not built: `stock_counts` (post-MVP), `inventory_valuation_layers` (FIFO is post-MVP; average cost is used).
 
 ### Finance
 `accounts` (chart, type, parent), `fiscal_years`, `fiscal_periods` (open/closed/locked),
@@ -135,6 +135,12 @@ API or screens yet (shell, as in the roadmap). `company_profile` is constrained 
 | `approval_decisions` | append-only (trigger on PostgreSQL), stores `payload_hash`, `on_behalf_of`, channel, IP | |
 | `approval_delegations` | time-boxed (CHECK `ends_at > starts_at`, delegator ≠ delegate), optional `action_key`, `revoked_at` | max length `approvals.delegation_max_days` (90) |
 | `approval_executions` | one row per attempt, append-only; partial unique index allows one `succeeded` per request (PostgreSQL) | retry history |
+
+## 3c. Sprint 3 and 4 notes
+
+Master Data (S3) and Inventory (S4) tables are described in [masterdata.md](masterdata.md) and [inventory.md](inventory.md).
+Both add only new tables; the one change to an existing table is that `approval_requests.payload` became encrypted text (S3).
+New immutability triggers (S4): `stock_ledger` and `stock_document_lines` are append-only; `stock_documents` rows may only change `status`/`reversed_by_id`.
 
 ## 4. Migration policy
 

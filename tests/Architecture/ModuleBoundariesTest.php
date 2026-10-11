@@ -5,6 +5,10 @@ use App\Modules\Approvals\Contracts\Approvable;
 use App\Modules\Approvals\Demo\DemoExpense;
 use App\Modules\Approvals\DTOs\ExecutionToken;
 use App\Modules\Approvals\Jobs\ExecuteApprovedRequestJob;
+use App\Modules\Inventory\Approvals\StockAdjustmentPost;
+use App\Modules\Inventory\Models\ItemCost;
+use App\Modules\Inventory\Models\StockBalance;
+use App\Modules\Inventory\Models\StockLedgerEntry;
 use App\Modules\MasterData\Approvals\PriceListPriceChange;
 use App\Modules\MasterData\Approvals\SupplierBankAccountChange;
 use Illuminate\Database\Eloquent\Model;
@@ -64,6 +68,7 @@ arch('an approved action can only be executed through the approval engine')
         DemoExpense::class,   // local-only demo action that implements Approvable
         PriceListPriceChange::class,         // real approvable actions (Master Data); each only
         SupplierBankAccountChange::class,    // implements Approvable::execute(), the engine supplies the token
+        StockAdjustmentPost::class,          // Inventory's approval-gated adjustment, same pattern
     ]);
 arch('approvals are never executed from controllers or commands')
     ->expect(ExecuteApprovedRequest::class)
@@ -73,3 +78,11 @@ arch('approvables are interfaces, payload hashing never sees floats')
 arch('actions and services do not depend on controllers')
     ->expect(['App\Modules\Core\Actions', 'App\Modules\Core\Services'])
     ->not->toUse('App\Modules\Core\Http\Controllers');
+
+arch('only Inventory writes the stock ledger, balances and item costs')
+    ->expect([
+        StockLedgerEntry::class,
+        StockBalance::class,
+        ItemCost::class,
+    ])
+    ->toOnlyBeUsedIn('App\Modules\Inventory');

@@ -1,5 +1,7 @@
 <?php
 
+use App\Modules\Core\Contracts\BranchDirectory;
+use App\Modules\Core\Models\Branch;
 use App\Modules\MasterData\Actions\Reference\AddTaxRate;
 use App\Modules\MasterData\Actions\Reference\SaveExchangeRate;
 use App\Modules\MasterData\Actions\SaveCustomer;
@@ -283,4 +285,33 @@ describe('directories for other modules', function () {
         failsWith('masterdata.customer_inactive', fn () => $directory->requireActiveCustomer($customer->id));
         failsWith('masterdata.supplier_not_found', fn () => $directory->requireActiveSupplier(999999));
     });
+});
+
+describe('item catalog lookups used by Inventory', function () {
+    it('finds many items at once, lists an item\'s units, and searches', function () {
+        $a = mdItem(['name' => 'Cotton Fabric', 'base_uom' => 'M', 'barcode' => '8881', 'uoms' => [['uom' => 'CM', 'factor' => '0.01', 'for_sale' => false]]]);
+        $b = mdItem(['name' => 'Steel Bolt']);
+        $catalog = app(ItemCatalog::class);
+
+        expect(array_keys($catalog->findMany([$a->id, $b->id, 999999])))->toBe([$a->id, $b->id]);
+
+        $units = $catalog->units($a->id);
+        expect(collect($units)->pluck('code')->all())->toBe(['M', 'CM'])
+            ->and($units[0]->isBase)->toBeTrue()->and($units[0]->factor)->toBe('1')->and($units[0]->decimals)->toBe(3)
+            ->and($units[1]->factor)->toBe('0.010000')->and($units[1]->forSale)->toBeFalse()->and($catalog->units(999999))->toBe([]);
+
+        expect(array_keys($catalog->search('fabric')))->toBe([$a->id])->and(array_keys($catalog->search('8881')))->toBe([$a->id])
+            ->and(array_keys($catalog->search('')))->toContain($a->id, $b->id)->and($catalog->search('no such thing'))->toBe([])
+            ->and($catalog->search('%'))->toBe([]);   // wildcards are text, not patterns
+    });
+});
+
+it('knows the active branches by code, for modules above Core', function () {
+    $col = Branch::factory()->create(['code' => 'COL', 'name' => 'Colombo', 'is_active' => true]);
+    $old = Branch::factory()->create(['code' => 'OLD', 'name' => 'Closed', 'is_active' => false]);
+    $directory = app(BranchDirectory::class);
+
+    expect($directory->idByCode('col'))->toBe($col->id)->and($directory->idByCode('OLD'))->toBeNull()->and($directory->idByCode('NOPE'))->toBeNull()
+        ->and($directory->labels([$col->id, $old->id]))->toBe([$col->id => 'COL — Colombo', $old->id => 'OLD — Closed'])
+        ->and($directory->active())->toHaveKey($col->id)->not->toHaveKey($old->id);
 });

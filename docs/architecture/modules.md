@@ -7,7 +7,7 @@
 | 1 | **Core** | Company, branches, departments, users, employees, roles/permissions, settings, numbering, attachments, audit, notifications, module config, idempotency | MVP S1 |
 | 2 | **Approvals** | Approval policies, requests, steps, delegation, execution status | MVP S2 |
 | 3 | **MasterData** | Customers, suppliers (incl. bank accounts), items, UoM, categories, currencies and exchange rates, tax codes and rates, payment terms, price lists; CSV import ([detail](masterdata.md)) | MVP S3 |
-| 4 | **Inventory** | Warehouses/locations, stock ledger, balances, lots, reservations, transfers, adjustments, reorder | MVP |
+| 4 | **Inventory** | Warehouses/locations, stock ledger, balances, lots, reservations, transfers, adjustments, reorder, weighted-average cost ([detail](inventory.md)) | MVP S4 |
 | 5 | **Finance** | Chart of accounts, periods, journals, AR, AP, receipts, payments, reports | MVP |
 | 6 | **Sales** | Leads, activities, quotations, sales orders, invoices, deliveries, returns | MVP |
 | 7 | **Procurement** | Requisitions, POs, goods receipts, supplier invoice linkage, returns | MVP |

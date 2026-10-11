@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Modules\MasterData\Support;
+namespace App\Support;
 
 use InvalidArgumentException;
 
@@ -14,7 +14,9 @@ final class Decimal
 
     public static function isDecimal(string $value, int $maxPlaces = 6): bool
     {
-        return preg_match('/^-?\d{1,18}(\.\d{1,'.$maxPlaces.'})?$/', $value) === 1;
+        $fraction = $maxPlaces > 0 ? '(\.\d{1,'.$maxPlaces.'})?' : '';
+
+        return preg_match('/^-?\d{1,18}'.$fraction.'$/', $value) === 1;
     }
 
     public static function assert(string $value): string

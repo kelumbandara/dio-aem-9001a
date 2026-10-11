@@ -36,6 +36,7 @@ describe('permissions', function () {
     });
 
     it('is unavailable when the module is switched off', function () {
+        app(ModuleRegistry::class)->disable('inventory');   // it depends on Master Data
         app(ModuleRegistry::class)->disable('masterdata');
 
         asApi(masterDataUser())->getJson('/api/v1/items')->assertForbidden()->assertJsonPath('error.code', 'core.module_disabled');

@@ -20,8 +20,8 @@ bank reconciliation import, Maintenance module, pgvector RAG.
 | **0 Architecture** (now) | These docs; owner review; env setup (PHP 8.3, PostgreSQL) |
 | **S1 Foundation** (done, pending review: [handover](handover/sprint-1.md)) | Laravel 13 scaffold, module skeleton + arch tests, auth (Sanctum, MFA hooks), company/branches/departments/warehouses shell, users vs employees, roles/permissions, settings, numbering, audit log, module toggles, API v1 base + error format, i18n (en/si/ta) shell, Blade layout/components, Pest + CI |
 | **S2 Approvals + Notifications + Attachments** (done, pending review: [handover](handover/sprint-2.md)) | Approval engine, authority matrix, notifications, secure uploads, queue/Horizon, scheduler |
-| **S3 Master Data** (done, pending review: [handover](handover/sprint-3.md)) | Items, UoM, categories, customers, suppliers, currencies, tax codes (LKR/VAT/SSCL/NBT seed), price lists |
-| **S4 Inventory** | Ledger, balances, lots, receive/issue, transfers, adjustments, reservations, reorder, negative-stock guard + reconciliation tests |
+| **S3 Master Data** (done: [handover](handover/sprint-3.md)) | Items, UoM, categories, customers, suppliers, currencies, tax codes (LKR/VAT/SSCL/NBT seed), price lists |
+| **S4 Inventory** (done, pending review: [handover](handover/sprint-4.md)) | Ledger, balances, lots, receive/issue, transfers, adjustments, reservations, reorder, negative-stock guard + reconciliation tests |
 | **S5 Finance** | CoA, periods, journals, posting rules, AR/AP, receipts, payments, TB, GL, statements + balance tests |
 | **S6 Sales** | Leads → quotation → SO → delivery → invoice → returns |
 | **S7 Procurement** | Requisition → PO → GRN → supplier invoice → returns |

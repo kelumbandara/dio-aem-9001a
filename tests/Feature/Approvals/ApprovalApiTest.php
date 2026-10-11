@@ -191,9 +191,10 @@ describe('delegations', function () {
 
 it('keeps the module switchable: a disabled Approvals module blocks its API', function () {
     $modules = app(ModuleRegistry::class);
-    expect(fn () => $modules->disable('approvals'))->toThrow(ModuleException::class, 'still required by masterdata');
+    expect(fn () => $modules->disable('approvals'))->toThrow(ModuleException::class, 'still required by');
 
-    $modules->disable('masterdata');   // dependents first
+    $modules->disable('inventory');    // dependents first
+    $modules->disable('masterdata');
     $modules->disable('approvals');
 
     asApi($this->approver)->getJson('/api/v1/approvals')->assertForbidden()->assertJsonPath('error.code', 'core.module_disabled');

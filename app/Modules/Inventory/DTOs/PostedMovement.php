@@ -1,0 +1,15 @@
+<?php
+
+namespace App\Modules\Inventory\DTOs;
+
+final readonly class PostedMovement
+{
+    public function __construct(
+        public int $documentId,
+        public string $publicId,
+        public string $documentNo,
+        public string $totalValue,   // LKR, sum of the absolute line values
+        public int $lineCount,
+        public bool $replayed,       // true when the source had already been posted and nothing new happened
+    ) {}
+}

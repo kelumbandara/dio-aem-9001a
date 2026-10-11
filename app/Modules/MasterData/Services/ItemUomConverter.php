@@ -7,7 +7,7 @@ use App\Modules\MasterData\Exceptions\MasterDataException;
 use App\Modules\MasterData\Models\Item;
 use App\Modules\MasterData\Models\ItemUom;
 use App\Modules\MasterData\Models\UnitOfMeasure;
-use App\Modules\MasterData\Support\Decimal;
+use App\Support\Decimal;
 
 final class ItemUomConverter implements UomConverter
 {

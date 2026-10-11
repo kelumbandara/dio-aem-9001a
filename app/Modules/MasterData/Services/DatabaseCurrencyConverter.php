@@ -6,7 +6,7 @@ use App\Modules\MasterData\Contracts\CurrencyConverter;
 use App\Modules\MasterData\Exceptions\MasterDataException;
 use App\Modules\MasterData\Models\Currency;
 use App\Modules\MasterData\Models\ExchangeRate;
-use App\Modules\MasterData\Support\Decimal;
+use App\Support\Decimal;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 

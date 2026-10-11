@@ -106,6 +106,15 @@ Master Data commands (S3):
 | `php artisan db:seed` | roles/permissions plus starter reference data (units, LKR/USD/EUR/GBP/INR, payment terms, VAT 18 %); safe to re-run |
 | `php artisan masterdata:import items\|customers\|suppliers file.csv [--check]` | CSV import, all or nothing; `--check` saves nothing |
 
+Inventory commands (S4):
+
+| Command | Purpose |
+|---|---|
+| `php artisan inventory:reconcile` | proves stock balances, average costs and document totals equal the ledger; exit 1 on any difference (scheduled daily 02:30) |
+
+The full test run takes about six minutes (it includes real-process concurrency tests); Composer's script timeout is 20 minutes.
+For a quicker loop run a folder: `vendor/bin/pest tests/Feature/Inventory`.
+
 ## 5. Troubleshooting
 
 - `Your Composer dependencies require a PHP version ">= 8.3"`: the terminal is using XAMPP's PHP;

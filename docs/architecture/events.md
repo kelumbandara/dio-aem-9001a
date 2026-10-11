@@ -30,8 +30,8 @@
 | `core.user.created/deactivated` | Core | AI, Communications |
 | `approval.requested/approved/rejected/expired/executed` | Approvals | Notifications, originating module, AI |
 | `masterdata.item.changed` | MasterData | Inventory, Reporting cache |
-| `inventory.stock.moved` | Inventory | Finance (valuation), Reporting, reorder check |
-| `inventory.stock.below_reorder` | Inventory | Procurement (suggest requisition), Notifications, AI |
+| `inventory.stock.moved` | Inventory (built S4; payload `document_id, document_no, type, item_ids, posting_date`) | Finance (valuation), Reporting |
+| `inventory.stock.below_reorder` | Inventory (built S4; once per crossing; payload `item_id, warehouse_id, available, min_qty, reorder_qty`) | Procurement (suggest requisition), Notifications, AI |
 | `sales.order.confirmed` | Sales | Inventory (reserve), Notifications |
 | `sales.delivery.posted` | Sales | Inventory (issue), Finance (COGS) |
 | `sales.invoice.posted` | Sales | Finance (AR journal + tax) |

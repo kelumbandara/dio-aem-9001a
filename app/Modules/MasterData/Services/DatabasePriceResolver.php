@@ -10,7 +10,7 @@ use App\Modules\MasterData\Models\ItemUom;
 use App\Modules\MasterData\Models\PriceList;
 use App\Modules\MasterData\Models\PriceListItem;
 use App\Modules\MasterData\Models\Supplier;
-use App\Modules\MasterData\Support\Decimal;
+use App\Support\Decimal;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 

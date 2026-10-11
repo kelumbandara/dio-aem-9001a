@@ -43,6 +43,15 @@
         @case('database')
             <ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>
             @break
+        @case('archive')
+            <path d="M3 4h18v4H3zM5 8v12h14V8M10 12h4"/>
+            @break
+        @case('swap')
+            <path d="M7 4L3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/>
+            @break
+        @case('clock')
+            <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>
+            @break
         @case('upload')
             <path d="M12 16V4M7 9l5-5 5 5M4 20h16"/>
             @break

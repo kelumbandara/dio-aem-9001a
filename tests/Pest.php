@@ -8,6 +8,13 @@ use App\Modules\Approvals\Models\ApprovalRequest;
 use App\Modules\Core\Database\Seeders\RolesAndPermissionsSeeder;
 use App\Modules\Core\Models\MfaSecret;
 use App\Modules\Core\Models\User;
+use App\Modules\Inventory\Actions\SaveWarehouse;
+use App\Modules\Inventory\Contracts\StockAvailability;
+use App\Modules\Inventory\Contracts\StockPoster;
+use App\Modules\Inventory\DTOs\PostedMovement;
+use App\Modules\Inventory\DTOs\StockLine;
+use App\Modules\Inventory\DTOs\StockMovement;
+use App\Modules\Inventory\Models\Warehouse;
 use App\Modules\MasterData\Actions\ApplyPriceChanges;
 use App\Modules\MasterData\Actions\SaveItem;
 use App\Modules\MasterData\Actions\SavePriceList;
@@ -16,6 +23,7 @@ use App\Modules\MasterData\Models\Item;
 use App\Modules\MasterData\Models\PriceList;
 use App\Modules\MasterData\Support\InputMapper;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\Sanctum;
 use PragmaRX\Google2FA\Google2FA;
@@ -181,4 +189,63 @@ function asApi(User $user)
 function idemKey(): array
 {
     return ['Idempotency-Key' => (string) Str::uuid()];
+}
+
+/** @param array<string, mixed> $overrides */
+function invWarehouse(array $overrides = []): Warehouse
+{
+    static $n = 0;
+    $n++;
+
+    return app(SaveWarehouse::class)(array_merge(['code' => "WH{$n}", 'name' => "Warehouse {$n}"], $overrides));
+}
+
+/** A stock line for a master-data item (quantities as strings). @param array<string, mixed> $o StockLine fields */
+function invLine(Item $item, string $qty, array $o = []): StockLine
+{
+    return new StockLine(...array_merge(['itemId' => $item->id, 'qty' => $qty], $o));
+}
+
+/**
+ * Post a movement straight through the poster (no permission or approval layer).
+ *
+ * @param  list<StockLine>  $lines
+ * @param  array<string, mixed>  $o  StockMovement fields except type/lines
+ */
+function invPost(string $type, array $lines, array $o = []): PostedMovement
+{
+    $reason = ['receipt' => 'purchase', 'issue' => 'sale', 'transfer' => 'transfer', 'adjustment' => 'count'][$type];
+
+    return app(StockPoster::class)->post(new StockMovement(...array_merge([
+        'type' => $type, 'postingDate' => now('Asia/Colombo')->toDateString(), 'reason' => $reason, 'lines' => $lines,
+    ], $o)));
+}
+
+/** Receive $qty of an item into a warehouse at $cost per base unit. */
+function invReceive(Item $item, Warehouse $wh, string $qty, string $cost, array $o = []): PostedMovement
+{
+    return invPost('receipt', [invLine($item, $qty, ['warehouseId' => $wh->id, 'unitCost' => $cost] + ($o['line'] ?? []))], Arr::except($o, 'line'));
+}
+
+/** Current on-hand of an item in a warehouse, base units. */
+function invOnHand(Item $item, ?Warehouse $wh = null): string
+{
+    return app(StockAvailability::class)->level($item->id, $wh?->id)->onHand;
+}
+
+function invUser(string ...$extra): User
+{
+    return userWithPermissions(...[
+        'inventory.warehouse.view', 'inventory.warehouse.manage', 'inventory.stock.view', 'inventory.receive', 'inventory.issue',
+        'inventory.transfer', 'inventory.adjust', 'inventory.reverse', 'inventory.reorder.manage', ...$extra,
+    ]);
+}
+
+/** @param array<string, mixed> $line @param array<string, mixed> $o */
+function docPayload(string $type, array $line, array $o = []): array
+{
+    return array_merge([
+        'type' => $type, 'reason' => ['receipt' => 'purchase', 'issue' => 'sale', 'transfer' => 'transfer', 'adjustment' => 'count'][$type],
+        'lines' => [$line],
+    ], $o);
 }

@@ -2,6 +2,7 @@
 
 use App\Modules\Approvals\ApprovalsServiceProvider;
 use App\Modules\Core\CoreServiceProvider;
+use App\Modules\Inventory\InventoryServiceProvider;
 use App\Modules\MasterData\MasterDataServiceProvider;
 
 /*
@@ -38,6 +39,13 @@ return [
             'name' => 'Master Data',
             'provider' => MasterDataServiceProvider::class,
             'depends_on' => ['core', 'approvals'],
+            'enabled' => true,
+            'required' => false,
+        ],
+        'inventory' => [
+            'name' => 'Inventory',
+            'provider' => InventoryServiceProvider::class,
+            'depends_on' => ['core', 'approvals', 'masterdata'],
             'enabled' => true,
             'required' => false,
         ],

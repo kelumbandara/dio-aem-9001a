@@ -120,8 +120,8 @@ it('manages modules from the admin page', function () {
     $this->actingAs(userWithPermissions('core.branch.view'))->post('/admin/modules/finance/disable')->assertForbidden();
 });
 
-it('registers Core and Approvals', function () {
+it('registers the shipped modules, each below the ones that use it', function () {
     $keys = array_keys(config('modules.modules'));
 
-    expect($keys)->toBe(['core', 'approvals', 'masterdata']);
+    expect($keys)->toBe(['core', 'approvals', 'masterdata', 'inventory']);
 });

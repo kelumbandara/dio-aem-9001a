@@ -7,7 +7,7 @@ use App\Modules\MasterData\DTOs\TaxResult;
 use App\Modules\MasterData\Exceptions\MasterDataException;
 use App\Modules\MasterData\Models\TaxCode;
 use App\Modules\MasterData\Models\TaxRate;
-use App\Modules\MasterData\Support\Decimal;
+use App\Support\Decimal;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 

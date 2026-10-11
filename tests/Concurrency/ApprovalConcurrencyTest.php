@@ -90,7 +90,6 @@ it('records exactly one decision when the same approval is submitted many times 
 
     $ok = array_keys($results, 'ok');
     expect($ok)->toHaveCount(1)
-        ->and(array_unique(array_diff($results, ['ok'])))->toBe(array_values(array_unique(array_diff($results, ['ok']))))
         ->and(array_diff($results, ['ok']))->each->toBe('err:approvals.not_pending')
         ->and(ApprovalDecision::where('request_id', $request->id)->count())->toBe(1)
         ->and(OutboxEvent::where('event_type', 'test.payment_released')->count())->toBe(1)
