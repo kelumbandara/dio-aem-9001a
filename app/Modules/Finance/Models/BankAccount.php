@@ -20,17 +20,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $account_no
  * @property string $currency
  * @property bool $is_active
+ * @property bool $show_on_invoices
  */
 #[RouteKey('public_id')]
 #[Hidden(['account_no'])]
-#[Fillable(['account_id', 'name', 'kind', 'bank_name', 'account_no', 'currency', 'is_active'])]
+#[Fillable(['account_id', 'name', 'kind', 'bank_name', 'account_no', 'currency', 'is_active', 'show_on_invoices'])]
 class BankAccount extends Model
 {
     use Auditable, HasPublicId;
 
     protected function casts(): array
     {
-        return ['account_no' => 'encrypted', 'is_active' => 'boolean'];
+        return ['account_no' => 'encrypted', 'is_active' => 'boolean', 'show_on_invoices' => 'boolean'];
     }
 
     /** @return BelongsTo<Account, $this> */

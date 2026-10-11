@@ -92,7 +92,7 @@ it('has an idempotent seeder', function () {
     $this->seed(RolesAndPermissionsSeeder::class);
     $this->seed(RolesAndPermissionsSeeder::class);
 
-    expect(Role::count())->toBe(3);
+    expect(Role::count())->toBe(4);   // super-admin, admin, accountant, user
 });
 
 it('only seeds the demo admin in local or testing environments', function () {
@@ -104,4 +104,14 @@ it('only seeds the demo admin in local or testing environments', function () {
     $this->app['env'] = 'production';
     (new DemoAdminSeeder)->run();
     expect(User::where('email', 'admin@dio.test')->exists())->toBeFalse();
+});
+
+it('gives the accountant Finance in full, read access to what Finance reports on, and nothing else', function () {
+    $granted = Role::findByName('accountant', 'web')->permissions->pluck('name');
+    $finance = collect(app(ModuleRegistry::class)->permissions(onlyEnabled: false))->filter(fn ($p) => str_starts_with($p, 'finance.'));
+
+    expect($finance->diff($granted)->all())->toBe([])
+        ->and($granted->contains('finance.period.lock'))->toBeTrue()->and($granted->contains('inventory.stock.view'))->toBeTrue()->and($granted->contains('masterdata.customer.view'))->toBeTrue()
+        ->and($granted->contains('inventory.adjust'))->toBeFalse()->and($granted->contains('masterdata.item.manage'))->toBeFalse()
+        ->and(config('core.mfa.required_roles'))->toContain('accountant');
 });

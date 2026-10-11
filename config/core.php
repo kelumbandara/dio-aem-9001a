@@ -42,7 +42,7 @@ return [
     'mfa' => [
         'issuer' => env('MFA_ISSUER', 'DIO ERP'),
         // Users holding any of these roles must enrol TOTP before using the system.
-        'required_roles' => ['super-admin', 'admin'],
+        'required_roles' => ['super-admin', 'admin', 'accountant'],
         'recovery_code_count' => 8,
     ],
 

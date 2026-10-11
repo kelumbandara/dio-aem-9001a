@@ -41,6 +41,7 @@ final class SaveBankAccount
                 'bank_name' => array_key_exists('bank_name', $data) ? $data['bank_name'] : $bank->bank_name,
                 'account_no' => array_key_exists('account_no', $data) ? $data['account_no'] : $bank->account_no,
                 'is_active' => (bool) ($data['is_active'] ?? $bank->is_active ?? true),
+                'show_on_invoices' => (bool) ($data['show_on_invoices'] ?? $bank->show_on_invoices ?? false),
             ])->save();
 
             return $bank->refresh();
