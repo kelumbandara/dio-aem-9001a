@@ -67,3 +67,19 @@ export function screenFor(path: string | null): string | null {
 
   return null;
 }
+
+/**
+ * The server address as the app needs it: only the scheme, host and port. People paste whole links (".../api/v1/health"); the path
+ * is dropped. Returns null when it is not an http(s) address.
+ */
+export function normalizeServerUrl(input: string): string | null {
+  const text = input.trim();
+  if (!/^https?:\/\/[^\s/]+/i.test(text)) return null;
+  try {
+    const u = new URL(text);
+
+    return u.protocol === 'http:' || u.protocol === 'https:' ? u.origin : null;
+  } catch {
+    return null;
+  }
+}
