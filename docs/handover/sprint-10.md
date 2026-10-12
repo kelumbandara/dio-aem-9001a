@@ -37,10 +37,10 @@ What the tests prove beyond "it runs":
 
 http://127.0.0.1:8000 → sidebar **Reports → Dashboards** (admin sees all seven; other demo users only theirs).
 
-## 5. Decisions for you
+## 5. Your answers (2026-10-12)
 
-1. Should **managers** see the Owner overview? Today only admins hold `reporting.executive`; it can be given to any role.
-2. Are the headline numbers on the Owner overview the right ones (list in the architecture note §1)?
+1. **Admin only** sees the Owner overview (as built; the permission can be given to other roles later).
+2. The Owner overview's headline numbers are **right** as built.
 
 Still open from before: purchase-order approval amounts, Horizon vs plain worker, ClamAV, whether GitHub Actions is green, the billing project's GitHub address.
 
