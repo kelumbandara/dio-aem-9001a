@@ -35,6 +35,11 @@ final class StockDocumentPolicy
 
     public function reverse(Authorizable $user, StockDocument $document): bool
     {
+        // Stock that went into a production order is taken back with a material return there, which keeps the order's books right.
+        if (str_starts_with((string) $document->source_type, 'production_')) {
+            return false;
+        }
+
         return $user->can('inventory.reverse') && $this->post($user, $document->doc_type);
     }
 }

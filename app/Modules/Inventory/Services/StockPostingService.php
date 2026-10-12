@@ -143,7 +143,11 @@ final class StockPostingService implements StockPoster
         if ($m->sourceType !== null && $m->sourceId !== null) {
             $existing = StockDocument::query()->where('source_type', $m->sourceType)->where('source_id', $m->sourceId)->where('doc_type', $m->type)->first();
             if ($existing !== null) {
-                return new PostedMovement($existing->id, $existing->public_id, $existing->document_no, $existing->total_value, $existing->lines()->count(), true);
+                $replayLines = $existing->lines()->orderBy('line_no')->get()->map(fn ($l) => [
+                    'itemId' => (int) $l->item_id, 'baseQty' => ltrim((string) $l->base_qty, '-'), 'value' => ltrim((string) $l->value, '-'), 'lotId' => $l->lot_id === null ? null : (int) $l->lot_id, 'lineIdx' => null,
+                ])->all();
+
+                return new PostedMovement($existing->id, $existing->public_id, $existing->document_no, $existing->total_value, $existing->lines()->count(), true, $replayLines);
             }
         }
 
@@ -671,6 +675,11 @@ final class StockPostingService implements StockPoster
         ], 'stock_document', $doc->id);
         $this->reorder->announceCrossings($before, $itemIds);
 
-        return new PostedMovement($doc->id, $doc->public_id, $doc->document_no, $doc->total_value, count($slices), false);
+        $posted = array_map(fn (array $s) => [
+            'itemId' => (int) $s['item'], 'baseQty' => ltrim((string) $s['base'], '-'), 'value' => ltrim((string) $s['value'], '-'),
+            'lotId' => ($s['lotId'] ?? null) === null ? null : (int) $s['lotId'], 'lineIdx' => $s['lineIdx'] ?? null,
+        ], $slices);
+
+        return new PostedMovement($doc->id, $doc->public_id, $doc->document_no, $doc->total_value, count($slices), false, $posted);
     }
 }

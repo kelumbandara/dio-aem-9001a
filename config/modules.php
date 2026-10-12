@@ -5,6 +5,7 @@ use App\Modules\Core\CoreServiceProvider;
 use App\Modules\Finance\FinanceServiceProvider;
 use App\Modules\Inventory\InventoryServiceProvider;
 use App\Modules\Licensing\LicensingServiceProvider;
+use App\Modules\Manufacturing\ManufacturingServiceProvider;
 use App\Modules\MasterData\MasterDataServiceProvider;
 use App\Modules\Procurement\ProcurementServiceProvider;
 use App\Modules\Sales\SalesServiceProvider;
@@ -78,6 +79,13 @@ return [
             'name' => 'Sales',
             'provider' => SalesServiceProvider::class,
             'depends_on' => ['core', 'approvals', 'masterdata', 'inventory', 'finance'],
+            'enabled' => true,
+            'required' => false,
+        ],
+        'manufacturing' => [
+            'name' => 'Manufacturing',
+            'provider' => ManufacturingServiceProvider::class,
+            'depends_on' => ['core', 'approvals', 'masterdata', 'inventory'],
             'enabled' => true,
             'required' => false,
         ],

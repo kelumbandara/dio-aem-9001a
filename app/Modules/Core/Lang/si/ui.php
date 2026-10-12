@@ -9,6 +9,7 @@ return [
         'approvals' => 'අනුමැතිය',
         'sales' => 'විකුණුම්',
         'purchasing' => 'මිලදී ගැනීම්',
+        'manufacturing' => 'නිෂ්පාදනය',
         'inventory' => 'තොග',
         'finance' => 'මූල්‍ය',
         'masterdata' => 'ප්‍රධාන දත්ත',

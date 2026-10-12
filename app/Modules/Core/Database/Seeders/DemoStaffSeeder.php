@@ -28,6 +28,7 @@ class DemoStaffSeeder extends Seeder
             ['approver@dio.test', 'Demo Approver', 'finance-approver'],
             ['approver2@dio.test', 'Demo Approver Two', 'finance-approver'],
             ['purchasing@dio.test', 'Demo Purchase Approver', 'purchase-approver'],
+            ['production@dio.test', 'Demo Production Planner', 'production'],
         ] as [$email, $name, $role]) {
             Role::findOrCreate($role, 'web');
 

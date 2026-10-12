@@ -8,6 +8,7 @@ return [
         'approvals' => 'Approvals',
         'sales' => 'Sales',
         'purchasing' => 'Purchasing',
+        'manufacturing' => 'Manufacturing',
         'inventory' => 'Inventory',
         'finance' => 'Finance',
         'masterdata' => 'Master data',

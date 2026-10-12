@@ -110,4 +110,5 @@ Stock on hand (filters, item card with where-it-is and recent movements), Stock 
 
 ## Reasons added for other modules
 
+- Issue and receipt reason `production` (Manufacturing, materials issued to / returned from a production order): Finance books them against work in progress (1105). `PostedMovement::lines` now lists each posted stock line (item, base quantity, value, lot) so a caller can record the cost of what it moved; a stock document whose source is a production issue/return cannot be reversed from the stock screens or API.
 - Issue reason `supplier_return` (Procurement, goods sent back to a supplier): Finance books it against goods received not invoiced.

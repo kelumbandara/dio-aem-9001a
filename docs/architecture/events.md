@@ -39,6 +39,9 @@
 | `procurement.order.approved` | Procurement (built S7; `order_id, document_no, supplier_id, gross_total`) | Communications (send to supplier), Reporting |
 | `procurement.receipt.posted` | Procurement (built S7; `receipt_id, document_no, order_id, supplier_id`) | Reporting (stock and GRNI are posted synchronously in the same transaction) |
 | `procurement.bill.posted` | Procurement (built S7; `bill_id, document_no, supplier_id, gross_total`) | Reporting (the payable journal is posted synchronously through `OpenItemPoster`) |
+| `manufacturing.bom.activated` / `.bom.retired` | Manufacturing (built S8; `bom_version_id, item_id, version_no`) | Reporting, AI |
+| `manufacturing.order.released` / `.order.cancelled` | Manufacturing (built S8; `order_id, order_no, item_id, planned_qty`) | Reporting, Communications |
+| `manufacturing.materials.issued` / `.materials.returned` | Manufacturing (built S8; `order_id, order_no, stock_document_no, value`; the stock and work-in-progress postings come from `inventory.stock.moved`) | Reporting |
 | `procurement.return.posted` | Procurement (built S7; `return_id, document_no, order_id, supplier_id, gross_total`) | Reporting |
 | `finance.journal.posted` | Finance (built S5; payload `journal_id, journal_no, entry_date, kind, total, source_type, source_id`) | Reporting |
 | `finance.period.closed` | Finance | all posting modules (block) |

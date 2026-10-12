@@ -64,6 +64,9 @@ Built in S6 (columns and rules: [sales.md](sales.md)): `sales_quotations`(+`_lin
 `leads`, `customer_activities`, `quotations`(+lines), `sales_orders`(+lines), `deliveries`(+lines),
 `sales_invoices`(+lines), `sales_returns`(+lines), `discount_rules`.
 
+### Manufacturing
+Built in S8 (rules: [manufacturing.md](manufacturing.md)): `work_centers`, `production_lines`, `machines`, `shifts`; `bom_versions` (one per product and version number; partial unique index = one `active` per product), `bom_components`, `bom_operations` (routing); `production_orders` (the six quantities with check constraints), `production_order_materials` (required / issued / returned quantities and values), `production_order_operations`, `production_material_movements` (permanent record of every issue and return). Triggers: an active or retired BOM version and its components/routing cannot change or be deleted, a retired version cannot be revived, material movements cannot be changed or deleted.
+
 ### Procurement
 Built in S7 (columns and rules: [procurement.md](procurement.md)): `purchase_orders`(+`_lines` with received/returned/billed quantities), `goods_receipts`(+`_lines` with the stock value = the GRNI amount), `supplier_bills`(+`_lines` with GRNI, variance and input VAT parts), `purchase_returns`(+`_lines`, the debit note's parts). Not built: `purchase_requisitions`. Original sketch:
 

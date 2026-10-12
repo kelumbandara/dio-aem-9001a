@@ -2,6 +2,8 @@
 
 ## 1. Manual MES (MVP)
 
+Built so far (Sprint 8, planning and material control): [manufacturing.md](manufacturing.md). The quantity model below exists on production orders already; output reporting, QC and finished-goods receipt follow in Sprint 9.
+
 Production flow: `Production Order → Release → Material Issue → Output Reports → QC → FG Receipt → Completion`.
 
 ### Quantity model (kept separate, never conflated)

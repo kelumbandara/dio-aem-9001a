@@ -1,0 +1,33 @@
+<?php
+
+use App\Modules\Manufacturing\Http\Controllers\Api\BomController;
+use App\Modules\Manufacturing\Http\Controllers\Api\OrderController;
+use App\Modules\Manufacturing\Http\Controllers\Api\SetupController;
+use Illuminate\Support\Facades\Route;
+
+// Mounted at /api/v1 (names api.v1.*) with the `module:manufacturing` guard.
+// Items, units, warehouses, work centres, machines and lines are referred to by code, material lines by their line number.
+
+Route::middleware(['auth:sanctum', 'mfa.enrolled'])->group(function () {
+    Route::get('boms', [BomController::class, 'index'])->name('boms.index');
+    Route::post('boms', [BomController::class, 'store'])->middleware('idempotent')->name('boms.store');
+    Route::get('boms/{version}', [BomController::class, 'show'])->name('boms.show');
+    Route::put('boms/{version}', [BomController::class, 'update'])->name('boms.update');
+    Route::post('boms/{version}/activate', [BomController::class, 'activate'])->middleware('idempotent')->name('boms.activate');
+    Route::post('boms/{version}/retire', [BomController::class, 'retire'])->middleware('idempotent')->name('boms.retire');
+    Route::post('boms/{version}/copy', [BomController::class, 'copy'])->middleware('idempotent')->name('boms.copy');
+    Route::delete('boms/{version}', [BomController::class, 'destroy'])->name('boms.destroy');
+
+    Route::get('production-orders', [OrderController::class, 'index'])->name('production-orders.index');
+    Route::post('production-orders', [OrderController::class, 'store'])->middleware('idempotent')->name('production-orders.store');
+    Route::get('production-orders/{order}', [OrderController::class, 'show'])->name('production-orders.show');
+    Route::put('production-orders/{order}', [OrderController::class, 'update'])->name('production-orders.update');
+    Route::post('production-orders/{order}/release', [OrderController::class, 'release'])->middleware('idempotent')->name('production-orders.release');
+    Route::post('production-orders/{order}/cancel', [OrderController::class, 'cancel'])->middleware('idempotent')->name('production-orders.cancel');
+    Route::post('production-orders/{order}/issues', [OrderController::class, 'issue'])->middleware('idempotent')->name('production-orders.issue');
+    Route::post('production-orders/{order}/returns', [OrderController::class, 'return'])->middleware('idempotent')->name('production-orders.return');
+
+    Route::get('manufacturing/{entity}', [SetupController::class, 'index'])->name('manufacturing.setup.index');
+    Route::post('manufacturing/{entity}', [SetupController::class, 'store'])->name('manufacturing.setup.store');
+    Route::put('manufacturing/{entity}/{id}', [SetupController::class, 'update'])->name('manufacturing.setup.update');
+});

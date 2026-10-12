@@ -15,6 +15,12 @@ use App\Modules\Inventory\DTOs\PostedMovement;
 use App\Modules\Inventory\DTOs\StockLine;
 use App\Modules\Inventory\DTOs\StockMovement;
 use App\Modules\Inventory\Models\Warehouse;
+use App\Modules\Manufacturing\Models\BomVersion;
+use App\Modules\Manufacturing\Models\ProductionOrder;
+use App\Modules\Manufacturing\Models\WorkCenter;
+use App\Modules\Manufacturing\Services\BomService;
+use App\Modules\Manufacturing\Services\ProductionOrderService;
+use App\Modules\Manufacturing\Services\SetupService;
 use App\Modules\MasterData\Actions\ApplyPriceChanges;
 use App\Modules\MasterData\Actions\SaveItem;
 use App\Modules\MasterData\Actions\SavePriceList;
@@ -22,6 +28,7 @@ use App\Modules\MasterData\Database\Seeders\ReferenceDataSeeder;
 use App\Modules\MasterData\Models\Item;
 use App\Modules\MasterData\Models\PriceList;
 use App\Modules\MasterData\Support\InputMapper;
+use App\Support\Exceptions\BusinessException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -256,4 +263,56 @@ function finUser(string ...$extra): User
         'finance.view', 'finance.account.manage', 'finance.mapping.manage', 'finance.bank.manage', 'finance.period.manage', 'finance.period.lock',
         'finance.journal.post', 'finance.reverse', 'finance.ar.view', 'finance.ar.receive', 'finance.ap.view', 'finance.ap.pay', 'finance.report.view', ...$extra,
     ]);
+}
+
+// ---------------------------------------------------------------------------------------------------- manufacturing
+
+/** Expect a business error with this code. */
+function mfgFails(Closure $fn, string $code): void
+{
+    try {
+        $fn();
+    } catch (BusinessException $e) {
+        expect($e->errorCode)->toBe($code);
+
+        return;
+    }
+    test()->fail("Expected business error {$code}.");
+}
+
+/** A work centre made the way the screens make it. */
+function mfgCenter(string $code = 'CUT', array $o = []): WorkCenter
+{
+    return app(SetupService::class)->save('work-centers', array_merge(['code' => $code, 'name' => "Centre {$code}", 'capacity_hours_per_day' => '8', 'hourly_rate' => '600'], $o));
+}
+
+/** @param  list<array{item: Item, qty: string, uom?: string, scrap_pct?: string}>  $components */
+function mfgDraft(Item $product, array $components, array $o = []): BomVersion
+{
+    return app(BomService::class)->save(array_merge([
+        'item' => $product->code,
+        'components' => array_map(fn (array $c) => ['item' => $c['item']->code] + Arr::except($c, 'item'), $components),
+    ], $o));
+}
+
+/** A bill of materials that is drafted and activated in one go. */
+function mfgBom(Item $product, array $components, array $o = []): BomVersion
+{
+    return app(BomService::class)->activate(mfgDraft($product, $components, $o));
+}
+
+/** @param array<string, mixed> $o */
+function mfgOrder(Item $product, string $qty, Warehouse $wh, array $o = []): ProductionOrder
+{
+    return app(ProductionOrderService::class)->save(array_merge([
+        'item' => $product->code, 'qty' => $qty, 'source_warehouse_id' => $wh->id, 'output_warehouse_id' => $wh->id,
+    ], $o));
+}
+
+/** A released order. */
+function mfgReleased(Item $product, string $qty, Warehouse $wh, array $o = []): ProductionOrder
+{
+    $order = mfgOrder($product, $qty, $wh, $o);
+
+    return app(ProductionOrderService::class)->release($order, userWithPermissions('manufacturing.order.release')->id)['order'];
 }
