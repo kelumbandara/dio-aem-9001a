@@ -11,6 +11,7 @@ return [
         'manufacturing' => 'Manufacturing',
         'inventory' => 'Inventory',
         'finance' => 'Finance',
+        'reporting' => 'Reports',
         'masterdata' => 'Master data',
         'admin' => 'Administration',
         'find' => 'Find a page',

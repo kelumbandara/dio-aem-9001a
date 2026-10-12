@@ -12,6 +12,7 @@ return [
         'manufacturing' => 'உற்பத்தி',
         'inventory' => 'சரக்கு',
         'finance' => 'நிதி',
+        'reporting' => 'அறிக்கைகள்',
         'masterdata' => 'முதன்மைத் தரவு',
         'admin' => 'நிர்வாகம்',
         'find' => 'பக்கத்தைத் தேடு',

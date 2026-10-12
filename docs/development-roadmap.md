@@ -29,7 +29,7 @@ bank reconciliation import, Maintenance module, pgvector RAG.
 | **S7c Licensing** (part 1 done, pending review: [handover](handover/licensing.md)) | Signed monthly licence in the product, grace → read-only → lock after non-payment, licence generator; the separate vendor billing project is part 2: **built, pending review** ([design](architecture/billing.md), [handover](handover/vendor-billing.md)) |
 | **S8 Manufacturing I** (done, pending review: [handover](handover/sprint-8.md)) | BOM versions, routing, work centers, machines, shifts, production orders, material issue/return |
 | **S9 Manufacturing II** (done, pending review: [handover](handover/sprint-9.md)) | Output/reject/rework/downtime entry per shift, QC, FG receipt (materials-only cost), completion with variance, operator UI |
-| **S10 Reporting** | Role dashboards, KPIs, exports |
+| **S10 Reporting** (done, pending review: [handover](handover/sprint-10.md)) | Seven role dashboards (owner, sales, purchasing, stores, finance, production, quality) with period comparison, drill-down, CSV, print and API |
 | **S11 AI Core** | Provider, orchestrator, registry, tools (read), audit, metering, web chat |
 | **S12 AI Agents** | 10 agents, drafts, approvals integration, safety suite |
 | **S13 Mobile** | RN app: login, approvals, production/downtime/quality/stock, AI chat, push |

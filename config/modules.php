@@ -8,6 +8,7 @@ use App\Modules\Licensing\LicensingServiceProvider;
 use App\Modules\Manufacturing\ManufacturingServiceProvider;
 use App\Modules\MasterData\MasterDataServiceProvider;
 use App\Modules\Procurement\ProcurementServiceProvider;
+use App\Modules\Reporting\ReportingServiceProvider;
 use App\Modules\Sales\SalesServiceProvider;
 
 /*
@@ -17,7 +18,7 @@ use App\Modules\Sales\SalesServiceProvider;
 |
 | `depends_on` lists the modules *below* this one in the dependency map. A
 | module may import Contracts/DTOs/Events of itself and of those modules only
-| (enforced by tests/Architecture). `enabled` is the default; the
+| (enforced by tests/Architecture). `optional_depends_on` lists modules whose Contracts a module may also import but that it can run without. `enabled` is the default; the
 | `module_settings` table overrides it per deployment. `required` modules can
 | never be disabled.
 |
@@ -86,6 +87,15 @@ return [
             'name' => 'Manufacturing',
             'provider' => ManufacturingServiceProvider::class,
             'depends_on' => ['core', 'approvals', 'masterdata', 'inventory', 'finance'],
+            'enabled' => true,
+            'required' => false,
+        ],
+        'reporting' => [
+            'name' => 'Reporting',
+            'provider' => ReportingServiceProvider::class,
+            'depends_on' => ['core'],
+            // May read these modules' Contracts/DTOs when they are switched on, but works without any of them (each dashboard simply goes missing).
+            'optional_depends_on' => ['approvals', 'masterdata', 'inventory', 'finance', 'sales', 'procurement', 'manufacturing'],
             'enabled' => true,
             'required' => false,
         ],

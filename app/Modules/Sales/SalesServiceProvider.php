@@ -3,10 +3,17 @@
 namespace App\Modules\Sales;
 
 use App\Modules\Core\DTOs\MenuItem;
+use App\Modules\Sales\Contracts\SalesMetrics;
+use App\Modules\Sales\Services\DatabaseSalesMetrics;
 use App\Support\ModuleServiceProvider;
 
 class SalesServiceProvider extends ModuleServiceProvider
 {
+    public function register(): void
+    {
+        $this->app->singleton(SalesMetrics::class, DatabaseSalesMetrics::class);
+    }
+
     protected function moduleKey(): string
     {
         return 'sales';

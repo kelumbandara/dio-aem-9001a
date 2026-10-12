@@ -73,6 +73,7 @@ app/Modules/Inventory/
 permissions, menu items, settings. Disabling a module hides routes/menu/AI tools and blocks its
 Actions; a module cannot be disabled while an enabled module depends on it. Profiles:
 `trading` (no Manufacturing/IoT), `manufacturing` (all).
+A module may also list `optional_depends_on` (since Sprint 10, used by Reporting): it may import those modules' Contracts/DTOs/Events but does not need them enabled, so switching one of them off never forces it off. Code that uses an optional module must check `ModuleRegistry::isEnabled()` first.
 
 ## 5. Key business workflows (summary)
 

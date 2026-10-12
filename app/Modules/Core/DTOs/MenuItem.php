@@ -8,7 +8,7 @@ final readonly class MenuItem
      * @param  string  $labelKey  translation key, e.g. core::menu.dashboard
      * @param  string  $route  named web route
      * @param  string|null  $permission  permission required to see the item (null = any authenticated user)
-     * @param  string  $group  sidebar section: main (always shown, no heading), approvals, sales, purchasing, inventory, manufacturing, finance, masterdata, admin
+     * @param  string  $group  sidebar section: main (always shown, no heading), approvals, sales, purchasing, inventory, manufacturing, finance, reporting, masterdata, admin
      */
     public function __construct(
         public string $labelKey,

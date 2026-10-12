@@ -47,7 +47,7 @@ function realChecker(): ModuleBoundaryChecker
 {
     return new ModuleBoundaryChecker(
         app_path('Modules'),
-        collect(config('modules.modules'))->map(fn ($m) => $m['depends_on'])->all(),
+        collect(config('modules.modules'))->map(fn ($m) => [...$m['depends_on'], ...($m['optional_depends_on'] ?? [])])->all(),
         config('modules.public_namespaces'),
     );
 }

@@ -7,6 +7,7 @@ use App\Modules\Core\DTOs\MenuItem;
 use App\Modules\Inventory\Approvals\StockAdjustmentPost;
 use App\Modules\Inventory\Console\ReconcileStock;
 use App\Modules\Inventory\Contracts\StockAvailability;
+use App\Modules\Inventory\Contracts\StockMetrics;
 use App\Modules\Inventory\Contracts\StockPoster;
 use App\Modules\Inventory\Contracts\StockReserver;
 use App\Modules\Inventory\Contracts\WarehouseDirectory;
@@ -15,6 +16,7 @@ use App\Modules\Inventory\Models\Warehouse;
 use App\Modules\Inventory\Policies\StockDocumentPolicy;
 use App\Modules\Inventory\Policies\WarehousePolicy;
 use App\Modules\Inventory\Services\DatabaseStockAvailability;
+use App\Modules\Inventory\Services\DatabaseStockMetrics;
 use App\Modules\Inventory\Services\DatabaseStockReserver;
 use App\Modules\Inventory\Services\EloquentWarehouseDirectory;
 use App\Modules\Inventory\Services\StockPostingService;
@@ -52,6 +54,7 @@ class InventoryServiceProvider extends ModuleServiceProvider
 
     public function register(): void
     {
+        $this->app->singleton(StockMetrics::class, DatabaseStockMetrics::class);
         $this->app->singleton(StockPostingService::class);
         $this->app->singleton(StockPoster::class, StockPostingService::class);
         $this->app->singleton(StockAvailability::class, DatabaseStockAvailability::class);

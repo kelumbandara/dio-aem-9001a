@@ -3,10 +3,17 @@
 namespace App\Modules\Manufacturing;
 
 use App\Modules\Core\DTOs\MenuItem;
+use App\Modules\Manufacturing\Contracts\ProductionMetrics;
+use App\Modules\Manufacturing\Services\DatabaseProductionMetrics;
 use App\Support\ModuleServiceProvider;
 
 class ManufacturingServiceProvider extends ModuleServiceProvider
 {
+    public function register(): void
+    {
+        $this->app->singleton(ProductionMetrics::class, DatabaseProductionMetrics::class);
+    }
+
     protected function moduleKey(): string
     {
         return 'manufacturing';
