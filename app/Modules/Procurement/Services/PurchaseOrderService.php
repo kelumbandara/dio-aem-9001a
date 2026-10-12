@@ -64,7 +64,8 @@ final class PurchaseOrderService
             if ($terms < 0 || $terms > 365) {
                 throw ProcurementException::make('procurement.terms_invalid', 'Payment terms are between 0 and 365 days.', 422, 'payment_terms_days');
             }
-            $built = $this->builder->build((array) ($data['lines'] ?? []), $supplier->id, $orderDate);
+            $inclusive = $order !== null ? $order->prices_include_vat : (bool) config('procurement.prices_include_vat');
+            $built = $this->builder->build((array) ($data['lines'] ?? []), $supplier->id, $orderDate, $inclusive);
 
             $values = [
                 'supplier_id' => $supplier->id, 'warehouse_id' => $warehouseId, 'order_date' => $orderDate, 'expected_date' => $expected,
@@ -75,7 +76,7 @@ final class PurchaseOrderService
             if ($order === null) {
                 $this->numbering->define('procurement.order', 'PO/{FY}/{SEQ}', 5, 'fiscal_yearly');
                 $order = PurchaseOrder::query()->create($values + [
-                    'document_no' => $this->numbering->next('procurement.order', null, CarbonImmutable::parse($orderDate)), 'status' => 'draft', 'version' => 1, 'created_by' => $by,
+                    'document_no' => $this->numbering->next('procurement.order', null, CarbonImmutable::parse($orderDate)), 'status' => 'draft', 'version' => 1, 'created_by' => $by, 'prices_include_vat' => $inclusive,
                 ]);
             } else {
                 $order->forceFill($values + ['version' => $order->version + 1])->save();

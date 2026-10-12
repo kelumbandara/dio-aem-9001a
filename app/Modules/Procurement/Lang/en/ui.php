@@ -12,6 +12,7 @@ return [
     ],
 
     'common' => [
+        'unit_price_incl' => 'Unit price (incl. VAT)', 'net_amount' => 'Net amount',
         'search' => 'Search', 'search_hint' => 'Document number', 'status' => 'Status', 'all' => 'All', 'filter' => 'Filter', 'document' => 'Document',
         'supplier' => 'Supplier', 'date' => 'Date', 'total' => 'Total', 'lines' => 'Lines', 'item' => 'Item', 'qty' => 'Qty', 'unit' => 'Unit', 'unit_price' => 'Unit price (excl. VAT)',
         'discount' => 'Disc. %', 'tax' => 'Tax code', 'amount' => 'Amount', 'subtotal' => 'Net value', 'vat' => 'VAT', 'save' => 'Save', 'cancel' => 'Cancel', 'edit' => 'Edit', 'remove' => 'Remove',
@@ -23,6 +24,7 @@ return [
     ],
 
     'form' => [
+        'lines_hint_incl' => 'Supplier prices include VAT. VAT is taken out of each line total; leave the price empty to use the supplier’s price list.',
         'intro' => 'What you are buying from a supplier. Prices are without VAT; input VAT is added per line from the item’s tax code. Submitting the order sends it for approval if your company has an approval rule for purchase orders, otherwise it is approved at once. Only an approved order can receive goods or be billed.',
         'deliver_to' => 'Deliver to', 'expected_date' => 'Expected by', 'supplier_ref' => 'Supplier quotation / reference', 'terms_days' => 'Payment terms (days)', 'terms_hint' => 'Empty = the supplier’s terms',
         'notes' => 'Notes', 'lines_hint' => 'Leave the price empty to use the supplier’s price list. Prices are per unit, before VAT.', 'base' => 'base', 'price_list' => 'price list', 'item_default' => 'item default',
@@ -49,6 +51,7 @@ return [
     'bill' => ['variance' => 'Price variance', 'overridden' => 'Price difference accepted: :reason', 'goods_received' => 'Goods received'],
 
     'print' => [
+        'line_total_incl' => 'Line total (incl. VAT)', 'included' => 'included',
         'title' => 'Purchase order', 'print' => 'Print', 'tax_id' => 'VAT / TIN', 'order_no' => 'Order no.', 'date' => 'Date', 'supplier' => 'Supplier', 'supplier_tax_id' => 'Supplier VAT / TIN',
         'deliver_to' => 'Deliver to', 'terms' => 'Payment terms', 'net_days' => 'Net :days days', 'due_on_receipt' => 'On receipt', 'description' => 'Description',
         'prepared_by' => 'Prepared by', 'authorised_by' => 'Authorised by', 'computer_generated' => 'This purchase order is computer-generated.',

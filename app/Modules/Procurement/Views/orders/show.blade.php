@@ -43,8 +43,8 @@
                 <th class="px-3 py-2 text-start font-medium">#</th><th class="px-3 py-2 text-start font-medium">{{ __('procurement::ui.common.item') }}</th>
                 <th class="px-3 py-2 text-end font-medium">{{ __('procurement::ui.common.qty') }}</th>
                 @if ($open) <th class="px-3 py-2 text-end font-medium">{{ __('procurement::ui.common.received') }}</th><th class="px-3 py-2 text-end font-medium">{{ __('procurement::ui.common.returned') }}</th><th class="px-3 py-2 text-end font-medium">{{ __('procurement::ui.common.billed') }}</th> @endif
-                <th class="px-3 py-2 text-end font-medium">{{ __('procurement::ui.common.unit_price') }}</th><th class="px-3 py-2 text-end font-medium">{{ __('procurement::ui.common.discount') }}</th>
-                <th class="px-3 py-2 text-start font-medium">{{ __('procurement::ui.common.tax') }}</th><th class="px-3 py-2 text-end font-medium">{{ __('procurement::ui.common.amount') }}</th>
+                <th class="px-3 py-2 text-end font-medium">{{ $doc['prices_include_vat'] ? __('procurement::ui.common.unit_price_incl') : __('procurement::ui.common.unit_price') }}</th><th class="px-3 py-2 text-end font-medium">{{ __('procurement::ui.common.discount') }}</th>
+                <th class="px-3 py-2 text-start font-medium">{{ __('procurement::ui.common.tax') }}</th><th class="px-3 py-2 text-end font-medium">{{ $doc['prices_include_vat'] ? __('procurement::ui.common.net_amount') : __('procurement::ui.common.amount') }}</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-slate-100">

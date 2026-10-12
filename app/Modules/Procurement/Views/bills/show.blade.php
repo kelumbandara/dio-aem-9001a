@@ -12,7 +12,7 @@
         <thead class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
             <tr>
                 <th class="px-3 py-2 text-start font-medium">#</th><th class="px-3 py-2 text-start font-medium">{{ __('procurement::ui.common.item') }}</th>
-                <th class="px-3 py-2 text-end font-medium">{{ __('procurement::ui.common.qty') }}</th><th class="px-3 py-2 text-end font-medium">{{ __('procurement::ui.common.unit_price') }}</th>
+                <th class="px-3 py-2 text-end font-medium">{{ __('procurement::ui.common.qty') }}</th><th class="px-3 py-2 text-end font-medium">{{ $doc['prices_include_vat'] ? __('procurement::ui.common.unit_price_incl') : __('procurement::ui.common.unit_price') }}</th>
                 <th class="px-3 py-2 text-end font-medium">{{ __('procurement::ui.bill.goods_received') }}</th><th class="px-3 py-2 text-end font-medium">{{ __('procurement::ui.bill.variance') }}</th>
                 <th class="px-3 py-2 text-end font-medium">{{ __('procurement::ui.common.amount') }}</th><th class="px-3 py-2 text-end font-medium">{{ __('procurement::ui.common.vat') }}</th>
             </tr>

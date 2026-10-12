@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\DB;
  * and the stock agree, goods-received-not-invoiced ends at (almost) nothing, and debit notes never pass their bill.
  */
 beforeEach(function () {
+    config(['procurement.prices_include_vat' => false]);   // these tests work in net prices; VAT-inclusive pricing has its own tests
     $this->seed(FinanceSeeder::class);
     $this->wh = invWarehouse(['code' => 'MAIN']);
     $this->supplier = app(SaveSupplier::class)(['name' => 'ACME Supplies']);
@@ -33,6 +34,7 @@ beforeEach(function () {
 
 it('keeps bills, debit notes, stock and ledgers consistent for random orders', function (int $seed) {
     mt_srand($seed);
+    config(['procurement.prices_include_vat' => in_array($seed % 4, [2, 3], true)]);   // half the scenarios price with VAT inside, half without
     $rand = fn (int $a, int $b) => mt_rand($a, $b);
 
     $lines = [];
@@ -61,7 +63,7 @@ it('keeps bills, debit notes, stock and ledgers consistent for random orders', f
         if ($op === 0 && $open($line) > 0) {
             $receipts->post($order, ['lines' => [['line' => $line->line_no, 'qty' => (string) $rand(1, $open($line))]]]);
         } elseif ($op === 1 && $billable($line) > 0) {
-            $price = $exactPrices ? null : Decimal::round(Decimal::mul(Decimal::div($line->net_amount, $line->qty), (string) (1 + $rand(-15, 15) / 1000)), 4);
+            $price = $exactPrices ? null : Decimal::round(Decimal::mul(Decimal::mul($line->unit_price, Decimal::sub('1', Decimal::div($line->discount_pct, '100'))), (string) (1 + $rand(-15, 15) / 1000)), 4);
             $bills->create($order, ['supplier_invoice_no' => 'S'.$seed.'-'.(++$invoiceNo), 'lines' => [['line' => $line->line_no, 'qty' => (string) $rand(1, $billable($line))] + ($price !== null ? ['unit_price' => $price] : [])]]);
         } elseif ($op === 2 && $onHand($line) > 0) {
             $qty = $rand(1, $onHand($line));

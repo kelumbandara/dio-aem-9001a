@@ -31,4 +31,13 @@ final class GrniQueries
 
         return Decimal::round(Decimal::sub($billed, $debited), 4);
     }
+
+    /** Value billed for an order line including VAT, less debit notes. */
+    public function grossBilled(int $orderLineId): string
+    {
+        $billed = (string) DB::table('supplier_bill_lines')->where('order_line_id', $orderLineId)->selectRaw('coalesce(sum(net_amount + vat_amount), 0) as v')->value('v');
+        $debited = (string) DB::table('purchase_return_lines')->where('order_line_id', $orderLineId)->selectRaw('coalesce(sum(net_amount + vat_amount), 0) as v')->value('v');
+
+        return Decimal::round(Decimal::sub($billed, $debited), 4);
+    }
 }

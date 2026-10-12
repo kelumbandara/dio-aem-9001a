@@ -83,16 +83,25 @@ final class SupplierBillService
                 /** @var PurchaseOrderLine $line */
                 $line = $p['line'];
                 $stocked = $p['stocked'];
-                $orderPrice = Decimal::round(Decimal::div($line->net_amount, $line->qty), 6);
+                $inclusive = $order->prices_include_vat;
+                $netCost = Decimal::round(Decimal::div($line->net_amount, $line->qty), 6);   // what stock was valued at
+                $typedTotal = $this->calculator->lineNet($line->qty, $line->unit_price, $line->discount_pct);
+                $orderPrice = $inclusive ? Decimal::round(Decimal::div($typedTotal, $line->qty), 6) : $netCost;   // the price as the supplier quotes it
                 $price = $p['price'] ?? $orderPrice;
                 $billedBefore = $line->qty_billed;
 
+                $amounts = $this->calculator->lineAmounts($p['qty'], $price, '0', $line->tax_code_id, $inclusive, $on);
+                $net = $amounts['net'];
+                $gross = $amounts['gross'];
                 if ($p['price'] === null && Decimal::compare(Decimal::add($billedBefore, $p['qty']), $line->qty) === 0) {
-                    $net = Decimal::sub($line->net_amount, $this->grni->netBilled($line->id));   // the bill that completes a line takes the exact remainder
-                } else {
-                    $net = Decimal::mul($p['qty'], $price);
+                    // the bill that completes a line takes the exact remainder of what the order said
+                    $net = Decimal::sub($line->net_amount, $this->grni->netBilled($line->id));
+                    if ($gross !== null) {
+                        $gross = Decimal::sub($typedTotal, $this->grni->grossBilled($line->id));
+                    }
                 }
                 $net = Decimal::round($net, 2);
+                $gross = $gross !== null ? Decimal::round($gross, 2) : null;
 
                 if ($this->outsideTolerance($price, $orderPrice)) {
                     $violations[] = "line {$line->line_no}: {$price} against the order's {$orderPrice}";
@@ -104,13 +113,13 @@ final class SupplierBillService
                     $left = $this->grni->remaining($line->id);
                     $grni = Decimal::compare($p['qty'], $available) === 0
                         ? $left
-                        : Decimal::round(Decimal::mul($p['qty'], $orderPrice), 4);
+                        : Decimal::round(Decimal::mul($p['qty'], $netCost), 4);
                     if (Decimal::compare($grni, $left, 4) > 0) {
                         $grni = $left;
                     }
                 }
                 $variance = $stocked ? Decimal::round(Decimal::sub($net, $grni), 4) : '0.0000';
-                $vat = $this->calculator->vat($line->tax_code_id, $net, $on);
+                $vat = $gross !== null ? ['rate' => $this->calculator->vat($line->tax_code_id, $net, $on)['rate'], 'amount' => Decimal::round(Decimal::sub($gross, $net), 2)] : $this->calculator->vat($line->tax_code_id, $net, $on);
 
                 $rows[] = ['line' => $line, 'qty' => $p['qty'], 'price' => $price, 'net' => $net, 'grni' => $grni, 'variance' => $variance, 'vat' => $vat, 'stocked' => $stocked];
             }
@@ -153,7 +162,7 @@ final class SupplierBillService
             $bill = new SupplierBill([
                 'document_no' => $documentNo, 'supplier_invoice_no' => $invoiceNo, 'order_id' => $order->id, 'supplier_id' => $order->supplier_id, 'bill_date' => $date, 'due_date' => $due,
                 'notes' => $this->text($data['notes'] ?? null, 2000), 'net_total' => $net, 'vat_total' => $vat, 'gross_total' => $gross, 'variance_total' => Decimal::round($variance, 4),
-                'override_reason' => $override, 'override_by' => $override !== null ? $by : null, 'journal_id' => $posted->id, 'created_by' => $by,
+                'override_reason' => $override, 'override_by' => $override !== null ? $by : null, 'journal_id' => $posted->id, 'created_by' => $by, 'prices_include_vat' => $order->prices_include_vat,
             ]);
             $bill->public_id = $publicId;
             $bill->save();

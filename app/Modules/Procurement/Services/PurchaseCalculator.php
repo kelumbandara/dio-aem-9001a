@@ -26,6 +26,24 @@ final class PurchaseCalculator
         return Decimal::round(Decimal::mul(Decimal::mul($qty, $unitPrice), $factor), 2);
     }
 
+    /**
+     * Net value of a line and, when the typed price includes VAT, the line total including VAT (null otherwise). With
+     * VAT-inclusive prices the typed total is what the supplier charges for the line; net is that total divided by
+     * (1 + rate), rounded to 2 places, and the VAT is whatever is left of the total.
+     *
+     * @return array{net: string, gross: string|null}
+     */
+    public function lineAmounts(string $qty, string $unitPrice, string $discountPct, ?int $taxCodeId, bool $inclusive, ?CarbonInterface $on = null): array
+    {
+        $typed = $this->lineNet($qty, $unitPrice, $discountPct);
+        if (! $inclusive || $taxCodeId === null || $this->catalog->kind($taxCodeId) !== 'vat') {
+            return ['net' => $typed, 'gross' => null];
+        }
+        $rate = $this->rates->rate($taxCodeId, $on);
+
+        return ['net' => Decimal::round(Decimal::div($typed, Decimal::add('1', Decimal::div($rate, '100'))), 2), 'gross' => $typed];
+    }
+
     /** @return array{rate: string, amount: string} */
     public function vat(?int $taxCodeId, string $net, ?CarbonInterface $on = null): array
     {

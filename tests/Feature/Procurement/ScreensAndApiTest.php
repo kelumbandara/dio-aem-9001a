@@ -17,6 +17,7 @@ use Spatie\Permission\Models\Role;
 const BUYER_PERMISSIONS = ['procurement.view', 'procurement.order.manage', 'procurement.receipt.post', 'procurement.return.post', 'procurement.reverse', 'procurement.bill.post'];
 
 beforeEach(function () {
+    config(['procurement.prices_include_vat' => false]);   // these tests work in net prices; VAT-inclusive pricing has its own tests
     $this->seed(FinanceSeeder::class);
     $this->wh = invWarehouse(['code' => 'MAIN']);
     $this->item = mdItem(['name' => 'Widget', 'default_tax_code' => 'VAT']);

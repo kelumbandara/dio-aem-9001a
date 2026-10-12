@@ -2,6 +2,12 @@
 
 return [
     /*
+    | Supplier prices include VAT (the owner's rule: suppliers' price lists are VAT inclusive). Copied onto each order
+    | and bill when it is created, so changing it never reinterprets old documents.
+    */
+    'prices_include_vat' => (bool) env('PROCUREMENT_PRICES_INCLUDE_VAT', true),
+
+    /*
     | A supplier's price may differ from the order's by this many percent (either way) without anyone having to
     | accept the difference. More than that, a bill needs someone with `procurement.bill.override` and a reason.
     | The difference itself is always posted to the purchase price variance account.

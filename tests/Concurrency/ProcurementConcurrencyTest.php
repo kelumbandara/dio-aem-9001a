@@ -17,6 +17,7 @@ use Symfony\Component\Process\Process;
  * transaction, so the data is committed and truncated afterwards.
  */
 beforeEach(function () {
+    config(['procurement.prices_include_vat' => false]);   // these tests work in net prices; VAT-inclusive pricing has its own tests
     Artisan::call('migrate', ['--force' => true]);
     cleanProcurementData();
     (new ReferenceDataSeeder)->run();
@@ -37,7 +38,7 @@ function procurementRace(string $mode, int $workers, int $attempts, int $orderId
     $processes = [];
     for ($i = 0; $i < $workers; $i++) {
         $p = new Process([PHP_BINARY, base_path('tests/Support/procurement-worker.php'), $mode, (string) $attempts, (string) $startAt, (string) $orderId, (string) $i],
-            base_path(), ['APP_ENV' => 'testing', 'DB_DATABASE' => config('database.connections.pgsql.database')]);
+            base_path(), ['APP_ENV' => 'testing', 'DB_DATABASE' => config('database.connections.pgsql.database'), 'PROCUREMENT_PRICES_INCLUDE_VAT' => 'false']);
         $p->start();
         $processes[] = $p;
     }

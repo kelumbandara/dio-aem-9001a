@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * A posted supplier bill. Immutable (the database refuses changes).
  *
  * @property int $id
+ * @property bool $prices_include_vat
  * @property string $public_id
  * @property string $document_no our number
  * @property string $supplier_invoice_no the supplier's own number
@@ -32,7 +33,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int|null $created_by
  */
 #[RouteKey('public_id')]
-#[Fillable(['document_no', 'supplier_invoice_no', 'order_id', 'supplier_id', 'bill_date', 'due_date', 'notes', 'net_total', 'vat_total', 'gross_total', 'variance_total', 'override_reason', 'override_by', 'journal_id', 'created_by'])]
+#[Fillable(['document_no', 'supplier_invoice_no', 'order_id', 'supplier_id', 'bill_date', 'due_date', 'notes', 'net_total', 'vat_total', 'gross_total', 'variance_total', 'override_reason', 'override_by', 'journal_id', 'created_by', 'prices_include_vat'])]
 class SupplierBill extends Model
 {
     use Auditable, HasPublicId;
@@ -43,7 +44,7 @@ class SupplierBill extends Model
 
     protected function casts(): array
     {
-        return ['bill_date' => 'immutable_date', 'due_date' => 'immutable_date', 'variance_total' => 'decimal:4', 'net_total' => 'decimal:4', 'vat_total' => 'decimal:4', 'gross_total' => 'decimal:4'];
+        return ['prices_include_vat' => 'boolean', 'bill_date' => 'immutable_date', 'due_date' => 'immutable_date', 'variance_total' => 'decimal:4', 'net_total' => 'decimal:4', 'vat_total' => 'decimal:4', 'gross_total' => 'decimal:4'];
     }
 
     /** @return HasMany<SupplierBillLine, $this> */

@@ -9,6 +9,7 @@
     $q = fn ($v) => str_contains((string) $v, '.') ? rtrim(rtrim((string) $v, '0'), '.') : (string) $v;
     $c = $doc['company'];
     $name = $c['trade_name'] ?: $c['legal_name'];
+    $incl = $doc['prices_include_vat'];
 @endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
@@ -100,8 +101,8 @@
         <thead>
             <tr>
                 <th style="width:24px">#</th><th>{{ __('procurement::ui.print.description') }}</th>
-                <th class="r">{{ __('procurement::ui.common.qty') }}</th><th class="r">{{ __('procurement::ui.common.unit_price') }}</th>
-                <th class="r">{{ __('procurement::ui.common.discount') }}</th><th class="r">{{ __('procurement::ui.common.amount') }}</th>
+                <th class="r">{{ __('procurement::ui.common.qty') }}</th><th class="r">{{ $incl ? __('procurement::ui.common.unit_price_incl') : __('procurement::ui.common.unit_price') }}</th>
+                <th class="r">{{ __('procurement::ui.common.discount') }}</th><th class="r">{{ $incl ? __('procurement::ui.print.line_total_incl') : __('procurement::ui.common.amount') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -112,7 +113,7 @@
                     <td class="r">{{ $q($l['qty']) }} {{ $l['uom'] }}</td>
                     <td class="r">{{ $m($l['unit_price']) }}</td>
                     <td class="r">{{ (float) $l['discount_pct'] > 0 ? $q($l['discount_pct']).'%' : '' }}</td>
-                    <td class="r">{{ $m($l['net_amount']) }}</td>
+                    <td class="r">{{ $m($incl ? bcadd($l['net_amount'], $l['vat_amount'], 4) : $l['net_amount']) }}</td>
                 </tr>
             @endforeach
         </tbody>
@@ -122,7 +123,7 @@
         <div class="notes">@if ($doc['notes'])<strong>{{ __('procurement::ui.form.notes') }}</strong><br>{{ $doc['notes'] }}@endif</div>
         <table class="sum">
             <tr><td>{{ __('procurement::ui.common.subtotal') }}</td><td class="r">{{ $m($doc['totals']['net']) }}</td></tr>
-            <tr><td>{{ __('procurement::ui.common.vat') }}</td><td class="r">{{ $m($doc['totals']['vat']) }}</td></tr>
+            <tr><td>{{ __('procurement::ui.common.vat') }}@if ($incl) ({{ __('procurement::ui.print.included') }})@endif</td><td class="r">{{ $m($doc['totals']['vat']) }}</td></tr>
             <tr class="grand"><td>{{ __('procurement::ui.common.total') }} (LKR)</td><td class="r">{{ $m($doc['totals']['gross']) }}</td></tr>
         </table>
     </div>

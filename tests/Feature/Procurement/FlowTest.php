@@ -33,6 +33,7 @@ function buyFails(Closure $fn, string $code): void
 }
 
 beforeEach(function () {
+    config(['procurement.prices_include_vat' => false]);   // these tests work in net prices; VAT-inclusive pricing has its own tests
     $this->seed(FinanceSeeder::class);
     $this->wh = invWarehouse(['code' => 'MAIN']);
     $this->item = mdItem(['name' => 'Widget', 'default_tax_code' => 'VAT']);

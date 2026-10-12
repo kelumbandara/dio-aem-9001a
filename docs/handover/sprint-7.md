@@ -18,7 +18,7 @@ New module **Procurement** (depends on Core, Approvals, Master Data, Inventory, 
 
 | Check | Result |
 |---|---|
-| `composer check` (Pint + Larastan level 6 + Pest) | Pint passed; Larastan **no errors**; **838 passed** (7,097 assertions), 669 s — a clean full run after the last code change |
+| `composer check` (Pint + Larastan level 6 + Pest) | Pint passed; Larastan **no errors**; **843 passed** (7,133 assertions), 698 s — a clean full run after the last code change |
 | Procurement tests | 46: flow 16, screens and API 14, random scenarios 16, plus 2 real-process concurrency tests; Finance debit-note tests 4 |
 | Dev database | migrated (2 new migrations), roles and mapping re-seeded, demo data loaded, `finance:reconcile` and `inventory:reconcile` clean |
 
@@ -74,3 +74,10 @@ What the tests prove beyond "it runs":
 ## 7. How to try it
 
 The local app is at <http://127.0.0.1:8000> (admin demo user holds every Procurement permission). In the sidebar: **Purchase orders** (a completed-looking order with a bill and a debit note, one half-received, and a draft — open the draft and press *Submit for approval*; with no policy it is approved at once), **Goods receipts**, **Supplier bills** (open `CT-88413`: cups LKR 11,000 + VAT 1,980 = 12,980, with the 10 damaged cups credited by a debit note of 649), **Purchase returns**. On an approved order you can *Receive goods*, *Enter supplier bill* (try a price 5 % off to see the block) and *Return goods / debit note*; *Print / PDF* gives the purchase order for the supplier. Commands: `php artisan finance:reconcile`, `php artisan inventory:reconcile`.
+
+## 8. Update after your reply (2026-10-12): approval rules, VAT-inclusive supplier prices, no requisitions
+
+- **Purchase orders need approval — rules now exist.** `PurchaseOrderPolicySeeder` creates two starting rules (visible and editable under Approvals → policies; it never overwrites an edited rule): every order needs one approval by role **`purchase-approver`**; an order of **LKR 500,000 or more** needs that approval and then one by **`finance-approver`**. **You asked for amounts to be set but gave none, so these figures (500,000, and the two roles) are mine — please confirm or give me yours.** Until a person holds the `purchase-approver` role, submitting an order is refused with a clear message. In the dev app a demo approver `purchasing@dio.test` (role purchase-approver) exists, and the two finance approvers from before cover the second step.
+- **Supplier prices include VAT**: built exactly like sales (setting `PROCUREMENT_PRICES_INCLUDE_VAT`, default on, copied onto each order and bill). A typed 118.00 is 100.00 net + 18.00 input VAT; stock is received at the net 100.00; bills compare the supplier's VAT-inclusive price with the order's, and the printed purchase order shows prices and line totals including VAT. Orders made before this change (the demo ones) stay net-priced.
+- **No purchase requisitions before Manufacturing** — noted; not built.
+- Tests: new VAT-inclusive and approval-rule tests; the random scenarios now run half inclusive / half net.

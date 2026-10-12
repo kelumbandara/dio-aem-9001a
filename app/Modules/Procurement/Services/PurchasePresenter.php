@@ -79,13 +79,13 @@ final class PurchasePresenter
 
             return [
                 'line' => $l->line_no, 'item' => $item?->code, 'item_name' => $item?->name, 'description' => $l->description, 'uom_id' => $l->uom_id, 'uom' => $this->uom($l->item_id, $l->uom_id),
-                'qty' => $l->qty, 'unit_price' => $l->unit_price, 'discount_pct' => $l->discount_pct, 'tax_code' => $tax['code'] ?? null, 'net_amount' => $l->net_amount,
+                'qty' => $l->qty, 'unit_price' => $l->unit_price, 'discount_pct' => $l->discount_pct, 'tax_code' => $tax['code'] ?? null, 'net_amount' => $l->net_amount, 'vat_amount' => $l->vat_amount,
                 'qty_received' => $l->qty_received, 'qty_returned' => $l->qty_returned, 'qty_billed' => $l->qty_billed, 'stocked' => $item?->isStocked() ?? false,
             ];
         })->all();
 
         return $this->headers(collect([$o]))[0] + [
-            'supplier_ref' => $o->supplier_ref, 'payment_terms_days' => $o->payment_terms_days, 'notes' => $o->notes, 'version' => $o->version, 'cancel_reason' => $o->cancel_reason,
+            'prices_include_vat' => $o->prices_include_vat, 'supplier_ref' => $o->supplier_ref, 'payment_terms_days' => $o->payment_terms_days, 'notes' => $o->notes, 'version' => $o->version, 'cancel_reason' => $o->cancel_reason,
             'approval_request_id' => $o->approval_request_id, 'approved_at' => $o->approved_at?->toIso8601String(),
             'lines' => $lines, 'totals' => ['net' => $o->net_total, 'vat' => $o->vat_total, 'gross' => $o->gross_total],
             'receipts' => GoodsReceipt::query()->where('order_id', $o->id)->orderBy('id')->get()->map(fn (GoodsReceipt $r) => ['id' => $r->public_id, 'document_no' => $r->document_no, 'date' => $r->receipt_date->toDateString(), 'status' => $r->status])->all(),
@@ -124,7 +124,7 @@ final class PurchasePresenter
         })->all();
 
         return $this->headers(collect([$b]))[0] + [
-            'order' => $order?->document_no, 'order_id' => $order?->public_id, 'notes' => $b->notes, 'variance_total' => $b->variance_total, 'override_reason' => $b->override_reason,
+            'order' => $order?->document_no, 'order_id' => $order?->public_id, 'prices_include_vat' => $b->prices_include_vat, 'notes' => $b->notes, 'variance_total' => $b->variance_total, 'override_reason' => $b->override_reason,
             'lines' => $rows, 'totals' => ['net' => $b->net_total, 'vat' => $b->vat_total, 'gross' => $b->gross_total],
             'returns' => PurchaseReturn::query()->where('bill_id', $b->id)->orderBy('id')->get()->map(fn (PurchaseReturn $r) => ['id' => $r->public_id, 'document_no' => $r->document_no, 'gross_total' => $r->gross_total])->all(),
         ];

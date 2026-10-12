@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $id
+ * @property bool $prices_include_vat
  * @property string $public_id
  * @property string $document_no
  * @property int $supplier_id
@@ -33,7 +34,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int|null $created_by
  */
 #[RouteKey('public_id')]
-#[Fillable(['document_no', 'supplier_id', 'warehouse_id', 'order_date', 'expected_date', 'status', 'supplier_ref', 'payment_terms_days', 'notes', 'net_total', 'vat_total', 'gross_total', 'approval_request_id', 'approved_at', 'approved_by', 'cancel_reason', 'version', 'created_by'])]
+#[Fillable(['document_no', 'supplier_id', 'warehouse_id', 'order_date', 'expected_date', 'status', 'supplier_ref', 'payment_terms_days', 'notes', 'net_total', 'vat_total', 'gross_total', 'approval_request_id', 'approved_at', 'approved_by', 'cancel_reason', 'version', 'created_by', 'prices_include_vat'])]
 class PurchaseOrder extends Model
 {
     use Auditable, HasPublicId;
@@ -44,7 +45,7 @@ class PurchaseOrder extends Model
 
     protected function casts(): array
     {
-        return ['order_date' => 'immutable_date', 'expected_date' => 'immutable_date', 'approved_at' => 'immutable_datetime', 'version' => 'integer', 'payment_terms_days' => 'integer', 'net_total' => 'decimal:4', 'vat_total' => 'decimal:4', 'gross_total' => 'decimal:4'];
+        return ['prices_include_vat' => 'boolean', 'order_date' => 'immutable_date', 'expected_date' => 'immutable_date', 'approved_at' => 'immutable_datetime', 'version' => 'integer', 'payment_terms_days' => 'integer', 'net_total' => 'decimal:4', 'vat_total' => 'decimal:4', 'gross_total' => 'decimal:4'];
     }
 
     /** @return HasMany<PurchaseOrderLine, $this> */

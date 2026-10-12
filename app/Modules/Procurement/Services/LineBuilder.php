@@ -32,7 +32,7 @@ final class LineBuilder
      *
      * @throws BusinessException
      */
-    public function build(array $raw, int $supplierId, string $date): array
+    public function build(array $raw, int $supplierId, string $date, bool $inclusive = false): array
     {
         if ($raw === []) {
             throw ProcurementException::make('procurement.lines_required', 'Add at least one line.', 422, 'lines');
@@ -87,18 +87,19 @@ final class LineBuilder
 
             $price = isset($row['unit_price']) && trim((string) $row['unit_price']) !== '' ? trim((string) $row['unit_price']) : null;
             if ($price === null) {
-                $price = $this->priceFor($item, $qty, $uomId, $supplierId, $taxCodeId, $on, $field);
+                $price = $this->priceFor($item, $qty, $uomId, $supplierId, $taxCodeId, $on, $field, $inclusive);
             } elseif (! Decimal::isDecimal($price, 4) || Decimal::compare($price, '0') < 0) {
                 throw ProcurementException::make('procurement.price_invalid', 'A price is zero or more, with at most 4 decimal places.', 422, "{$field}.unit_price");
             }
 
-            $lineNet = $this->calculator->lineNet($qty, $price, $discount);
-            $lineVat = $this->calculator->vat($taxCodeId, $lineNet, $on);
+            $amounts = $this->calculator->lineAmounts($qty, $price, $discount, $taxCodeId, $inclusive, $on);
+            $lineNet = $amounts['net'];
+            $lineVat = $amounts['gross'] !== null ? ['amount' => Decimal::round(Decimal::sub($amounts['gross'], $lineNet), 2)] : $this->calculator->vat($taxCodeId, $lineNet, $on);
             $description = isset($row['description']) ? trim((string) $row['description']) : '';
             $lines[] = [
                 'line_no' => $i + 1, 'item_id' => $item->id, 'description' => $description !== '' ? mb_substr($description, 0, 255) : $item->name,
                 'uom_id' => $uomId, 'qty' => $qty, 'unit_price' => Decimal::round($price, 4), 'discount_pct' => Decimal::round($discount, 4),
-                'tax_code_id' => $taxCodeId, 'net_amount' => $lineNet,
+                'tax_code_id' => $taxCodeId, 'net_amount' => $lineNet, 'vat_amount' => $lineVat['amount'],
             ];
             $net = Decimal::add($net, $lineNet);
             $vat = Decimal::add($vat, $lineVat['amount']);
@@ -125,7 +126,7 @@ final class LineBuilder
         return $item;
     }
 
-    private function priceFor(ItemInfo $item, string $qty, int $uomId, int $supplierId, ?int $taxCodeId, CarbonImmutable $on, string $field): string
+    private function priceFor(ItemInfo $item, string $qty, int $uomId, int $supplierId, ?int $taxCodeId, CarbonImmutable $on, string $field, bool $inclusive): string
     {
         $quote = $this->prices->quote($item->id, $qty, $uomId, 'purchase', null, $supplierId, $on);
         if ($quote === null) {
@@ -134,11 +135,15 @@ final class LineBuilder
         if ($quote->currencyCode !== 'LKR') {
             throw ProcurementException::make('procurement.price_currency', "The price list for {$item->code} is in {$quote->currencyCode}; enter the LKR price.", 422, "{$field}.unit_price");
         }
-        if (! $quote->taxInclusive || $taxCodeId === null || $this->taxCatalog->kind($taxCodeId) !== 'vat') {
-            return $quote->unitPrice;
+        $vat = $taxCodeId !== null && $this->taxCatalog->kind($taxCodeId) === 'vat';
+        if (! $vat || $quote->taxInclusive === $inclusive) {
+            return $quote->unitPrice;   // the list and the order agree on whether VAT is in the price
         }
 
-        return Decimal::round(Decimal::div($quote->unitPrice, Decimal::add('1', Decimal::div($this->rates->rate($taxCodeId, $on), '100'))), 4);
+        // Convert between the list's basis and the order's.
+        $factor = Decimal::add('1', Decimal::div($this->rates->rate($taxCodeId, $on), '100'));
+
+        return Decimal::round($inclusive ? Decimal::mul($quote->unitPrice, $factor) : Decimal::div($quote->unitPrice, $factor), 4);
     }
 
     private function defaultVatCodeId(): ?int
