@@ -4,7 +4,7 @@ AI-powered ERP and manual MES (IoT-ready) for Sri Lankan SMEs — manufacturing 
 One shared codebase, independent deployment per customer (Coolify).
 
 **Status:** Sprint 7 (Procurement), the Branding step and the Licensing module (signed monthly licence, grace → read-only →
-lock) are complete and awaiting owner review — see [docs/handover/sprint-7.md](docs/handover/sprint-7.md),
+lock) and the separate vendor billing project (`vendor-billing/`, see its [README](vendor-billing/README.md)) are complete and awaiting owner review — see [docs/handover/vendor-billing.md](docs/handover/vendor-billing.md), [docs/handover/sprint-7.md](docs/handover/sprint-7.md),
 [docs/handover/branding.md](docs/handover/branding.md) and [docs/handover/licensing.md](docs/handover/licensing.md); earlier handovers: [Sprint 6](docs/handover/sprint-6.md),
 [Sprint 5](docs/handover/sprint-5.md), [Sprint 4](docs/handover/sprint-4.md), [Sprint 3](docs/handover/sprint-3.md),
 [Sprint 2](docs/handover/sprint-2.md), [Sprint 1](docs/handover/sprint-1.md).

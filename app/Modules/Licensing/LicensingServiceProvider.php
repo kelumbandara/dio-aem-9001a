@@ -5,6 +5,7 @@ namespace App\Modules\Licensing;
 use App\Modules\Core\Contracts\LicenceGate;
 use App\Modules\Core\DTOs\MenuItem;
 use App\Modules\Licensing\Console\LicenceCheck;
+use App\Modules\Licensing\Console\LicenceFetch;
 use App\Modules\Licensing\Console\LicenceIssue;
 use App\Modules\Licensing\Console\LicenceKeys;
 use App\Modules\Licensing\Http\Middleware\EnforceLicence;
@@ -46,11 +47,12 @@ class LicensingServiceProvider extends ModuleServiceProvider
         $router->pushMiddlewareToGroup('api', EnforceLicence::class);
 
         if ($this->app->runningInConsole()) {
-            $this->commands([LicenceKeys::class, LicenceIssue::class, LicenceCheck::class]);
+            $this->commands([LicenceKeys::class, LicenceIssue::class, LicenceCheck::class, LicenceFetch::class]);
         }
 
         $this->callAfterResolving(Schedule::class, function (Schedule $schedule): void {
             $schedule->command('licence:check')->dailyAt('06:00')->withoutOverlapping(30);
+            $schedule->command('licence:fetch')->everyFourHours()->withoutOverlapping(30);
         });
     }
 }

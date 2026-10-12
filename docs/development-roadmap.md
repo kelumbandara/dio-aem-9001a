@@ -26,7 +26,7 @@ bank reconciliation import, Maintenance module, pgvector RAG.
 | **S6 Sales** (done, pending review: [handover](handover/sprint-6.md)) | Quotation → SO (credit-limit block, reservation) → delivery → tax invoice (VAT, SSCL/NBT) → credit notes/returns. Leads/CRM activities deferred |
 | **S7 Procurement** (done, pending review: [handover](handover/sprint-7.md)) | PO (approval gate) → goods receipt → supplier bill (three-way match, price variance) → returns + debit notes. Requisitions deferred |
 | **S7b Branding** (done, pending review: [handover](handover/branding.md)) | Appearance: company name and logo, colours, font and size, corners, document footer, vendor-only “Powered by”; applied to all screens and printed documents |
-| **S7c Licensing** (part 1 done, pending review: [handover](handover/licensing.md)) | Signed monthly licence in the product, grace → read-only → lock after non-payment, licence generator; the separate vendor billing project (bank-transfer entry, PayHere) is part 2 |
+| **S7c Licensing** (part 1 done, pending review: [handover](handover/licensing.md)) | Signed monthly licence in the product, grace → read-only → lock after non-payment, licence generator; the separate vendor billing project is part 2: **built, pending review** ([design](architecture/billing.md), [handover](handover/vendor-billing.md)) |
 | **S8 Manufacturing I** | BOM versions, routing, work centers, machines, shifts, production orders, material issue/return |
 | **S9 Manufacturing II** | Output/reject/rework/downtime entry, QC, FG receipt, completion, operator UI |
 | **S10 Reporting** | Role dashboards, KPIs, exports |

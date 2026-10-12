@@ -1,6 +1,6 @@
 # Licensing and subscription billing
 
-**Status:** part 1 (the Licensing module in this product) is built; the vendor billing project and PayHere are not.
+**Status:** part 1 (the Licensing module in this product) and part 2 (the separate vendor billing project, `vendor-billing/`, see [billing.md](billing.md)) are built. PayHere *recurring* charging is not; customers pay each monthly invoice through PayHere or by bank transfer.
 
 Decisions by the owner (2026-10-12): the vendor **hosts every installation** on its own cloud servers (customers never run
 the software themselves); customers pay **monthly**, by **bank transfer** (recorded by hand) or **PayHere** (automatic);
@@ -56,3 +56,4 @@ installations stay on the vendor's servers and the contract states the terms. Th
 - **Screen** (Administration → Licence, `licensing.manage`, held by admin): status, last day, days left, plan, modules, the **installation ID** to give the vendor, paste-a-licence form, history. The screen itself is open to every signed-in user (so it is reachable when locked) but only managers can install. **API**: `GET/POST /api/v1/licence`.
 - **Vendor tools**: `licence:keys`, `licence:issue` (secret key read from a file or `LICENCE_PRIVATE_KEY`, never an argument), and the daily `licence:check` notifications (7, 3, 1 and 0 days before the end, and at the start of each stricter phase; once each).
 - Core knows only a small contract (`LicenceGate`: banner and module check); without the module it allows everything.
+- **Automatic renewal**: `php artisan licence:fetch` (scheduled every 4 hours; does nothing unless `VENDOR_BILLING_URL` and `VENDOR_BILLING_TOKEN` are set) asks the vendor billing system for this installation's newest licence and installs it. The licence is still verified offline against `LICENCE_PUBLIC_KEY`, so the billing system is trusted for delivery only.

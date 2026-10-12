@@ -121,7 +121,10 @@ Licensing commands (vendor):
 |---|---|
 | `php artisan licence:keys` | makes the vendor's signing key pair once; prints the public key (put it in every installation's `LICENCE_PUBLIC_KEY`) and the secret key (keep it only on the vendor's own machine) |
 | `php artisan licence:issue <installation-id> --company="…" --months=1 [--users=…] [--modules=sales,finance] --key-file=<secret-key-file>` | signs a licence for one installation |
+| `php artisan licence:fetch` | fetches this installation's newest licence from the vendor billing system when `VENDOR_BILLING_URL` / `VENDOR_BILLING_TOKEN` are set (scheduled every 4 hours) |
 | `php artisan licence:check` | tells administrators when the licence is about to end or has entered a stricter phase (scheduled 06:00; does nothing where licensing is not enforced) |
+
+The vendor billing system is a separate application in `vendor-billing/` with its own setup, commands and tests: see `vendor-billing/README.md`.
 
 Finance commands (S5):
 

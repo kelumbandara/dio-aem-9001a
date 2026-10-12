@@ -26,4 +26,11 @@ return [
 
     // Shown on the licence screen: how to renew (the vendor's contact details).
     'renew_note' => env('LICENCE_RENEW_NOTE'),
+
+    /*
+    | Automatic renewal: where the vendor's billing system is and this installation's own token for it (both are given by
+    | the vendor). Leave empty to paste licences by hand.
+    */
+    'vendor_url' => env('VENDOR_BILLING_URL'),
+    'vendor_token' => env('VENDOR_BILLING_TOKEN'),
 ];
