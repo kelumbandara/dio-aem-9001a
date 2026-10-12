@@ -111,6 +111,14 @@ describe('errors', () => {
     expect(unauthorized).toHaveBeenCalledTimes(1);
   });
 
+  it('recognises an address that is not the company system (a web page answered with 200)', async () => {
+    const f = fakeFetch(() => new Response('<html>Metro bundler</html>', { status: 200 }));
+    const e = (await clientWith(f.impl).client.post('/auth/login', {}).catch((x) => x)) as ApiError;
+    expect(e).toBeInstanceOf(ApiError);
+    expect(e).toMatchObject({ code: 'bad_response', network: false });
+    expect(e.message).toContain('server address');
+  });
+
   it('turns a failed connection into a retryable network error without leaking details', async () => {
     const f = fakeFetch(() => {
       throw new TypeError('Network request failed at 10.0.0.5 with Bearer secret-token');

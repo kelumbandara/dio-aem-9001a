@@ -101,6 +101,9 @@ export function createClient(config: ClientConfig): Client {
       throw error;
     }
 
+    // an answer that is not JSON (a web page, the wrong program on that port) is not our server: say so instead of failing later
+    if (json === null) throw new ApiError('This address did not answer like the company system. Check the server address.', res.status, 'bad_response');
+
     return json as T;
   }
 
