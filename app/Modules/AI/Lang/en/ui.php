@@ -1,0 +1,28 @@
+<?php
+
+return [
+    'menu' => ['assistant' => 'Ask the assistant', 'usage' => 'AI usage'],
+    'new_chat' => 'New question',
+    'intro' => 'Ask in plain words about sales, purchases, stock, money owed, cash or production. The assistant looks up the figures you are allowed to see and shows which pages they come from. It only reads: it never changes anything.',
+    'not_configured' => 'The assistant is not switched on yet: an administrator needs to add the AI provider key on the server.',
+    'try_asking' => 'You could ask:',
+    'example_1' => 'How are sales this month compared with last month?',
+    'example_2' => 'Which customers owe us the most, and how late are they?',
+    'example_3' => 'Which items are below their reorder level?',
+    'your_question' => 'Your question',
+    'placeholder' => 'Type your question…',
+    'ask' => 'Ask',
+    'read_only' => 'Answers are drawn from your records; check important figures on the linked pages.',
+    'based_on' => 'Based on:',
+    'max_steps' => 'I could not finish looking this up. Please ask a narrower question.',
+    'empty_answer' => 'I could not produce an answer. Please try rephrasing the question.',
+    'usage_intro' => 'What the assistant has cost this month (calendar month, Colombo time). Model: :model. Tokens are shown as sent / received.',
+    'spent_company' => 'Spent this month (company)',
+    'limit' => 'Monthly limit: USD :amount',
+    'limit_person' => 'Monthly limit per person',
+    'person' => 'Person',
+    'questions' => 'Questions',
+    'tokens' => 'Tokens',
+    'cost' => 'Cost',
+    'nothing' => 'Nobody has used the assistant this month.',
+];

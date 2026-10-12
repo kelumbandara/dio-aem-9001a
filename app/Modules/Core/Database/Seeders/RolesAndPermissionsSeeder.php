@@ -38,8 +38,10 @@ class RolesAndPermissionsSeeder extends Seeder
             // Procurement: sees every purchasing document and enters supplier bills (price differences beyond the tolerance stay with admin).
             'procurement.view', 'procurement.bill.post',
             // Manufacturing: sees production orders, bills of materials and what is in work in progress.
-            'manufacturing.view'];
-        $salesStaff = ['sales.view', 'sales.quotation.manage', 'sales.order.manage', 'sales.order.confirm', 'sales.delivery.post',
+            'manufacturing.view',
+            // The assistant answers from what the person may already see.
+            'ai.use'];
+        $salesStaff = ['ai.use', 'sales.view', 'sales.quotation.manage', 'sales.order.manage', 'sales.order.confirm', 'sales.delivery.post',
             'masterdata.reference.view', 'masterdata.item.view', 'masterdata.customer.view', 'masterdata.price_list.view', 'inventory.stock.view', 'inventory.warehouse.view'];
         Role::findOrCreate('accountant', 'web')->syncPermissions(array_values(array_filter(
             $names,
@@ -52,14 +54,14 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // Purchasing staff raise purchase orders, receive goods and send them back; they read suppliers, items, prices and stock but change none
         // of them, do not enter supplier bills (the accountant does) and cannot accept a price difference or reverse a receipt (admin only).
-        $purchasing = ['procurement.view', 'procurement.order.manage', 'procurement.receipt.post', 'procurement.return.post',
+        $purchasing = ['ai.use', 'procurement.view', 'procurement.order.manage', 'procurement.receipt.post', 'procurement.return.post',
             'masterdata.reference.view', 'masterdata.item.view', 'masterdata.supplier.view', 'masterdata.price_list.view', 'inventory.stock.view', 'inventory.warehouse.view'];
         Role::findOrCreate('purchasing', 'web')->syncPermissions(array_values(array_filter($names, fn (string $name) => in_array($name, $purchasing, true))));
 
         // Production staff draft bills of materials, plan, release and run production orders and issue/return materials; they read items,
         // warehouses and stock but change none of them. Activating a bill, issuing more than required and the work-centre/machine/shift
         // setup stay with admin.
-        $production = ['manufacturing.view', 'manufacturing.bom.manage', 'manufacturing.order.manage', 'manufacturing.order.release', 'manufacturing.issue.post',
+        $production = ['ai.use', 'manufacturing.view', 'manufacturing.bom.manage', 'manufacturing.order.manage', 'manufacturing.order.release', 'manufacturing.issue.post',
             'manufacturing.output.report', 'manufacturing.downtime.report', 'manufacturing.qc.inspect', 'manufacturing.receipt.post', 'manufacturing.order.complete',
             'masterdata.reference.view', 'masterdata.item.view', 'inventory.stock.view', 'inventory.warehouse.view'];
         Role::findOrCreate('production', 'web')->syncPermissions(array_values(array_filter($names, fn (string $name) => in_array($name, $production, true))));

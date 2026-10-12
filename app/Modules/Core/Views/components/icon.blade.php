@@ -70,6 +70,9 @@
         @case('chart')
             <path d="M4 20V4M4 20h16"/><path d="M8 16v-5M12 16V8M16 16v-3"/>
             @break
+        @case('chat')
+            <path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/>
+            @break
         @case('upload')
             <path d="M12 16V4M7 9l5-5 5 5M4 20h16"/>
             @break

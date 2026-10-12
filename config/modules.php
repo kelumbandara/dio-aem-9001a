@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\AI\AIServiceProvider;
 use App\Modules\Approvals\ApprovalsServiceProvider;
 use App\Modules\Core\CoreServiceProvider;
 use App\Modules\Finance\FinanceServiceProvider;
@@ -96,6 +97,15 @@ return [
             'depends_on' => ['core'],
             // May read these modules' Contracts/DTOs when they are switched on, but works without any of them (each dashboard simply goes missing).
             'optional_depends_on' => ['approvals', 'masterdata', 'inventory', 'finance', 'sales', 'procurement', 'manufacturing'],
+            'enabled' => true,
+            'required' => false,
+        ],
+        'ai' => [
+            'name' => 'AI assistant',
+            'provider' => AIServiceProvider::class,
+            'depends_on' => ['core'],
+            // Reads these modules through their read-only metrics Contracts; each tool disappears with its module.
+            'optional_depends_on' => ['inventory', 'finance', 'sales', 'procurement', 'manufacturing'],
             'enabled' => true,
             'required' => false,
         ],
