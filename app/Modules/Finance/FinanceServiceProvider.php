@@ -44,13 +44,13 @@ class FinanceServiceProvider extends ModuleServiceProvider
     protected function menu(): array
     {
         return [
-            new MenuItem('finance::ui.menu.accounts', 'finance.accounts.index', 'finance.view', 'book', 300),
-            new MenuItem('finance::ui.menu.journals', 'finance.journals.index', 'finance.view', 'swap', 310),
-            new MenuItem('finance::ui.menu.receivables', 'finance.receivables.index', 'finance.ar.view', 'building', 320),
-            new MenuItem('finance::ui.menu.payables', 'finance.payables.index', 'finance.ap.view', 'truck', 330),
-            new MenuItem('finance::ui.menu.reports', 'finance.reports.index', 'finance.report.view', 'chart', 340),
-            new MenuItem('finance::ui.menu.periods', 'finance.periods.index', 'finance.view', 'clock', 350),
-            new MenuItem('finance::ui.menu.setup', 'finance.setup.index', 'finance.view', 'cog', 360),
+            new MenuItem('finance::ui.menu.accounts', 'finance.accounts.index', 'finance.view', 'book', 300, group: 'finance'),
+            new MenuItem('finance::ui.menu.journals', 'finance.journals.index', 'finance.view', 'swap', 310, group: 'finance'),
+            new MenuItem('finance::ui.menu.receivables', 'finance.receivables.index', 'finance.ar.view', 'building', 320, group: 'finance'),
+            new MenuItem('finance::ui.menu.payables', 'finance.payables.index', 'finance.ap.view', 'truck', 330, group: 'finance'),
+            new MenuItem('finance::ui.menu.reports', 'finance.reports.index', 'finance.report.view', 'chart', 340, group: 'finance'),
+            new MenuItem('finance::ui.menu.periods', 'finance.periods.index', 'finance.view', 'clock', 350, group: 'finance'),
+            new MenuItem('finance::ui.menu.setup', 'finance.setup.index', 'finance.view', 'cog', 360, group: 'finance'),
         ];
     }
 

@@ -5,6 +5,18 @@ return [
     'app_name' => 'DIO ERP',
     'language' => 'மொழி',
 
+    'menu_groups' => [
+        'approvals' => 'அங்கீகாரங்கள்',
+        'sales' => 'விற்பனை',
+        'purchasing' => 'கொள்முதல்',
+        'inventory' => 'சரக்கு',
+        'finance' => 'நிதி',
+        'masterdata' => 'முதன்மைத் தரவு',
+        'admin' => 'நிர்வாகம்',
+        'find' => 'பக்கத்தைத் தேடு',
+        'none' => 'பொருந்தும் பக்கம் இல்லை.',
+    ],
+
     'menu' => [
         'dashboard' => 'டாஷ்போர்டு',
         'modules' => 'தொகுதிகள்',

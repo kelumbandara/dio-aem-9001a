@@ -8,6 +8,7 @@ final readonly class MenuItem
      * @param  string  $labelKey  translation key, e.g. core::menu.dashboard
      * @param  string  $route  named web route
      * @param  string|null  $permission  permission required to see the item (null = any authenticated user)
+     * @param  string  $group  sidebar section: main (always shown, no heading), approvals, sales, purchasing, inventory, finance, masterdata, admin
      */
     public function __construct(
         public string $labelKey,
@@ -16,10 +17,11 @@ final readonly class MenuItem
         public string $icon = 'circle',
         public int $order = 100,
         public string $module = '',
+        public string $group = 'main',
     ) {}
 
     public function forModule(string $module): self
     {
-        return new self($this->labelKey, $this->route, $this->permission, $this->icon, $this->order, $module);
+        return new self($this->labelKey, $this->route, $this->permission, $this->icon, $this->order, $module, $this->group);
     }
 }

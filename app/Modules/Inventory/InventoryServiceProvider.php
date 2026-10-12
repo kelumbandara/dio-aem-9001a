@@ -42,11 +42,11 @@ class InventoryServiceProvider extends ModuleServiceProvider
     protected function menu(): array
     {
         return [
-            new MenuItem('inventory::ui.menu.stock', 'inventory.stock.index', 'inventory.stock.view', 'archive', 200),
-            new MenuItem('inventory::ui.menu.documents', 'inventory.documents.index', 'inventory.stock.view', 'swap', 210),
-            new MenuItem('inventory::ui.menu.lots', 'inventory.lots.index', 'inventory.stock.view', 'clock', 220),
-            new MenuItem('inventory::ui.menu.reorder', 'inventory.reorder.index', 'inventory.stock.view', 'bell', 230),
-            new MenuItem('inventory::ui.menu.warehouses', 'inventory.warehouses.index', 'inventory.warehouse.view', 'building', 240),
+            new MenuItem('inventory::ui.menu.stock', 'inventory.stock.index', 'inventory.stock.view', 'archive', 200, group: 'inventory'),
+            new MenuItem('inventory::ui.menu.documents', 'inventory.documents.index', 'inventory.stock.view', 'swap', 210, group: 'inventory'),
+            new MenuItem('inventory::ui.menu.lots', 'inventory.lots.index', 'inventory.stock.view', 'clock', 220, group: 'inventory'),
+            new MenuItem('inventory::ui.menu.reorder', 'inventory.reorder.index', 'inventory.stock.view', 'bell', 230, group: 'inventory'),
+            new MenuItem('inventory::ui.menu.warehouses', 'inventory.warehouses.index', 'inventory.warehouse.view', 'building', 240, group: 'inventory'),
         ];
     }
 

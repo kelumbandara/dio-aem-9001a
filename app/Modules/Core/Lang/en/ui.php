@@ -4,6 +4,18 @@ return [
     'app_name' => 'DIO ERP',
     'language' => 'Language',
 
+    'menu_groups' => [
+        'approvals' => 'Approvals',
+        'sales' => 'Sales',
+        'purchasing' => 'Purchasing',
+        'inventory' => 'Inventory',
+        'finance' => 'Finance',
+        'masterdata' => 'Master data',
+        'admin' => 'Administration',
+        'find' => 'Find a page',
+        'none' => 'No page matches.',
+    ],
+
     'menu' => [
         'dashboard' => 'Dashboard',
         'modules' => 'Modules',

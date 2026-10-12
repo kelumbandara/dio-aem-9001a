@@ -61,12 +61,12 @@ class MasterDataServiceProvider extends ModuleServiceProvider
     protected function menu(): array
     {
         return [
-            new MenuItem('masterdata::ui.menu.items', 'items.index', 'masterdata.item.view', 'box', 100),
-            new MenuItem('masterdata::ui.menu.customers', 'customers.index', 'masterdata.customer.view', 'building', 110),
-            new MenuItem('masterdata::ui.menu.suppliers', 'suppliers.index', 'masterdata.supplier.view', 'truck', 120),
-            new MenuItem('masterdata::ui.menu.price_lists', 'price-lists.index', 'masterdata.price_list.view', 'tag', 130),
-            new MenuItem('masterdata::ui.menu.reference', 'masterdata.reference.index', 'masterdata.reference.view', 'database', 140),
-            new MenuItem('masterdata::ui.menu.import', 'masterdata.import.create', 'masterdata.import', 'upload', 150),
+            new MenuItem('masterdata::ui.menu.items', 'items.index', 'masterdata.item.view', 'box', 100, group: 'masterdata'),
+            new MenuItem('masterdata::ui.menu.customers', 'customers.index', 'masterdata.customer.view', 'building', 110, group: 'masterdata'),
+            new MenuItem('masterdata::ui.menu.suppliers', 'suppliers.index', 'masterdata.supplier.view', 'truck', 120, group: 'masterdata'),
+            new MenuItem('masterdata::ui.menu.price_lists', 'price-lists.index', 'masterdata.price_list.view', 'tag', 130, group: 'masterdata'),
+            new MenuItem('masterdata::ui.menu.reference', 'masterdata.reference.index', 'masterdata.reference.view', 'database', 140, group: 'masterdata'),
+            new MenuItem('masterdata::ui.menu.import', 'masterdata.import.create', 'masterdata.import', 'upload', 150, group: 'masterdata'),
         ];
     }
 

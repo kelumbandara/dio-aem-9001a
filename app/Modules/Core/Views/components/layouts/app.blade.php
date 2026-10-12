@@ -20,7 +20,7 @@
     <div class="flex min-h-screen">
         {{-- Sidebar: off-canvas below lg, fixed column from lg up --}}
         <div class="fixed inset-0 z-30 bg-slate-900/40 lg:hidden" x-show="nav" x-transition.opacity @click="nav = false" x-cloak></div>
-        <aside class="fixed inset-y-0 start-0 z-40 flex w-64 -translate-x-full flex-col border-e border-(--sidebar-border) bg-(--sidebar-bg) text-(--sidebar-text) transition-transform lg:static lg:translate-x-0 rtl:translate-x-full lg:rtl:translate-x-0"
+        <aside class="fixed inset-y-0 start-0 z-40 flex w-64 -translate-x-full flex-col border-e border-(--sidebar-border) bg-(--sidebar-bg) text-(--sidebar-text) transition-transform lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 rtl:translate-x-full lg:rtl:translate-x-0"
                :class="{ 'translate-x-0 rtl:translate-x-0': nav }">
             <div class="flex h-16 items-center gap-3 px-5 text-lg font-semibold tracking-tight text-(--sidebar-title)">
                 @if ($logo)
@@ -28,20 +28,57 @@
                 @endif
                 <span class="min-w-0 truncate">{{ $look->appName() }}</span>
             </div>
-            <nav class="flex-1 space-y-1 px-3 py-2" aria-label="Main">
-                @foreach ($menu as $item)
-                    @php $active = request()->routeIs($item->route); @endphp
-                    <a href="{{ route($item->route) }}"
-                       @class([
-                           'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium',
-                           'bg-(--sidebar-active-bg) text-(--sidebar-active-text)' => $active,
-                           'text-(--sidebar-text) hover:bg-(--sidebar-hover)' => ! $active,
-                       ])
-                       @if ($active) aria-current="page" @endif>
-                        <x-core::icon :name="$item->icon" class="h-5 w-5 shrink-0" />
-                        <span>{{ __($item->labelKey) }}</span>
-                    </a>
+            @php
+                $order = ['main', 'approvals', 'sales', 'purchasing', 'inventory', 'finance', 'masterdata', 'admin'];
+                $sections = collect($menu)->groupBy('group')->sortBy(fn ($items, $g) => (($i = array_search($g, $order, true)) === false ? 99 : $i));
+                $activeGroup = optional(collect($menu)->first(fn ($i) => request()->routeIs($i->route)))->group;
+                $labels = collect($menu)->map(fn ($i) => mb_strtolower(__($i->labelKey)))->values();
+            @endphp
+            <nav class="min-h-0 flex-1 space-y-1 overflow-y-auto px-3 py-2" aria-label="Main"
+                 x-data="{
+                     q: '',
+                     active: @js($activeGroup),
+                     open: (() => { try { return JSON.parse(localStorage.getItem('nav.open') || '{}'); } catch (e) { return {}; } })(),
+                     init() { if (this.active) { this.open[this.active] = true; } },
+                     isOpen(g) { return this.q !== '' || this.open[g] === true; },
+                     toggle(g) { this.open[g] = ! this.isOpen(g); try { localStorage.setItem('nav.open', JSON.stringify(this.open)); } catch (e) {} },
+                     hit(label) { return this.q === '' || label.includes(this.q.toLowerCase().trim()); },
+                     none() { return this.q !== '' && ! @js($labels).some(l => this.hit(l)); }
+                 }">
+                <div class="relative px-1 pb-2">
+                    <label for="nav-search" class="sr-only">{{ __('core::ui.menu_groups.find') }}</label>
+                    <x-core::icon name="search" class="pointer-events-none absolute start-4 top-2.5 h-4 w-4 opacity-60" />
+                    <input id="nav-search" type="search" x-model="q" autocomplete="off" placeholder="{{ __('core::ui.menu_groups.find') }}"
+                           class="w-full rounded-lg border-0 bg-(--sidebar-hover) py-2 ps-9 pe-3 text-sm text-(--sidebar-text) placeholder:text-(--sidebar-text) placeholder:opacity-60 focus:ring-2 focus:ring-(--sidebar-active-text)">
+                </div>
+                @foreach ($sections as $group => $items)
+                    @php $items = $items->sortBy('order')->values(); $groupLabels = $items->map(fn ($i) => mb_strtolower(__($i->labelKey)))->values(); @endphp
+                    <div x-show="q === '' || @js($groupLabels).some(l => hit(l))">
+                        @if ($group !== 'main')
+                            <button type="button" @click="toggle(@js($group))" :aria-expanded="isOpen(@js($group)).toString()"
+                                    class="mt-2 flex w-full items-center justify-between rounded-lg px-3 py-1.5 text-xs font-semibold uppercase tracking-wider opacity-80 hover:bg-(--sidebar-hover) hover:opacity-100">
+                                <span>{{ __('core::ui.menu_groups.'.$group) }}</span>
+                                <x-core::icon name="chevron-down" class="h-4 w-4 transition-transform" ::class="isOpen(@js($group)) ? '' : '-rotate-90 rtl:rotate-90'" />
+                            </button>
+                        @endif
+                        <div class="space-y-1" @if ($group !== 'main') x-show="isOpen(@js($group))" @endif>
+                            @foreach ($items as $item)
+                                @php $active = request()->routeIs($item->route); @endphp
+                                <a href="{{ route($item->route) }}" x-show="hit(@js(mb_strtolower(__($item->labelKey))))"
+                                   @class([
+                                       'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium',
+                                       'bg-(--sidebar-active-bg) text-(--sidebar-active-text)' => $active,
+                                       'text-(--sidebar-text) hover:bg-(--sidebar-hover)' => ! $active,
+                                   ])
+                                   @if ($active) aria-current="page" @endif>
+                                    <x-core::icon :name="$item->icon" class="h-5 w-5 shrink-0" />
+                                    <span>{{ __($item->labelKey) }}</span>
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
                 @endforeach
+                <p x-show="none()" x-cloak class="px-3 py-2 text-sm opacity-70">{{ __('core::ui.menu_groups.none') }}</p>
             </nav>
             @if ($look->poweredBy())
                 <div class="px-5 py-3 text-xs text-(--sidebar-text) opacity-70">{{ $look->poweredBy() }}</div>

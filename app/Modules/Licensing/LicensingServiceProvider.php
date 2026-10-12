@@ -28,7 +28,7 @@ class LicensingServiceProvider extends ModuleServiceProvider
 
     protected function menu(): array
     {
-        return [new MenuItem('licensing::ui.menu.licence', 'licence.show', 'licensing.manage', 'key', 920)];
+        return [new MenuItem('licensing::ui.menu.licence', 'licence.show', 'licensing.manage', 'key', 920, group: 'admin')];
     }
 
     public function register(): void

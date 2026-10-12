@@ -37,14 +37,14 @@ class ApprovalsServiceProvider extends ModuleServiceProvider
     protected function menu(): array
     {
         $demo = $this->app->environment('local')
-            ? [new MenuItem('approvals::ui.menu.demo', 'approvals.demo', null, 'puzzle', 990)]
+            ? [new MenuItem('approvals::ui.menu.demo', 'approvals.demo', null, 'puzzle', 990, group: 'admin')]
             : [];
 
         return [...$demo,
-            new MenuItem('approvals::ui.menu.inbox', 'approvals.index', null, 'check-circle', 20),
-            new MenuItem('approvals::ui.menu.delegations', 'approvals.delegations.index', null, 'users', 25),
-            new MenuItem('approvals::ui.menu.policies', 'approvals.policies.index', 'approvals.policy.manage', 'cog', 880),
-            new MenuItem('approvals::ui.menu.authority', 'approvals.authority.index', 'approvals.authority.manage', 'scale', 885),
+            new MenuItem('approvals::ui.menu.inbox', 'approvals.index', null, 'check-circle', 20, group: 'approvals'),
+            new MenuItem('approvals::ui.menu.delegations', 'approvals.delegations.index', null, 'users', 25, group: 'approvals'),
+            new MenuItem('approvals::ui.menu.policies', 'approvals.policies.index', 'approvals.policy.manage', 'cog', 880, group: 'admin'),
+            new MenuItem('approvals::ui.menu.authority', 'approvals.authority.index', 'approvals.authority.manage', 'scale', 885, group: 'admin'),
         ];
     }
 

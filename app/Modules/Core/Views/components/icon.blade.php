@@ -1,6 +1,12 @@
 @props(['name' => 'circle'])
 <svg {{ $attributes->merge(['class' => 'h-5 w-5']) }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
     @switch($name)
+        @case('chevron-down')
+            <path d="m6 9 6 6 6-6"/>
+            @break
+        @case('search')
+            <circle cx="11" cy="11" r="6"/><path d="m20 20-4.2-4.2"/>
+            @break
         @case('home')
             <path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>
             @break

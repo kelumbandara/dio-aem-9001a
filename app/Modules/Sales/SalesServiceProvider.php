@@ -26,11 +26,11 @@ class SalesServiceProvider extends ModuleServiceProvider
     protected function menu(): array
     {
         return [
-            new MenuItem('sales::ui.menu.quotations', 'sales.quotations.index', 'sales.view', 'tag', 100),
-            new MenuItem('sales::ui.menu.orders', 'sales.orders.index', 'sales.view', 'box', 110),
-            new MenuItem('sales::ui.menu.deliveries', 'sales.deliveries.index', 'sales.view', 'truck', 120),
-            new MenuItem('sales::ui.menu.invoices', 'sales.invoices.index', 'sales.view', 'book', 130),
-            new MenuItem('sales::ui.menu.credit_notes', 'sales.credit-notes.index', 'sales.view', 'swap', 140),
+            new MenuItem('sales::ui.menu.quotations', 'sales.quotations.index', 'sales.view', 'tag', 100, group: 'sales'),
+            new MenuItem('sales::ui.menu.orders', 'sales.orders.index', 'sales.view', 'box', 110, group: 'sales'),
+            new MenuItem('sales::ui.menu.deliveries', 'sales.deliveries.index', 'sales.view', 'truck', 120, group: 'sales'),
+            new MenuItem('sales::ui.menu.invoices', 'sales.invoices.index', 'sales.view', 'book', 130, group: 'sales'),
+            new MenuItem('sales::ui.menu.credit_notes', 'sales.credit-notes.index', 'sales.view', 'swap', 140, group: 'sales'),
         ];
     }
 }

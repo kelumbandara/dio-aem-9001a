@@ -70,11 +70,11 @@ class CoreServiceProvider extends ModuleServiceProvider
     protected function menu(): array
     {
         return [
-            new MenuItem('core::ui.menu.dashboard', 'dashboard', null, 'home', 10),
-            new MenuItem('core::ui.menu.modules', 'modules.index', 'core.module.manage', 'puzzle', 900),
-            new MenuItem('core::ui.menu.company', 'company.edit', 'core.company.manage', 'building', 905),
-            new MenuItem('core::ui.menu.appearance', 'appearance.edit', 'core.appearance.manage', 'palette', 906),
-            new MenuItem('core::ui.menu.audit_log', 'audit-log.index', 'core.audit.view', 'shield', 910),
+            new MenuItem('core::ui.menu.dashboard', 'dashboard', null, 'home', 10, group: 'main'),
+            new MenuItem('core::ui.menu.modules', 'modules.index', 'core.module.manage', 'puzzle', 900, group: 'admin'),
+            new MenuItem('core::ui.menu.company', 'company.edit', 'core.company.manage', 'building', 905, group: 'admin'),
+            new MenuItem('core::ui.menu.appearance', 'appearance.edit', 'core.appearance.manage', 'palette', 906, group: 'admin'),
+            new MenuItem('core::ui.menu.audit_log', 'audit-log.index', 'core.audit.view', 'shield', 910, group: 'admin'),
         ];
     }
 

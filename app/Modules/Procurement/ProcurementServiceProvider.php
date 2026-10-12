@@ -27,10 +27,10 @@ class ProcurementServiceProvider extends ModuleServiceProvider
     protected function menu(): array
     {
         return [
-            new MenuItem('procurement::ui.menu.orders', 'procurement.orders.index', 'procurement.view', 'truck', 150),
-            new MenuItem('procurement::ui.menu.receipts', 'procurement.receipts.index', 'procurement.view', 'archive', 160),
-            new MenuItem('procurement::ui.menu.bills', 'procurement.bills.index', 'procurement.view', 'book', 170),
-            new MenuItem('procurement::ui.menu.returns', 'procurement.returns.index', 'procurement.view', 'swap', 180),
+            new MenuItem('procurement::ui.menu.orders', 'procurement.orders.index', 'procurement.view', 'truck', 150, group: 'purchasing'),
+            new MenuItem('procurement::ui.menu.receipts', 'procurement.receipts.index', 'procurement.view', 'archive', 160, group: 'purchasing'),
+            new MenuItem('procurement::ui.menu.bills', 'procurement.bills.index', 'procurement.view', 'book', 170, group: 'purchasing'),
+            new MenuItem('procurement::ui.menu.returns', 'procurement.returns.index', 'procurement.view', 'swap', 180, group: 'purchasing'),
         ];
     }
 
