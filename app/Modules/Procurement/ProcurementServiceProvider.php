@@ -5,8 +5,10 @@ namespace App\Modules\Procurement;
 use App\Modules\Approvals\Contracts\ApprovalService;
 use App\Modules\Core\DTOs\MenuItem;
 use App\Modules\Procurement\Approvals\PurchaseOrderApprove;
+use App\Modules\Procurement\Contracts\PurchaseOrderDrafter;
 use App\Modules\Procurement\Contracts\PurchasingMetrics;
 use App\Modules\Procurement\Services\DatabasePurchasingMetrics;
+use App\Modules\Procurement\Services\EloquentPurchaseOrderDrafter;
 use App\Support\ModuleServiceProvider;
 
 class ProcurementServiceProvider extends ModuleServiceProvider
@@ -14,6 +16,7 @@ class ProcurementServiceProvider extends ModuleServiceProvider
     public function register(): void
     {
         $this->app->singleton(PurchasingMetrics::class, DatabasePurchasingMetrics::class);
+        $this->app->bind(PurchaseOrderDrafter::class, EloquentPurchaseOrderDrafter::class);
     }
 
     protected function moduleKey(): string

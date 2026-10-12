@@ -7,6 +7,7 @@ use App\Modules\AI\Models\Conversation;
 use App\Modules\AI\Models\Execution;
 use App\Modules\AI\Providers\ClaudeProvider;
 use App\Modules\AI\Services\ConversationService;
+use App\Modules\AI\Services\Tools\ToolCatalog;
 use App\Modules\Core\Contracts\ModuleRegistry;
 use App\Modules\Core\Database\Seeders\RolesAndPermissionsSeeder;
 use App\Modules\Finance\Database\Seeders\FinanceSeeder;
@@ -31,9 +32,30 @@ describe('the Claude provider', function () {
         expect($res->text)->toBe('Hello')->and($res->inputTokens)->toBe(12)->and($res->outputTokens)->toBe(3)->and($res->toolCalls)->toBe([]);
         Http::assertSent(function ($r) {
             return $r->url() === 'https://api.example.test/v1/messages' && $r->header('x-api-key') === ['sk-test-secret-key'] && $r->header('anthropic-version') === ['2023-06-01']
-                && $r['model'] === 'claude-test' && $r['system'] === 'Be useful.' && $r['max_tokens'] === 500 && $r['messages'][0]['content'] === 'Hi' && $r['tools'][0]['name'] === 'sales.summary'
+                && $r['model'] === 'claude-test' && $r['system'] === 'Be useful.' && $r['max_tokens'] === 500 && $r['messages'][0]['content'] === 'Hi' && $r['tools'][0]['name'] === 'sales__summary'
                 && ! str_contains($r->body(), 'sk-test-secret-key');
         });
+    });
+
+    it('sends tool names the provider accepts and reads them back as our own names', function () {
+        Http::fake(['*' => Http::response(['content' => [['type' => 'tool_use', 'id' => 'toolu_1', 'name' => 'sales__top_customers', 'input' => ['from' => '2026-11-01']]], 'usage' => ['input_tokens' => 5, 'output_tokens' => 2], 'stop_reason' => 'tool_use'])]);
+        $tools = [['name' => 'sales.top_customers', 'description' => 'd', 'input_schema' => ['type' => 'object', 'properties' => new stdClass, 'required' => []]]];
+        $earlier = [['role' => 'user', 'content' => 'Hi'], ['role' => 'assistant', 'content' => [['type' => 'tool_use', 'id' => 'toolu_0', 'name' => 'stock.valuation', 'input' => new stdClass]]],
+            ['role' => 'user', 'content' => [['type' => 'tool_result', 'tool_use_id' => 'toolu_0', 'content' => '{}']]]];
+        $res = (new ClaudeProvider)->complete(aiRequest(['tools' => $tools, 'messages' => $earlier]));
+
+        expect($res->toolCalls[0]->name)->toBe('sales.top_customers')->and($res->blocks[0]['name'])->toBe('sales.top_customers');
+        Http::assertSent(fn ($r) => $r['tools'][0]['name'] === 'sales__top_customers' && $r['messages'][1]['content'][0]['name'] === 'stock__valuation');
+    });
+
+    it('has only tool names the provider accepts once translated, each one unique', function () {
+        $wire = [];
+        foreach (app(ToolCatalog::class)->all() as $tool) {
+            expect($tool->name())->not->toContain('__')->and(ClaudeProvider::internalName(ClaudeProvider::wireName($tool->name())))->toBe($tool->name());
+            expect(ClaudeProvider::wireName($tool->name()))->toMatch('/^[a-zA-Z0-9_-]{1,128}$/');
+            $wire[] = ClaudeProvider::wireName($tool->name());
+        }
+        expect($wire)->toBe(array_values(array_unique($wire)));
     });
 
     it('leaves the tools field out when there are none', function () {
@@ -74,7 +96,7 @@ describe('the Claude provider', function () {
                 (new ClaudeProvider)->complete(aiRequest());
                 $this->fail('Expected an error');
             } catch (AiException $e) {
-                expect($e->errorCode)->toBe('ai.provider_unavailable')->and($e->getMessage())->toContain("status {$status}")->and($e->getMessage())->not->toContain('sk-test');
+                expect($e->errorCode)->toBe('ai.provider_unavailable')->and($e->getMessage())->toContain("status {$status}: invalid x-api-key [key]")->and($e->getMessage())->not->toContain('sk-test');
             }
         }
     });

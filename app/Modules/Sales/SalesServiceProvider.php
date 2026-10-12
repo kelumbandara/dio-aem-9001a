@@ -3,8 +3,10 @@
 namespace App\Modules\Sales;
 
 use App\Modules\Core\DTOs\MenuItem;
+use App\Modules\Sales\Contracts\QuotationDrafter;
 use App\Modules\Sales\Contracts\SalesMetrics;
 use App\Modules\Sales\Services\DatabaseSalesMetrics;
+use App\Modules\Sales\Services\EloquentQuotationDrafter;
 use App\Support\ModuleServiceProvider;
 
 class SalesServiceProvider extends ModuleServiceProvider
@@ -12,6 +14,7 @@ class SalesServiceProvider extends ModuleServiceProvider
     public function register(): void
     {
         $this->app->singleton(SalesMetrics::class, DatabaseSalesMetrics::class);
+        $this->app->bind(QuotationDrafter::class, EloquentQuotationDrafter::class);
     }
 
     protected function moduleKey(): string

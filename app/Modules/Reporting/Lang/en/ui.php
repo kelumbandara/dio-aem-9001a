@@ -20,6 +20,8 @@ return [
     'to' => 'To',
     'compare_with' => 'Compare with',
     'apply' => 'Apply',
+    'ask_ai' => 'Ask the assistant to explain',
+    'ask_ai_question' => 'Explain the :title dashboard for :from to :to compared with :cfrom to :cto: what changed, what is good and what needs attention?',
     'export_csv' => 'Download CSV (Excel)',
     'print' => 'Print',
     'printed' => 'Printed :at',

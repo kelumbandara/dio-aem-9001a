@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\Collection;
 /** Conversations belong to the person who started them; nobody else (not even an administrator) reads another person's chat here. */
 final class ConversationService
 {
-    public function start(int $userId, string $firstMessage): Conversation
+    public function start(int $userId, string $firstMessage, string $agent = AgentRegistry::DEFAULT): Conversation
     {
         $title = trim(mb_substr(preg_replace('/\s+/u', ' ', $firstMessage) ?? '', 0, 80));
 
-        return Conversation::create(['user_id' => $userId, 'title' => $title === '' ? 'Conversation' : $title, 'channel' => 'web']);
+        return Conversation::create(['user_id' => $userId, 'title' => $title === '' ? 'Conversation' : $title, 'channel' => 'web', 'agent' => $agent]);
     }
 
     /** @return Collection<int, Conversation> */

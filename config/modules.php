@@ -105,7 +105,7 @@ return [
             'provider' => AIServiceProvider::class,
             'depends_on' => ['core'],
             // Reads these modules through their read-only metrics Contracts; each tool disappears with its module.
-            'optional_depends_on' => ['inventory', 'finance', 'sales', 'procurement', 'manufacturing'],
+            'optional_depends_on' => ['masterdata', 'inventory', 'finance', 'sales', 'procurement', 'manufacturing'],
             'enabled' => true,
             'required' => false,
         ],

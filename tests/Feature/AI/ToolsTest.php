@@ -55,12 +55,12 @@ describe('the tool list', function () {
         $this->boss = userWithPermissions('ai.use', 'sales.view', 'procurement.view', 'inventory.stock.view', 'finance.report.view', 'manufacturing.view');
     });
 
-    it('only offers read tools, each with a name, a description, a schema, a permission and a module', function () {
+    it('only offers read and draft tools, each with a name, a description, a schema, a permission and a module', function () {
         $tools = app(ToolCatalog::class)->all();
-        expect($tools)->toHaveCount(20);
+        expect($tools)->toHaveCount(26);
         $names = [];
         foreach ($tools as $t) {
-            expect($t->risk())->toBe('R0')->and($t->name())->toMatch('/^[a-z_]+\.[a-z_]+$/')->and(strlen($t->description()))->toBeGreaterThan(20)
+            expect($t->risk())->toBeIn(['R0', 'R1'])->and($t->name())->toMatch('/^[a-z_]+\.[a-z_]+$/')->and(strlen($t->description()))->toBeGreaterThan(20)
                 ->and($t->schema()['type'])->toBe('object')->and($t->permission())->not->toBe('')->and($t->module())->not->toBe('');
             $names[] = $t->name();
         }
@@ -83,6 +83,9 @@ describe('the tool list', function () {
         $ctx = new ToolContext($this->boss, $this->boss->id, CarbonImmutable::now('Asia/Colombo'));
         $period = ['from' => '2026-11-01', 'to' => '2026-11-04'];
         foreach (app(ToolCatalog::class)->all() as $tool) {
+            if (array_diff($tool->schema()['required'], ['from', 'to']) !== []) {
+                continue;                                                                    // lookups and drafts need real codes: tested on their own
+            }
             $input = isset(((array) $tool->schema()['properties'])['from']) ? $period : [];
             expect((new SchemaValidator)->problems($tool->schema(), $input))->toBe([], $tool->name());
             $result = $tool->handle($input, $ctx);

@@ -9,7 +9,7 @@ use App\Modules\AI\Exceptions\AiException;
 use Carbon\CarbonImmutable;
 use Closure;
 
-/** A read tool defined by its name, schema and a function over one module's metrics contract. */
+/** A tool (read by default; drafts say R1) defined by its name, schema and a function over one module's metrics contract. */
 final class ClosureTool implements BusinessTool
 {
     public const PERIOD = [
@@ -30,6 +30,7 @@ final class ClosureTool implements BusinessTool
         private readonly array $properties,
         private readonly array $required,
         private readonly Closure $run,
+        private readonly string $risk = 'R0',
     ) {}
 
     public function name(): string
@@ -49,7 +50,7 @@ final class ClosureTool implements BusinessTool
 
     public function risk(): string
     {
-        return 'R0';
+        return $this->risk;
     }
 
     public function permission(): string

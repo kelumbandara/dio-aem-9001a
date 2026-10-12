@@ -49,15 +49,32 @@ final class SchemaValidator
             'integer' => is_int($value),
             'number' => is_int($value) || is_float($value),
             'boolean' => is_bool($value),
+            'array' => is_array($value) && array_is_list($value),
             default => false,
         };
         if (! $ok) {
-            $label = ['string' => 'text', 'integer' => 'a whole number', 'number' => 'a number', 'boolean' => 'true or false'][$type] ?? $type;
+            $label = ['string' => 'text', 'integer' => 'a whole number', 'number' => 'a number', 'boolean' => 'true or false', 'array' => 'a list'][$type] ?? $type;
 
             return ["'{$name}' must be {$label}."];
         }
         if (isset($rule['enum']) && ! in_array($value, $rule['enum'], true)) {
             return ["'{$name}' must be one of: ".implode(', ', $rule['enum']).'.'];
+        }
+        if ($type === 'array') {
+            if (isset($rule['minItems']) && count($value) < $rule['minItems']) {
+                return ["'{$name}' needs at least {$rule['minItems']} entries."];
+            }
+            if (isset($rule['maxItems']) && count($value) > $rule['maxItems']) {
+                return ["'{$name}' may have at most {$rule['maxItems']} entries."];
+            }
+            $problems = [];
+            foreach ($value as $i => $entry) {
+                foreach ($this->problems((array) ($rule['items'] ?? []), $entry) as $p) {
+                    $problems[] = "{$name}[".($i + 1).']: '.$p;
+                }
+            }
+
+            return $problems;
         }
         if ($type === 'string') {
             if (isset($rule['maxLength']) && mb_strlen($value) > $rule['maxLength']) {

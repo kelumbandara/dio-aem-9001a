@@ -31,7 +31,7 @@ bank reconciliation import, Maintenance module, pgvector RAG.
 | **S9 Manufacturing II** (done, pending review: [handover](handover/sprint-9.md)) | Output/reject/rework/downtime entry per shift, QC, FG receipt (materials-only cost), completion with variance, operator UI |
 | **S10 Reporting** (done, pending review: [handover](handover/sprint-10.md)) | Seven role dashboards (owner, sales, purchasing, stores, finance, production, quality) with period comparison, drill-down, CSV, print and API |
 | **S11 AI Core** (done, pending review: [handover](handover/sprint-11.md)) | Claude provider, run loop, 20 read tools, input checks, injection boundary, immutable audit, metering and budgets, web chat and API |
-| **S12 AI Agents** | 10 agents, drafts, approvals integration, safety suite |
+| **S12 AI Agents** (done, pending review: [handover](handover/sprint-12.md)) | 7 department agents (Maintenance/HR/Customer-service wait for their modules and channels), lookups, draft quotation and purchase order, safety suite; approvals integration deliberately not needed (the assistant never submits) |
 | **S13 Mobile** | RN app: login, approvals, production/downtime/quality/stock, AI chat, push |
 | **S14 Communications** | Email, WhatsApp, templates, consent, identity linking |
 | **S15 Hardening & Release** | Security review, performance, backup/restore drill, Coolify runbooks, pilot |

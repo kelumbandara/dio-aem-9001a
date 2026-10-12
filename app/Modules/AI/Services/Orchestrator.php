@@ -10,6 +10,7 @@ use App\Modules\AI\Models\Conversation;
 use App\Modules\AI\Models\Execution;
 use App\Modules\AI\Models\Message;
 use App\Modules\AI\Services\Tools\SchemaValidator;
+use App\Support\Exceptions\BusinessException;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Auth\Access\Authorizable;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -39,12 +40,12 @@ final class Orchestrator
      *
      * @throws AiException
      */
-    public function ask(Authenticatable&Authorizable $user, Conversation $conversation, string $question, string $agent = AgentRegistry::DEFAULT): Message
+    public function ask(Authenticatable&Authorizable $user, Conversation $conversation, string $question): Message
     {
         $userId = (int) $user->getAuthIdentifier();
         $started = hrtime(true);
         $today = CarbonImmutable::now(config('core.display_timezone'))->startOfDay();
-        $def = $this->agents->get($agent, App::getLocale(), $today);
+        $def = $this->agents->get($conversation->agent, App::getLocale(), $today);
 
         $text = $this->safety->question($question);
         if ($text === null) {
@@ -63,7 +64,7 @@ final class Orchestrator
         $messages = $this->merge([...$history, ['role' => 'user', 'content' => $text]]);
 
         $context = new ToolContext($user, $userId, $today);
-        $available = $this->tools->availableTo($user);
+        $available = $this->tools->availableTo($user, $def['tools']);
         $schemas = array_map(fn ($t) => ['name' => $t->name(), 'description' => $t->description(), 'input_schema' => $t->schema()], $available);
         $hash = hash('sha256', $def['system'].json_encode($messages));
 
@@ -89,7 +90,7 @@ final class Orchestrator
                 $messages[] = ['role' => 'assistant', 'content' => $res->blocks];
                 $results = [];
                 foreach ($res->toolCalls as $call) {
-                    [$block, $entry, $got] = $this->runTool($call->id, $call->name, $call->input, $user, $context);
+                    [$block, $entry, $got] = $this->runTool($call->id, $call->name, $call->input, $user, $context, $def['tools']);
                     $results[] = $block;
                     $audit[] = $entry;
                     array_push($refs, ...$got);
@@ -122,9 +123,10 @@ final class Orchestrator
      * Runs one requested tool, or refuses it. The result block goes back to the model; the entry goes to the audit trail.
      *
      * @param  array<string, mixed>  $input
+     * @param  list<string>|null  $allow  the agent's tool list
      * @return array{0: array<string, mixed>, 1: array<string, mixed>, 2: list<array{label: string, url: string}>}
      */
-    private function runTool(string $id, string $name, array $input, Authorizable $user, ToolContext $context): array
+    private function runTool(string $id, string $name, array $input, Authorizable $user, ToolContext $context, ?array $allow): array
     {
         $t0 = hrtime(true);
         $entry = ['name' => mb_substr($name, 0, 80), 'input' => $this->safety->cleanResult($input)['data'], 'status' => 'ok', 'flagged' => false, 'ms' => 0];
@@ -136,10 +138,11 @@ final class Orchestrator
             return [['type' => 'tool_result', 'tool_use_id' => $id, 'content' => $message, 'is_error' => true], $entry, []];
         };
 
-        $tool = $this->tools->find($name, $user);
+        $tool = $this->tools->find($name, $user, $allow);
         if ($tool === null) {
             return $finish('denied', 'This tool is not available to you.');       // unknown, module off and no permission read the same
         }
+        $entry['risk'] = $tool->risk();
         $problems = $this->validator->problems($tool->schema(), $input);
         if ($problems !== []) {
             return $finish('invalid', 'The input was refused: '.implode(' ', $problems));
@@ -147,8 +150,8 @@ final class Orchestrator
 
         try {
             $result = $tool->handle($input, $context);
-        } catch (AiException $e) {
-            return $finish('invalid', 'The input was refused: '.$e->getMessage());
+        } catch (BusinessException $e) {
+            return $finish('invalid', 'This could not be done: '.$e->getMessage());
         } catch (Throwable $e) {
             report($e);
 
@@ -157,6 +160,9 @@ final class Orchestrator
 
         $clean = $this->safety->cleanResult($result->data);
         $entry['flagged'] = $clean['flagged'];
+        if ($result->audit !== []) {
+            $entry['result'] = $this->safety->cleanResult($result->audit)['data'];
+        }
         $entry['ms'] = (int) ((hrtime(true) - $t0) / 1_000_000);
 
         return [
@@ -212,7 +218,7 @@ final class Orchestrator
     }
 
     /**
-     * @param  array{name: string, model: string, system: string}  $def
+     * @param  array{name: string, model: string, system: string, tools: list<string>|null, drafts: bool}  $def
      * @param  list<array<string, mixed>>  $calls
      */
     private function audit(Conversation $conversation, int $userId, array $def, string $status, string $hash, int $steps, array $calls, int $in, int $out, int|float $started, ?string $errorCode): Execution

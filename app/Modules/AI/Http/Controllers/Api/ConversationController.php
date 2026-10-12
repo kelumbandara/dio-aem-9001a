@@ -4,12 +4,15 @@ namespace App\Modules\AI\Http\Controllers\Api;
 
 use App\Modules\AI\Models\Conversation;
 use App\Modules\AI\Models\Message;
+use App\Modules\AI\Services\AgentRegistry;
 use App\Modules\AI\Services\ConversationService;
 use App\Modules\AI\Services\Orchestrator;
+use App\Modules\AI\Services\ToolRegistry;
 use App\Modules\AI\Services\UsageMeter;
 use App\Support\Http\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ConversationController extends Controller
 {
@@ -28,11 +31,18 @@ class ConversationController extends Controller
         return response()->json(['data' => $this->conversation($c) + ['messages' => $c->messages()->get()->map(fn (Message $m) => $this->present($m))->all()]]);
     }
 
-    public function start(Request $request, ConversationService $conversations, Orchestrator $orchestrator): JsonResponse
+    public function agents(Request $request, AgentRegistry $agents, ToolRegistry $tools): JsonResponse
     {
         $this->need($request, 'ai.use');
-        $data = $request->validate(['message' => ['required', 'string']]);
-        $c = $conversations->start($request->user()->id, $data['message']);
+
+        return response()->json(['data' => array_map(fn (string $k) => ['key' => $k, 'name' => __("ai::ui.agents.{$k}.name"), 'description' => __("ai::ui.agents.{$k}.description")], $agents->availableTo($request->user(), $tools))]);
+    }
+
+    public function start(Request $request, ConversationService $conversations, Orchestrator $orchestrator, AgentRegistry $agents, ToolRegistry $tools): JsonResponse
+    {
+        $this->need($request, 'ai.use');
+        $data = $request->validate(['message' => ['required', 'string'], 'agent' => ['nullable', 'string', Rule::in($agents->availableTo($request->user(), $tools))]]);
+        $c = $conversations->start($request->user()->id, $data['message'], $data['agent'] ?? AgentRegistry::DEFAULT);
         $answer = $orchestrator->ask($request->user(), $c, $data['message']);
 
         return response()->json(['data' => $this->conversation($c->refresh()) + ['answer' => $this->present($answer)]], 201);
@@ -72,6 +82,6 @@ class ConversationController extends Controller
     /** @return array<string, mixed> */
     private function conversation(Conversation $c): array
     {
-        return ['id' => $c->public_id, 'title' => $c->title, 'updated_at' => $c->updated_at->toIso8601String()];
+        return ['id' => $c->public_id, 'title' => $c->title, 'agent' => $c->agent, 'updated_at' => $c->updated_at->toIso8601String()];
     }
 }

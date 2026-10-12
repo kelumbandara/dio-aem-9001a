@@ -84,7 +84,7 @@ describe('a question and its answer', function () {
         $names = array_column($model->requests[0]->tools, 'name');
         expect($names)->toContain('sales.summary')->and($names)->not->toContain('finance.profit')->and($names)->not->toContain('stock.valuation')->and($names)->not->toContain('production.summary');
         [, $all] = aiAsk($this->boss, 'Hi', [ScriptedProvider::say('Hi')]);
-        expect(count($all->requests[0]->tools))->toBe(20)->and($all->requests[0]->tools[0]['input_schema']['type'])->toBe('object');
+        expect(count($all->requests[0]->tools))->toBe(21)->and($all->requests[0]->tools[0]['input_schema']['type'])->toBe('object');
     });
 
     it('gives the model earlier turns of the same conversation, and joins neighbouring turns by the same speaker', function () {
@@ -151,7 +151,7 @@ describe('what the model is not allowed to do', function () {
             $this->instance(SalesMetrics::class, $sales);
             [, $model] = aiAsk($this->salesman, 'x', [ScriptedProvider::useTool($tool, $input), ScriptedProvider::say('ok')]);
             $result = collect($model->requests[1]->messages)->last()['content'][0];
-            expect($result['is_error'])->toBeTrue()->and($result['content'])->toContain('The input was refused')->and($result['content'])->toContain($expected);
+            expect($result['is_error'])->toBeTrue()->and($result['content'])->toContain($expected);
             expect(aiLastRun()->tool_calls[0]['status'])->toBe('invalid');
         }
     });

@@ -26,6 +26,10 @@ return [
     'history_messages' => (int) env('AI_HISTORY_MESSAGES', 12),
     'max_message_chars' => 2000,
 
+    // Drafts the assistant may prepare (quotations, purchase orders): per question and per person per hour.
+    'max_drafts_per_run' => (int) env('AI_MAX_DRAFTS_PER_RUN', 3),
+    'drafts_per_hour' => (int) env('AI_DRAFTS_PER_HOUR', 10),
+
     // Safety: tool results are cut to this many characters per text value and this many rows per list.
     'tool_text_chars' => 120,
     'tool_rows' => 15,

@@ -15,10 +15,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $user_id
  * @property string $title
  * @property string $channel
+ * @property string $agent
  * @property CarbonImmutable $updated_at
  */
 #[RouteKey('public_id')]
-#[Fillable(['user_id', 'title', 'channel'])]
+#[Fillable(['user_id', 'title', 'channel', 'agent'])]
 class Conversation extends Model
 {
     use HasPublicId;

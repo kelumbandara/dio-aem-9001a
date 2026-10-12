@@ -15,7 +15,7 @@ use Illuminate\Contracts\Container\Container;
  * Every read tool (risk R0). Each is a thin adapter over a module's read-only metrics contract, the same figures the Reporting
  * dashboards show, so the assistant and the dashboards cannot disagree. Nothing here writes, and nothing takes SQL or a file name.
  */
-final class ToolCatalog
+class ToolCatalog
 {
     private const LIMIT = ['limit' => ['type' => 'integer', 'minimum' => 1, 'maximum' => 15, 'description' => 'How many rows (default 10).']];
 
@@ -24,7 +24,7 @@ final class ToolCatalog
     /** @return list<BusinessTool> */
     public function all(): array
     {
-        return array_merge($this->sales(), $this->purchasing(), $this->stock(), $this->finance(), $this->production());
+        return array_merge($this->sales(), $this->purchasing(), $this->stock(), $this->finance(), $this->production(), $this->container->make(WorkTools::class)->all());
     }
 
     /** @return list<BusinessTool> */

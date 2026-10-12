@@ -1,5 +1,6 @@
 @php
     $field = 'block rounded-lg border-0 px-3 py-2 text-sm shadow-sm ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-indigo-600';
+    $askAi = app(\App\Modules\Core\Contracts\ModuleRegistry::class)->isEnabled('ai') && auth()->user()->can('ai.use') && \Illuminate\Support\Facades\Route::has('ai.chat.index');
     $q = ['period' => $d['preset'], 'compare' => $d['compare_mode'], 'from' => $d['period']->from, 'to' => $d['period']->to];
 @endphp
 <x-core::layouts.app :title="$d['title']">
@@ -24,6 +25,9 @@
         <x-core::button type="submit" variant="secondary">{{ __('reporting::ui.apply') }}</x-core::button>
         <a class="rounded-lg px-3 py-2 text-sm text-indigo-600 hover:underline" href="{{ route('reporting.csv', [$d['key']] + $q) }}">{{ __('reporting::ui.export_csv') }}</a>
         <a class="rounded-lg px-3 py-2 text-sm text-indigo-600 hover:underline" target="_blank" href="{{ route('reporting.print', [$d['key']] + $q) }}">{{ __('reporting::ui.print') }}</a>
+        @if ($askAi)
+            <a class="rounded-lg px-3 py-2 text-sm text-indigo-600 hover:underline" href="{{ route('ai.chat.index', ['agent' => $d['key'] === 'stores' ? 'inventory' : $d['key'], 'q' => __('reporting::ui.ask_ai_question', ['title' => $d['title'], 'from' => $d['period']->from, 'to' => $d['period']->to, 'cfrom' => $d['compare']?->from ?? '', 'cto' => $d['compare']?->to ?? ''])]) }}">{{ __('reporting::ui.ask_ai') }}</a>
+        @endif
     </form>
     @include('reporting::dashboards._body')
 </x-core::layouts.app>

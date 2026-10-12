@@ -12,6 +12,9 @@
                 <x-core::alert type="error">{{ __('ai::ui.not_configured') }}</x-core::alert>
             @endunless
             <p class="mb-4 max-w-3xl text-sm text-slate-600">{{ __('ai::ui.intro') }}</p>
+            @if ($conversation)
+                <p class="mb-4 text-sm text-slate-600">{{ __('ai::ui.talking_to') }} <span class="font-medium text-slate-800">{{ __('ai::ui.agents.'.$conversation->agent.'.name') }}</span></p>
+            @endif
 
             <div class="space-y-4" data-chat>
                 @forelse ($messages as $m)
@@ -42,9 +45,19 @@
 
             <form method="POST" action="{{ $conversation ? route('ai.chat.message', $conversation->public_id) : route('ai.chat.start') }}" class="mt-6">
                 @csrf
+                @if (! $conversation && count($agents) > 1)
+                    <div class="mb-3">
+                        <label for="agent" class="mb-1 block text-xs font-medium text-slate-600">{{ __('ai::ui.ask_who') }}</label>
+                        <select id="agent" name="agent" class="block rounded-lg border-0 px-3 py-2 text-sm shadow-sm ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-indigo-600">
+                            @foreach ($agents as $a)
+                                <option value="{{ $a }}" @selected(old('agent', $agent) === $a)>{{ __('ai::ui.agents.'.$a.'.name') }} — {{ __('ai::ui.agents.'.$a.'.description') }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                @endif
                 <label for="message" class="sr-only">{{ __('ai::ui.your_question') }}</label>
                 <textarea id="message" name="message" rows="3" maxlength="{{ config('ai.max_message_chars') }}" required placeholder="{{ __('ai::ui.placeholder') }}"
-                          class="block w-full rounded-lg border-0 px-3 py-2 text-sm shadow-sm ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-indigo-600">{{ old('message') }}</textarea>
+                          class="block w-full rounded-lg border-0 px-3 py-2 text-sm shadow-sm ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-indigo-600">{{ old('message', $prefill) }}</textarea>
                 @error('message') <p class="mt-1 text-sm text-red-700" role="alert">{{ $message }}</p> @enderror
                 <div class="mt-2 flex items-center justify-between">
                     <p class="text-xs text-slate-500">{{ __('ai::ui.read_only') }}</p>
