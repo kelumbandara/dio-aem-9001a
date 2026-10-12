@@ -1,4 +1,19 @@
-import { formatDate, formatDecimal, formatMoney, isQty, localPath, qtyOrZero, screenFor, today } from '@/util/format';
+import { formatDate, formatDecimal, formatMoney, isQty, localPath, normalizeServerUrl, qtyOrZero, screenFor, today } from '@/util/format';
+
+describe('server address', () => {
+  it('keeps only scheme, host and port, whatever link was pasted', () => {
+    expect(normalizeServerUrl('http://192.168.0.105:8000')).toBe('http://192.168.0.105:8000');
+    expect(normalizeServerUrl(' http://192.168.0.105:8000/api/v1/health ')).toBe('http://192.168.0.105:8000');
+    expect(normalizeServerUrl('https://erp.mycompany.lk/login?x=1#top')).toBe('https://erp.mycompany.lk');
+    expect(normalizeServerUrl('HTTPS://ERP.MyCompany.lk///')).toBe('https://erp.mycompany.lk');
+  });
+
+  it('refuses what is not a web address', () => {
+    for (const bad of ['', '192.168.0.105:8000', 'ftp://x.test', 'javascript:alert(1)', 'http://', 'https:// spaced.test', 'erp.mycompany.lk']) {
+      expect(normalizeServerUrl(bad)).toBeNull();
+    }
+  });
+});
 
 describe('quantities', () => {
   it('accepts what the server accepts and nothing else', () => {

@@ -6,6 +6,7 @@ import { ApiError } from '@/api/client';
 import { useSession } from '@/auth/session';
 import { LOCALES } from '@/i18n';
 import { Body, Button, Choice, Field, Notice, Screen, Title } from '@/ui/kit';
+import { normalizeServerUrl } from '@/util/format';
 
 export default function SignIn() {
   const { t, signIn, serverUrl, locale, setLocale } = useSession();
@@ -22,14 +23,16 @@ export default function SignIn() {
   async function submit() {
     setError(null);
     setServerError(null);
-    if (!/^https?:\/\/[^\s/]+/i.test(server.trim())) {
+    const address = normalizeServerUrl(server);
+    if (address === null) {
       setServerError(t('server_invalid'));
 
       return;
     }
+    setServer(address); // a pasted link such as .../api/v1/health becomes just the address
     setBusy(true);
     try {
-      await signIn(server, email, password, needCode ? code : undefined);
+      await signIn(address, email, password, needCode ? code : undefined);
     } catch (e) {
       if (e instanceof ApiError && e.code === 'auth.mfa_required') {
         setNeedCode(true);
