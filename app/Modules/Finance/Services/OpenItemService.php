@@ -59,14 +59,19 @@ final class OpenItemService implements OpenItemPoster
                 throw FinanceException::make('finance.lines_invalid', 'An invoice needs at least one line.', 422, 'lines');
             }
 
+            // A sales invoice has credit lines only. A supplier bill has debit lines (stock received, expense, input VAT) and may carry
+            // credit lines too (a price lower than the goods-received value); the supplier is owed the difference.
             $total = '0';
             foreach ($invoice->lines as $i => $line) {
-                $amount = $receivable ? $line->credit : $line->debit;
-                $other = $receivable ? $line->debit : $line->credit;
-                if (Decimal::compare($other, '0', 4) !== 0 || ! Decimal::isDecimal($amount, 4) || Decimal::compare($amount, '0', 4) <= 0) {
-                    throw FinanceException::make('finance.lines_invalid', 'Give '.($receivable ? 'credit' : 'debit').' lines only, each above zero; the party line is added for you.', 422, "lines.{$i}");
+                $amount = $receivable ? $line->credit : Decimal::sub($line->debit, $line->credit);
+                $other = $receivable ? $line->debit : '0';
+                if (Decimal::compare($other, '0', 4) !== 0 || ! Decimal::isDecimal($line->debit, 4) || ! Decimal::isDecimal($line->credit, 4) || Decimal::compare($amount, '0', 4) === 0 || ($receivable && Decimal::compare($amount, '0', 4) < 0)) {
+                    throw FinanceException::make('finance.lines_invalid', $receivable ? 'Give credit lines only, each above zero; the customer line is added for you.' : 'Give debit lines (or credit lines for a price below the goods received), each above zero; the supplier line is added for you.', 422, "lines.{$i}");
                 }
                 $total = Decimal::add($total, $amount);
+            }
+            if (Decimal::compare($total, '0', 4) <= 0) {
+                throw FinanceException::make('finance.lines_invalid', 'The document must come to more than zero.', 422, 'lines');
             }
             $total = Decimal::round($total, 4);
 

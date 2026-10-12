@@ -5,6 +5,7 @@ use App\Modules\Core\CoreServiceProvider;
 use App\Modules\Finance\FinanceServiceProvider;
 use App\Modules\Inventory\InventoryServiceProvider;
 use App\Modules\MasterData\MasterDataServiceProvider;
+use App\Modules\Procurement\ProcurementServiceProvider;
 use App\Modules\Sales\SalesServiceProvider;
 
 /*
@@ -55,6 +56,13 @@ return [
             'name' => 'Finance',
             'provider' => FinanceServiceProvider::class,
             'depends_on' => ['core', 'approvals', 'masterdata'],
+            'enabled' => true,
+            'required' => false,
+        ],
+        'procurement' => [
+            'name' => 'Procurement',
+            'provider' => ProcurementServiceProvider::class,
+            'depends_on' => ['core', 'approvals', 'masterdata', 'inventory', 'finance'],
             'enabled' => true,
             'required' => false,
         ],

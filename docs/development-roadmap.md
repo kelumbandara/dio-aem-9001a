@@ -24,7 +24,7 @@ bank reconciliation import, Maintenance module, pgvector RAG.
 | **S4 Inventory** (done: [handover](handover/sprint-4.md)) | Ledger, balances, lots, receive/issue, transfers, adjustments, reservations, reorder, negative-stock guard + reconciliation tests |
 | **S5 Finance** (done, pending review: [handover](handover/sprint-5.md)) | CoA, periods, journals, posting rules, AR/AP, receipts, payments, TB, GL, statements + balance tests |
 | **S6 Sales** (done, pending review: [handover](handover/sprint-6.md)) | Quotation → SO (credit-limit block, reservation) → delivery → tax invoice (VAT, SSCL/NBT) → credit notes/returns. Leads/CRM activities deferred |
-| **S7 Procurement** | Requisition → PO → GRN → supplier invoice → returns |
+| **S7 Procurement** (done, pending review: [handover](handover/sprint-7.md)) | PO (approval gate) → goods receipt → supplier bill (three-way match, price variance) → returns + debit notes. Requisitions deferred |
 | **S8 Manufacturing I** | BOM versions, routing, work centers, machines, shifts, production orders, material issue/return |
 | **S9 Manufacturing II** | Output/reject/rework/downtime entry, QC, FG receipt, completion, operator UI |
 | **S10 Reporting** | Role dashboards, KPIs, exports |

@@ -284,7 +284,7 @@ final class SalesCreditNoteService
                 throw SalesException::make('sales.qty_invalid', 'Enter a quantity above zero.', 422, "{$field}.qty");
             }
             if (Decimal::compare($qty, $left($line)) > 0) {
-                throw SalesException::make('sales.qty_exceeds_invoice', 'Only '.$left($line)." of line {$no} can still be credited.", 422, "{$field}.qty");
+                throw SalesException::make('sales.qty_exceeds_invoice', 'Only '.Decimal::trim(Decimal::round($left($line), 6))." of line {$no} can still be credited.", 422, "{$field}.qty");
             }
             $out[] = ['line' => $line, 'qty' => Decimal::round($qty, 6)];
         }

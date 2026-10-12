@@ -9,6 +9,7 @@ use App\Modules\Finance\Approvals\ManualJournalPost;
 use App\Modules\Finance\Approvals\SupplierPaymentPost;
 use App\Modules\Finance\Console\ReconcileFinance;
 use App\Modules\Finance\Contracts\CreditNotePoster;
+use App\Modules\Finance\Contracts\DebitNotePoster;
 use App\Modules\Finance\Contracts\JournalPoster;
 use App\Modules\Finance\Contracts\OpenItemPoster;
 use App\Modules\Finance\Contracts\ReceivablePosition;
@@ -17,6 +18,7 @@ use App\Modules\Finance\Services\CreditNoteService;
 use App\Modules\Finance\Services\DatabaseReceivablePosition;
 use App\Modules\Finance\Services\JournalPostingService;
 use App\Modules\Finance\Services\OpenItemService;
+use App\Modules\Finance\Services\SupplierDebitNoteService;
 use App\Support\ModuleServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Event;
@@ -58,6 +60,7 @@ class FinanceServiceProvider extends ModuleServiceProvider
         $this->app->singleton(JournalPoster::class, JournalPostingService::class);
         $this->app->singleton(OpenItemPoster::class, OpenItemService::class);
         $this->app->singleton(CreditNotePoster::class, CreditNoteService::class);
+        $this->app->singleton(DebitNotePoster::class, SupplierDebitNoteService::class);
         $this->app->singleton(ReceivablePosition::class, DatabaseReceivablePosition::class);
     }
 

@@ -51,7 +51,7 @@ return [
         'reverse' => 'මෙම ලේඛනය ප්‍රතිවර්තනය කරන්න', 'reverse_hint' => 'ජර්නලය ප්‍රතිවර්තනය කර පියවූ මුදල් ලේඛනවලට ආපසු දෙයි.', 'balance' => 'හිඟ ශේෂය',
     ],
 
-    'methods' => ['cash' => 'මුදල්', 'cheque' => 'චෙක්පත', 'bank_transfer' => 'බැංකු මාරුව', 'card' => 'කාඩ්පත', 'other' => 'වෙනත්'],
+    'methods' => ['cash' => 'මුදල්', 'cheque' => 'චෙක්පත', 'bank_transfer' => 'බැංකු මාරුව', 'card' => 'කාඩ්පත', 'other' => 'වෙනත්', 'credit_note' => 'ණය සටහන', 'debit_note' => 'හර සටහන'],
 
     'reports' => [
         'title' => 'මූල්‍ය වාර්තා',
@@ -81,7 +81,7 @@ return [
 
     'mapping' => [
         'inventory' => 'තොග (තොග වටිනාකම)', 'wip' => 'කර්මාන්ත ප්‍රගතියේ ඇති වැඩ', 'grni' => 'ලැබුණු නමුත් බිල්පත් නොලැබූ භාණ්ඩ', 'receivable_control' => 'ලැබිය යුතු පාලන ගිණුම (ගනුදෙනුකරුවන්)', 'payable_control' => 'ගෙවිය යුතු පාලන ගිණුම (සැපයුම්කරුවන්)',
-        'sales_revenue' => 'විකුණුම් ආදායම', 'cogs' => 'විකුණුම් පිරිවැය', 'stock_adjustment' => 'තොග ගැලපීම් සහ ඉවත් කිරීම්', 'sample_expense' => 'නොමිලේ දුන් සාම්පල', 'purchase_variance' => 'මිලදී ගැනීම් මිල විචලනය',
+        'sales_revenue' => 'විකුණුම් ආදායම', 'cogs' => 'විකුණුම් පිරිවැය', 'stock_adjustment' => 'තොග ගැලපීම් සහ ඉවත් කිරීම්', 'sample_expense' => 'නොමිලේ දුන් සාම්පල', 'purchase_expense' => 'සේවා සහ තොග නොවන අයිතම මිලදී ගැනීම්', 'purchase_variance' => 'මිලදී ගැනීම් මිල විචලනය',
         'discount_given' => 'දුන් වට්ටම්', 'discount_received' => 'ලැබූ වට්ටම්', 'vat_output' => 'ගෙවිය යුතු VAT (විකුණුම්)', 'sscl_payable' => 'ගෙවිය යුතු SSCL (විකුණුම්)', 'nbt_payable' => 'ගෙවිය යුතු NBT (විකුණුම්)',
         'vat_input' => 'ලැබිය යුතු VAT (මිලදී ගැනීම්)', 'opening_balance_equity' => 'ආරම්භක ශේෂ හිමිකම', 'retained_earnings' => 'රඳවා ගත් ඉපැයීම්', 'year_result' => 'වර්ෂයේ ලාභ / අලාභ', 'fx_gain' => 'විදේශ විනිමය ලාභය', 'fx_loss' => 'විදේශ විනිමය අලාභය',
     ],

@@ -107,3 +107,7 @@ Stock on hand (filters, item card with where-it-is and recent movements), Stock 
 ## 12. Permissions
 
 `inventory.warehouse.{view,manage}`, `inventory.stock.view`, `inventory.receive`, `inventory.issue`, `inventory.transfer`, `inventory.adjust`, `inventory.reverse`, `inventory.reorder.manage`. `admin` holds all; other roles none until the owner decides who does what.
+
+## Reasons added for other modules
+
+- Issue reason `supplier_return` (Procurement, goods sent back to a supplier): Finance books it against goods received not invoiced.

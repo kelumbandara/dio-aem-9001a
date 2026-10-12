@@ -10,7 +10,7 @@
 | 4 | **Inventory** | Warehouses/locations, stock ledger, balances, lots, reservations, transfers, adjustments, reorder, weighted-average cost ([detail](inventory.md)) | MVP S4 |
 | 5 | **Finance** | Chart of accounts, periods, journals, posting rules, AR, AP, receipts, payments, reports ([detail](finance.md)) | MVP S5 |
 | 6 | **Sales** | Quotations, sales orders (credit-limit block, reservation), deliveries, tax invoices (VAT, SSCL/NBT), credit notes and returns ([detail](sales.md)); leads/activities later | MVP S6 |
-| 7 | **Procurement** | Requisitions, POs, goods receipts, supplier invoice linkage, returns | MVP |
+| 7 | **Procurement** | Purchase orders (approval gate), goods receipts, supplier bills with three-way match, returns and debit notes ([detail](procurement.md)); requisitions later | MVP S7 |
 | 8 | **Manufacturing** | BOM, routing, work centers, machines, lines, shifts, production orders, material issue/return, output, rejects, rework, downtime, QC, FG receipt | MVP (after ERP core) |
 | 9 | **Reporting** | Deterministic KPI queries, dashboards, exports | MVP (incremental) |
 | 10 | **AI** | Providers, orchestrator, agents, tools, conversation, usage, retrieval, safety, execution audit | MVP-lite, grows |

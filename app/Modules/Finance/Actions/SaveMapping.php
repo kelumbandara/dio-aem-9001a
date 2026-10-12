@@ -14,7 +14,7 @@ final class SaveMapping
     public const CLASSES = [
         'inventory' => ['asset'], 'wip' => ['asset'], 'grni' => ['liability'], 'receivable_control' => ['asset'], 'payable_control' => ['liability'],
         'sales_revenue' => ['income'], 'cogs' => ['expense'], 'stock_adjustment' => ['expense'], 'sample_expense' => ['expense'], 'purchase_variance' => ['expense'],
-        'discount_given' => ['income', 'expense'], 'discount_received' => ['income'], 'vat_output' => ['liability'], 'sscl_payable' => ['liability'], 'nbt_payable' => ['liability'],
+        'purchase_expense' => ['expense'], 'discount_given' => ['income', 'expense'], 'discount_received' => ['income'], 'vat_output' => ['liability'], 'sscl_payable' => ['liability'], 'nbt_payable' => ['liability'],
         'vat_input' => ['asset'], 'opening_balance_equity' => ['equity'], 'retained_earnings' => ['equity'], 'year_result' => ['equity'], 'fx_gain' => ['income'], 'fx_loss' => ['expense'],
     ];
 

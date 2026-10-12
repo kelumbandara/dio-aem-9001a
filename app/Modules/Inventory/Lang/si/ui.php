@@ -30,6 +30,7 @@ return [
         'types' => ['receipt' => 'ලැබීම', 'issue' => 'නිකුත් කිරීම', 'transfer' => 'මාරු කිරීම', 'adjustment' => 'ගැලපීම'],
         'status' => ['posted' => 'පළ කළ', 'reversed' => 'ප්‍රතිවර්තනය කළ'],
         'reasons' => [
+            'supplier_return' => 'සැපයුම්කරුට ආපසු',
             'purchase' => 'මිලදී ගැනීම', 'production' => 'නිෂ්පාදනය', 'return' => 'ආපසු', 'opening' => 'ආරම්භක තොගය', 'other' => 'වෙනත්',
             'sale' => 'විකිණීම', 'sample' => 'සාම්පල', 'scrap' => 'ඉවත දැමීම', 'transfer' => 'මාරු කිරීම',
             'count' => 'තොග ගණන් කිරීම', 'damage' => 'හානිය', 'expiry' => 'කල් ඉකුත්වීම', 'loss' => 'අලාභය', 'found' => 'සොයාගත්', 'reversal' => 'ප්‍රතිවර්තනය',

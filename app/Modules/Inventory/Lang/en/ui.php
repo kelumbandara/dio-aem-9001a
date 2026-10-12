@@ -29,6 +29,7 @@ return [
         'types' => ['receipt' => 'Receipt', 'issue' => 'Issue', 'transfer' => 'Transfer', 'adjustment' => 'Adjustment'],
         'status' => ['posted' => 'Posted', 'reversed' => 'Reversed'],
         'reasons' => [
+            'supplier_return' => 'Return to supplier',
             'purchase' => 'Purchase', 'production' => 'Production', 'return' => 'Return', 'opening' => 'Opening stock', 'other' => 'Other',
             'sale' => 'Sale', 'sample' => 'Sample', 'scrap' => 'Scrap', 'transfer' => 'Transfer',
             'count' => 'Stock count', 'damage' => 'Damage', 'expiry' => 'Expiry', 'loss' => 'Loss', 'found' => 'Found', 'reversal' => 'Reversal',

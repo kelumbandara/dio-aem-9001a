@@ -65,6 +65,8 @@ Built in S6 (columns and rules: [sales.md](sales.md)): `sales_quotations`(+`_lin
 `sales_invoices`(+lines), `sales_returns`(+lines), `discount_rules`.
 
 ### Procurement
+Built in S7 (columns and rules: [procurement.md](procurement.md)): `purchase_orders`(+`_lines` with received/returned/billed quantities), `goods_receipts`(+`_lines` with the stock value = the GRNI amount), `supplier_bills`(+`_lines` with GRNI, variance and input VAT parts), `purchase_returns`(+`_lines`, the debit note's parts). Not built: `purchase_requisitions`. Original sketch:
+
 `purchase_requisitions`(+lines), `purchase_orders`(+lines), `goods_receipts`(+lines),
 `supplier_invoices`(+lines, match status), `purchase_returns`(+lines).
 
@@ -156,6 +158,12 @@ trigger checks every journal balances when the transaction commits.
 Sales adds only new tables (`sales_*`) plus, in Finance, `bank_accounts.show_on_invoices` and a relaxed `settlements` rule (`method = 'credit_note'` has no bank
 account; every other method must). New immutability triggers: posted invoices, credit notes (with their lines and tax rows) and delivery lines reject UPDATE and
 DELETE; deliveries may only change `status`/`reversal_document_id` (no delete). Order lines carry `qty_delivered`/`qty_invoiced` with CHECKs (never above the ordered quantity).
+
+## 3f. Sprint 7 notes
+
+Procurement adds only new tables (`purchase_*`, `goods_*`, `supplier_bill*`). Finance: `settlements` allows method `debit_note` (payable side, no bank account) beside `credit_note` (receivable side).
+New immutability triggers: posted supplier bills, their lines, purchase returns and their lines, and goods-receipt lines reject UPDATE and DELETE; receipts may only change
+`status`/`reversal_document_id` (no delete). Order lines carry received/returned/billed quantities with CHECKs (returned ≤ received, received − returned ≤ ordered, billed ≤ ordered).
 
 ## 4. Migration policy
 

@@ -18,6 +18,15 @@ use App\Modules\Inventory\Models\StockBalance;
 use App\Modules\Inventory\Models\StockLedgerEntry;
 use App\Modules\MasterData\Approvals\PriceListPriceChange;
 use App\Modules\MasterData\Approvals\SupplierBankAccountChange;
+use App\Modules\Procurement\Approvals\PurchaseOrderApprove;
+use App\Modules\Procurement\Models\GoodsReceipt;
+use App\Modules\Procurement\Models\GoodsReceiptLine;
+use App\Modules\Procurement\Models\PurchaseOrder;
+use App\Modules\Procurement\Models\PurchaseOrderLine;
+use App\Modules\Procurement\Models\PurchaseReturn;
+use App\Modules\Procurement\Models\PurchaseReturnLine;
+use App\Modules\Procurement\Models\SupplierBill;
+use App\Modules\Procurement\Models\SupplierBillLine;
 use App\Modules\Sales\Models\CreditNote;
 use App\Modules\Sales\Models\CreditNoteLine;
 use App\Modules\Sales\Models\CreditNoteTax;
@@ -90,6 +99,7 @@ arch('an approved action can only be executed through the approval engine')
         StockAdjustmentPost::class,          // Inventory's approval-gated adjustment, same pattern
         ManualJournalPost::class,            // Finance's approval-gated manual journal
         SupplierPaymentPost::class,          // Finance's approval-gated supplier payment
+        PurchaseOrderApprove::class,         // Procurement's approval-gated purchase order
     ]);
 arch('approvals are never executed from controllers or commands')
     ->expect(ExecuteApprovedRequest::class)
@@ -128,3 +138,10 @@ arch('only Sales writes quotations, orders, deliveries, invoices and credit note
         Invoice::class, InvoiceLine::class, InvoiceTax::class, CreditNote::class, CreditNoteLine::class, CreditNoteTax::class,
     ])
     ->toOnlyBeUsedIn('App\Modules\Sales');
+
+arch('only Procurement writes purchase orders, receipts, bills and returns')
+    ->expect([
+        PurchaseOrder::class, PurchaseOrderLine::class, GoodsReceipt::class, GoodsReceiptLine::class,
+        SupplierBill::class, SupplierBillLine::class, PurchaseReturn::class, PurchaseReturnLine::class,
+    ])
+    ->toOnlyBeUsedIn('App\Modules\Procurement');

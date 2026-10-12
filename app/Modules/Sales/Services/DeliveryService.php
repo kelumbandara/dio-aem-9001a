@@ -171,7 +171,7 @@ final class DeliveryService
                 throw SalesException::make('sales.qty_invalid', 'Enter a quantity above zero.', 422, "{$field}.qty");
             }
             if (Decimal::compare($qty, $open) > 0) {
-                throw SalesException::make('sales.qty_exceeds_open', "Only {$open} of line {$no} is left to deliver.", 422, "{$field}.qty");
+                throw SalesException::make('sales.qty_exceeds_open', 'Only '.Decimal::trim(Decimal::round($open, 6))." of line {$no} is left to deliver.", 422, "{$field}.qty");
             }
             $out[] = ['line' => $line, 'qty' => Decimal::round($qty, 6)];
         }

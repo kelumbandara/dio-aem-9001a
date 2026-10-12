@@ -33,7 +33,9 @@ class RolesAndPermissionsSeeder extends Seeder
         // (master data, stock, warehouses) and issues sales invoices and credit notes. It cannot change master data or stock. Permissions that do not exist yet are skipped.
         $readable = ['masterdata.reference.view', 'masterdata.item.view', 'masterdata.customer.view', 'masterdata.supplier.view', 'masterdata.price_list.view', 'inventory.stock.view', 'inventory.warehouse.view',
             // Sales: sees every document and issues invoices and credit notes; quotations, orders, deliveries and credit-limit overrides stay with sales staff and admins.
-            'sales.view', 'sales.invoice.post', 'sales.credit_note.post'];
+            'sales.view', 'sales.invoice.post', 'sales.credit_note.post',
+            // Procurement: sees every purchasing document and enters supplier bills (price differences beyond the tolerance stay with admin).
+            'procurement.view', 'procurement.bill.post'];
         $salesStaff = ['sales.view', 'sales.quotation.manage', 'sales.order.manage', 'sales.order.confirm', 'sales.delivery.post',
             'masterdata.reference.view', 'masterdata.item.view', 'masterdata.customer.view', 'masterdata.price_list.view', 'inventory.stock.view', 'inventory.warehouse.view'];
         Role::findOrCreate('accountant', 'web')->syncPermissions(array_values(array_filter(
@@ -44,6 +46,12 @@ class RolesAndPermissionsSeeder extends Seeder
         // Sales staff quote, take and confirm orders and send goods out; they see customers, items, prices and stock but change none of
         // them, do not invoice (the accountant does), cannot reverse a delivery and cannot override a credit limit (admin only).
         Role::findOrCreate('sales', 'web')->syncPermissions(array_values(array_filter($names, fn (string $name) => in_array($name, $salesStaff, true))));
+
+        // Purchasing staff raise purchase orders, receive goods and send them back; they read suppliers, items, prices and stock but change none
+        // of them, do not enter supplier bills (the accountant does) and cannot accept a price difference or reverse a receipt (admin only).
+        $purchasing = ['procurement.view', 'procurement.order.manage', 'procurement.receipt.post', 'procurement.return.post',
+            'masterdata.reference.view', 'masterdata.item.view', 'masterdata.supplier.view', 'masterdata.price_list.view', 'inventory.stock.view', 'inventory.warehouse.view'];
+        Role::findOrCreate('purchasing', 'web')->syncPermissions(array_values(array_filter($names, fn (string $name) => in_array($name, $purchasing, true))));
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }

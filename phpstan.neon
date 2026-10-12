@@ -20,3 +20,4 @@ parameters:
         - app/Modules/Inventory/Database/Migrations
         - app/Modules/Finance/Database/Migrations
         - app/Modules/Sales/Database/Migrations
+        - app/Modules/Procurement/Database/Migrations

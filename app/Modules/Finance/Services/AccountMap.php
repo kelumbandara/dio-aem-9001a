@@ -23,6 +23,7 @@ final class AccountMap
         'stock_adjustment' => '2207',
         'sample_expense' => '2203',
         'purchase_variance' => '2217',
+        'purchase_expense' => '2412',
         'discount_given' => '2100',
         'discount_received' => '2205',
         'vat_output' => '1524',

@@ -41,7 +41,7 @@ final class StockPostingService implements StockPoster
 {
     public const REASONS = [
         StockDocument::RECEIPT => ['purchase', 'production', 'return', 'opening', 'other'],
-        StockDocument::ISSUE => ['sale', 'production', 'sample', 'scrap', 'other'],
+        StockDocument::ISSUE => ['sale', 'production', 'sample', 'scrap', 'supplier_return', 'other'],
         StockDocument::TRANSFER => ['transfer'],
         StockDocument::ADJUSTMENT => ['count', 'damage', 'expiry', 'loss', 'found', 'other'],
     ];

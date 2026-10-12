@@ -246,6 +246,7 @@ describe('reports', function () {
 });
 
 it('is unavailable when the module is switched off', function () {
+    app(ModuleRegistry::class)->disable('procurement');
     app(ModuleRegistry::class)->disable('sales');
     app(ModuleRegistry::class)->disable('finance');
 

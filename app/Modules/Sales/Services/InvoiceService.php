@@ -195,7 +195,7 @@ final class InvoiceService
                 throw SalesException::make('sales.qty_invalid', 'Enter a quantity above zero.', 422, "{$field}.qty");
             }
             if (Decimal::compare($qty, $max) > 0) {
-                throw SalesException::make('sales.qty_exceeds_billable', "Only {$max} of line {$no} can be invoiced now (delivered and not yet invoiced).", 422, "{$field}.qty");
+                throw SalesException::make('sales.qty_exceeds_billable', 'Only '.Decimal::trim(Decimal::round($max, 6))." of line {$no} can be invoiced now (delivered and not yet invoiced).", 422, "{$field}.qty");
             }
             $out[] = ['line' => $line, 'qty' => Decimal::round($qty, 6)];
         }

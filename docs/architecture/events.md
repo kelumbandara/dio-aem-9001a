@@ -36,9 +36,10 @@
 | `sales.delivery.posted` | Sales (built S6; `delivery_id, document_no, order_id, customer_id`) | Reporting (stock and COGS are posted synchronously in the same transaction, not by this event) |
 | `sales.invoice.posted` | Sales (built S6; `invoice_id, document_no, customer_id, gross_total`) | Reporting (the receivable and tax journal are posted synchronously through `OpenItemPoster`) |
 | `sales.credit_note.posted` | Sales (built S6; `credit_note_id, document_no, invoice_id, customer_id, gross_total`) | Reporting |
-| `procurement.po.approved` | Procurement | Communications (send to supplier, approval-gated) |
-| `procurement.goods.received` | Procurement | Inventory (stock in), Finance (GRNI) |
-| `procurement.supplier_invoice.posted` | Procurement | Finance (AP) |
+| `procurement.order.approved` | Procurement (built S7; `order_id, document_no, supplier_id, gross_total`) | Communications (send to supplier), Reporting |
+| `procurement.receipt.posted` | Procurement (built S7; `receipt_id, document_no, order_id, supplier_id`) | Reporting (stock and GRNI are posted synchronously in the same transaction) |
+| `procurement.bill.posted` | Procurement (built S7; `bill_id, document_no, supplier_id, gross_total`) | Reporting (the payable journal is posted synchronously through `OpenItemPoster`) |
+| `procurement.return.posted` | Procurement (built S7; `return_id, document_no, order_id, supplier_id, gross_total`) | Reporting |
 | `finance.journal.posted` | Finance (built S5; payload `journal_id, journal_no, entry_date, kind, total, source_type, source_id`) | Reporting |
 | `finance.period.closed` | Finance | all posting modules (block) |
 | `mfg.order.released` | Manufacturing | Inventory (reserve) |

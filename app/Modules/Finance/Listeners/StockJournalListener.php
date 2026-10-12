@@ -25,7 +25,7 @@ final class StockJournalListener
     /** type => reason => mapping key of the counter account */
     private const COUNTER = [
         'receipt' => ['purchase' => 'grni', 'production' => 'wip', 'return' => 'cogs', 'opening' => 'opening_balance_equity', 'other' => 'stock_adjustment'],
-        'issue' => ['sale' => 'cogs', 'production' => 'wip', 'sample' => 'sample_expense', 'scrap' => 'stock_adjustment', 'other' => 'stock_adjustment'],
+        'issue' => ['sale' => 'cogs', 'production' => 'wip', 'sample' => 'sample_expense', 'scrap' => 'stock_adjustment', 'supplier_return' => 'grni', 'other' => 'stock_adjustment'],
         'adjustment' => [],
     ];
 
