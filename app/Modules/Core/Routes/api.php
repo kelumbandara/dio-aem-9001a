@@ -5,6 +5,7 @@ use App\Modules\Core\Http\Controllers\Api\AttachmentController;
 use App\Modules\Core\Http\Controllers\Api\AuthController;
 use App\Modules\Core\Http\Controllers\Api\BranchController;
 use App\Modules\Core\Http\Controllers\Api\HealthController;
+use App\Modules\Core\Http\Controllers\Api\MobileController;
 use App\Modules\Core\Http\Controllers\Api\NotificationController;
 use Illuminate\Support\Facades\Route;
 
@@ -35,6 +36,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('appearance/logo', [AppearanceController::class, 'logo'])->name('appearance.logo');   // multipart: not idempotency-keyed
         Route::delete('appearance/logo', [AppearanceController::class, 'removeLogo'])->name('appearance.logo.remove');
         Route::post('appearance/reset', [AppearanceController::class, 'reset'])->name('appearance.reset');
+
+        Route::get('mobile/config', [MobileController::class, 'config'])->name('mobile.config');
+        Route::post('devices', [MobileController::class, 'register'])->middleware('throttle:30,1')->name('devices.register');
+        Route::delete('devices/{device}', [MobileController::class, 'forget'])->name('devices.forget');
 
         Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
         Route::post('notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');

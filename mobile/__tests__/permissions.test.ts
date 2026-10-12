@@ -1,0 +1,31 @@
+import { featuresFor, isOlderVersion } from '@/util/permissions';
+
+describe('featuresFor', () => {
+  const all = ['manufacturing.output.report', 'manufacturing.downtime.report', 'manufacturing.qc.inspect', 'inventory.stock.view', 'ai.use'];
+  const modules = ['core', 'approvals', 'manufacturing', 'inventory', 'ai'];
+
+  it('shows what the person may do', () => {
+    expect(featuresFor(all, modules)).toEqual({ approvals: true, production: true, downtime: true, quality: true, stock: true, assistant: true });
+  });
+
+  it('shows nothing a person has no permission for', () => {
+    expect(featuresFor(['inventory.stock.view'], modules)).toEqual({ approvals: true, production: false, downtime: false, quality: false, stock: true, assistant: false });
+    expect(featuresFor([], modules).stock).toBe(false);
+  });
+
+  it('shows nothing of a module that is switched off', () => {
+    expect(featuresFor(all, ['core'])).toEqual({ approvals: false, production: false, downtime: false, quality: false, stock: false, assistant: false });
+    expect(featuresFor(all, ['core', 'manufacturing']).stock).toBe(false);
+  });
+});
+
+describe('isOlderVersion', () => {
+  it('compares versions number by number', () => {
+    expect(isOlderVersion('1.0.0', '1.0.1')).toBe(true);
+    expect(isOlderVersion('1.9.0', '1.10.0')).toBe(true);
+    expect(isOlderVersion('2.0.0', '1.99.99')).toBe(false);
+    expect(isOlderVersion('1.2.0', '1.2.0')).toBe(false);
+    expect(isOlderVersion('1.2', '1.2.0')).toBe(false);
+    expect(isOlderVersion('1.2', '1.2.1')).toBe(true);
+  });
+});

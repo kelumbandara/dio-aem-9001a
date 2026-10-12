@@ -11,6 +11,7 @@ use App\Modules\Manufacturing\Models\ShiftTarget;
 use App\Modules\Manufacturing\Services\DowntimeService;
 use App\Modules\Manufacturing\Services\OutputService;
 use App\Modules\Manufacturing\Services\ShiftReport;
+use App\Modules\Manufacturing\Services\ShiftService;
 use App\Modules\Manufacturing\Services\ShiftTargetService;
 use App\Modules\MasterData\Contracts\ItemCatalog;
 use App\Support\Decimal;
@@ -68,6 +69,15 @@ class ShopfloorController extends Controller
         $shift = ! empty($data['shift']) ? Shift::query()->whereRaw('lower(code) = ?', [strtolower($data['shift'])])->first() : null;
 
         return response()->json(['data' => $report->summary($from, $to, $shift?->id), 'meta' => ['from' => $from, 'to' => $to, 'shift' => $shift?->code]]);
+    }
+
+    /** The shift running right now and its shift date (a night shift after midnight belongs to the evening before), or null between shifts. */
+    public function currentShift(Request $request, ShiftService $shifts): JsonResponse
+    {
+        $this->need($request, 'manufacturing.view');
+        $now = $shifts->current();
+
+        return response()->json(['data' => $now === null ? null : ['shift' => $now['shift']->code, 'name' => $now['shift']->name, 'date' => $now['date']->toDateString()]]);
     }
 
     public function targets(Request $request): JsonResponse

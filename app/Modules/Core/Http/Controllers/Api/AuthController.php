@@ -5,6 +5,7 @@ namespace App\Modules\Core\Http\Controllers\Api;
 use App\Modules\Core\Actions\AuthenticateUser;
 use App\Modules\Core\Http\Requests\ApiLoginRequest;
 use App\Modules\Core\Http\Resources\UserResource;
+use App\Modules\Core\Models\MobileDevice;
 use App\Modules\Core\Models\User;
 use App\Modules\Core\Services\MfaService;
 use App\Support\Http\Controller;
@@ -31,7 +32,9 @@ class AuthController extends Controller
 
     public function logout(Request $request): JsonResponse
     {
-        $request->user()->currentAccessToken()->delete();
+        $token = $request->user()->currentAccessToken();
+        MobileDevice::query()->where('user_id', $request->user()->id)->where('token_id', $token->id)->delete();      // signed out: no more push messages to this phone
+        $token->delete();
 
         return response()->json(null, 204);
     }

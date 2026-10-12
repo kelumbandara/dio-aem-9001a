@@ -68,6 +68,8 @@ rather than executing. Clients poll or are notified.
   authoritative state; conflicts surfaced (never silently merged for posted documents).
 - Push token registration: `POST /devices/push-token`.
 
+> **Implemented in Sprint 13:** `GET /mobile/config`, `POST /devices` (push address), `DELETE /devices/{id}`, `GET /shifts/current`; offline entries use the existing `Idempotency-Key` plus `external_id` on output and downtime. See [mobile.md](mobile.md).
+
 ## 6. Contract testing
 
 OpenAPI 3.1 spec generated and committed (`docs/api/openapi.yaml`); CI contract tests assert
