@@ -8,7 +8,7 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "lk.dio.erp"
+      "bundleIdentifier": "lk.diosolutions.erp"
     },
     "android": {
       "adaptiveIcon": {
@@ -18,7 +18,7 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "lk.dio.erp"
+      "package": "lk.diosolutions.erp"
     },
     "web": {
       "favicon": "./assets/favicon.png"

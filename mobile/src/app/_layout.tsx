@@ -1,10 +1,10 @@
-import * as Notifications from 'expo-notifications';
 import { router, SplashScreen, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { SessionProvider, useSession } from '@/auth/session';
+import { notifications } from '@/push/notifications';
 import { localPath, screenFor } from '@/util/format';
 
 void SplashScreen.preventAutoHideAsync();
@@ -33,7 +33,9 @@ function Gate() {
       const target = screenFor(localPath(typeof data?.url === 'string' ? data.url : null));
       if (target) router.push(target as never);
     };
-    const sub = Notifications.addNotificationResponseReceivedListener((r) => open(r.notification.request.content.data as Record<string, unknown> | undefined));
+    const N = notifications();                        // null in Expo Go, where push cannot work: the rest of the app is unaffected
+    if (!N) return;
+    const sub = N.addNotificationResponseReceivedListener((r) => open(r.notification.request.content.data as Record<string, unknown> | undefined));
 
     return () => sub.remove();
   }, [signedIn]);

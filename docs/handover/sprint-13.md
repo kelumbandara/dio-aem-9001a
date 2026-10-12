@@ -22,7 +22,7 @@ A phone app (folder `mobile/`, React Native with Expo) and the few server additi
 | Check | Result |
 |---|---|
 | `composer check` (Pint + Larastan + Pest) | Pint passed; Larastan **no errors** (769 files); **1,216 passed** (10,498 assertions), 1,276 s, a clean full run after the last change |
-| Phone app: `npm test` / `npm run typecheck` / `npm run lint` | **47 tests passed**; TypeScript no errors; ESLint no problems |
+| Phone app: `npm test` / `npm run typecheck` / `npm run lint` | **50 tests passed**; TypeScript no errors; ESLint no problems |
 | Phone app bundles | `expo export` for **web** and **Android** (Hermes) both build the whole app (all screens) |
 | Server tests added | 19: push and devices (`tests/Feature/Core/MobileTest.php`, 15) and current shift (`CurrentShiftApiTest.php`, 4) |
 
@@ -41,7 +41,8 @@ What the tests prove beyond "it runs":
 
 - **I have not run the app on a phone or an emulator** (none available here): the screens were never seen or touched. They compile, bundle, type-check and lint, the logic behind them is tested, and the server calls were exercised for real, but layout, touch sizes, keyboard behaviour and the look in dark mode are **unproven until you try it** (Expo Go on your phone, see §4).
 - **Push notifications were not tried end to end**: the server side is tested against a faked push service; they cannot work in Expo Go and need a built app, an Expo project id and (Android) a Firebase key.
-- Not built: barcode scanning, photos on inspections, sales/purchase/finance screens, dashboards on the phone, biometric unlock, downtime stopwatch, push delivery receipts, offline reading, store packaging and icons. Bundle ids `lk.dio.erp` and the app name are **placeholders** (open decision #15).
+- **First trial on a phone (Expo Go) found a defect, now fixed**: the notifications library, loaded at start-up, stopped the whole app in Expo Go. It is now loaded only in a built app; in Expo Go push is simply off and the rest works. Two tests (one proving the library is never loaded in Expo Go) and a hand mutation check cover it.
+- Not built: barcode scanning, photos on inspections, sales/purchase/finance screens, dashboards on the phone, biometric unlock, downtime stopwatch, push delivery receipts, offline reading, store packaging and icons. Bundle id is `lk.diosolutions.erp` (your choice of company: DIO Solutions); app icon and store texts are not done.
 - Demo data limit: the demo machines are all switched off, so the machine choice is empty in the demo (downtime needs a machine).
 - A phone must reach the server: plain `http` works in Expo Go on your own network; a built app needs **https**.
 
@@ -52,13 +53,15 @@ What the tests prove beyond "it runs":
 3. Phone: install **Expo Go**, same Wi-Fi, scan the QR code. In the app type the address, sign in as `production@dio.test` or `approver@dio.test` (demo passwords as before).
 4. Try: report output on the running order, turn on flight mode and report again (it says it is saved on the phone), turn it off and watch it send; approve a request created on the website; search stock; ask the assistant.
 
-## 5. Decisions for you
+## 5. Your answers (2026-10-13) and what follows
 
-1. **App name, bundle ids and icons** (open decision #15): please give the company name and the bundle id (for example `lk.yourcompany.erp`), or confirm `lk.dio.erp`.
-2. Who will **publish** the app (Google Play / App Store accounts are the company's own, with their fees), or is a private install (a file the company hands out) enough at first?
-3. Which **extra phone functions** matter most next: barcode scanning for order and item, photos on inspections, or sales/purchase screens?
+1. Company **DIO Solutions**, bundle id chosen: `lk.diosolutions.erp`.
+2. **Private install** is enough: see docs/architecture/mobile.md §4a (Android APK through the company's own Expo account).
+3. Next phone functions: **sales and purchase screens** (not built yet; proposed as the next mobile step).
 
-Still open from before: purchase-order approval amounts, Horizon vs plain worker, ClamAV, whether GitHub Actions is green, the billing project's GitHub address.
+## 5a. Still open
+
+App icon and store texts (not needed for a private install). Still open from before: purchase-order approval amounts, Horizon vs plain worker, ClamAV, whether GitHub Actions is green, the billing project's GitHub address.
 
 ## 6. Unresolved risks
 

@@ -34,11 +34,21 @@ Sign-in · **Home** (what is waiting, offline entries to send, shortcuts) · **A
 2. Install **Expo Go** on the phone, same Wi-Fi as the PC, scan the QR code, type the printed address into *Server address*.
 3. Allow PHP through the Windows firewall when asked. Use `-Lan` only on a network you trust.
 
-Limits of Expo Go: **remote push notifications are not reliable in Expo Go** (Expo removed them there on Android and limits them elsewhere); they need a built app (a development build or the store build). Everything else works. A store/production build needs: the Expo account project id (`extra.eas.projectId`), the app name and the bundle identifiers (currently placeholders `lk.dio.erp`: decision #15 in decisions/0000-open-decisions.md), app icons, an **https** address for the server (Android blocks plain http in built apps), and, for push on Android, an FCM key in the Expo account.
+Limits of Expo Go: **remote push notifications do not work in Expo Go** (Expo removed them there with SDK 53). The app detects Expo Go, never loads the notifications library there (loading it alone stops the app with an error: this was found on the first trial on a phone and fixed), and carries on without push; everything else works. Push needs a built app (see §4a). A store/production build needs: the Expo account project id (`extra.eas.projectId`), the app name and the bundle identifiers (the bundle id is `lk.diosolutions.erp` (company: DIO Solutions)), app icons, an **https** address for the server (Android blocks plain http in built apps), and, for push on Android, an FCM key in the Expo account.
+
+### 4a. Private install (no store)
+
+The owner chose a private install for now. The project has `eas.json` and `expo-dev-client`. With a free Expo account (the company's own): `npm install -g eas-cli`, `eas login`, then in `mobile/`:
+
+- `eas build --profile preview --platform android`: builds an **APK** (installable file) and gives a download link/QR code; staff install it on Android (allow "install from unknown sources"). This build supports push once Firebase is connected (`eas credentials`, an FCM key) and the Expo project id is set (`eas init`).
+- `eas build --profile development --platform android`: the same with developer tools, for testing push during development.
+- iPhone: a private install needs an Apple developer account (paid) for ad-hoc or TestFlight distribution; Android is the simpler route.
+
+These steps use the company's own accounts and keys; nothing is stored in this repository.
 
 ## 5. Tests and checks
 
-`cd mobile; npm test` (Jest: API client, offline queue, formatting, permissions, translations: 47 tests), `npm run typecheck`, `npm run lint`, and `npx expo export --platform web|android` to prove the whole app bundles. Server side: `tests/Feature/Core/MobileTest.php` and `tests/Feature/Manufacturing/CurrentShiftApiTest.php`, part of `composer check`.
+`cd mobile; npm test` (Jest: API client, offline queue, formatting, permissions, translations, push in Expo Go: 50 tests), `npm run typecheck`, `npm run lint`, and `npx expo export --platform web|android` to prove the whole app bundles. Server side: `tests/Feature/Core/MobileTest.php` and `tests/Feature/Manufacturing/CurrentShiftApiTest.php`, part of `composer check`.
 
 ## 6. Not built
 
