@@ -8,4 +8,4 @@
 $root = Resolve-Path "$PSScriptRoot\..\.."
 Set-Location "$root\mobile"
 if (-not (Test-Path node_modules)) { npm install }
-npx expo start
+npx expo start --go

@@ -38,10 +38,10 @@ Limits of Expo Go: **remote push notifications do not work in Expo Go** (Expo re
 
 ### 4a. Private install (no store)
 
-The owner chose a private install for now. The project has `eas.json` and `expo-dev-client`. With a free Expo account (the company's own): `npm install -g eas-cli`, `eas login`, then in `mobile/`:
+The owner chose a private install for now. The project has `eas.json`. With a free Expo account (the company's own): `npm install -g eas-cli`, `eas login`, then in `mobile/`:
 
 - `eas build --profile preview --platform android`: builds an **APK** (installable file) and gives a download link/QR code; staff install it on Android (allow "install from unknown sources"). This build supports push once Firebase is connected (`eas credentials`, an FCM key) and the Expo project id is set (`eas init`).
-- `eas build --profile development --platform android`: the same with developer tools, for testing push during development.
+- `eas build --profile development --platform android`: the same with developer tools, for testing push during development. Before this one run `npx expo install expo-dev-client`. **Do not keep that package installed while testing with Expo Go**: with it present, `npx expo start` makes the QR code target a development build, and Expo Go shows a blank screen. (`mobile.ps1` starts with `--go` so Expo Go always works.)
 - iPhone: a private install needs an Apple developer account (paid) for ad-hoc or TestFlight distribution; Android is the simpler route.
 
 These steps use the company's own accounts and keys; nothing is stored in this repository.
