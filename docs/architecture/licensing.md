@@ -1,4 +1,6 @@
-# Licensing and subscription billing — design (not built yet)
+# Licensing and subscription billing
+
+**Status:** part 1 (the Licensing module in this product) is built; the vendor billing project and PayHere are not.
 
 Decisions by the owner (2026-10-12): the vendor **hosts every installation** on its own cloud servers (customers never run
 the software themselves); customers pay **monthly**, by **bank transfer** (recorded by hand) or **PayHere** (automatic);
@@ -43,3 +45,14 @@ installations stay on the vendor's servers and the contract states the terms. Th
 1. Licensing module in this product: licence model and verification, settings page (current licence, paste a new one, plan terms), warnings, grace / read-only / lock enforcement, tests, plus a command-line licence generator for the vendor.
 2. Vendor billing project: customers, plan, invoices, bank-transfer recording, licence issue.
 3. PayHere recurring payments and automatic renewal.
+
+## 6. What is built (part 1)
+
+- **Module `licensing`** (required; depends on Core). Table `licences` keeps every installed licence permanently (the database refuses changes and deletions). **The licence with the newest issue date that has started is the one in force**, so a renewal is just a newer licence, and the vendor can also shorten or end a licence — suspend an installation — by issuing a newer one. A licence older than the newest one installed is refused, as is one for another installation, one with a bad signature, or one dated in the future.
+- **Signature**: `LicenceToken` — `DIO1.<payload>.<signature>`, Ed25519 (libsodium) over the exact payload bytes. The public key comes from `LICENCE_PUBLIC_KEY`; stored licences are re-checked against it on every read, so a tampered row is ignored.
+- **Phases** (today against the last day, Asia/Colombo): active → grace (7 days, everything works, warning on every screen) → read-only (14 days: GET/print/export allowed, every change refused with HTTP 402 `licensing.read_only`, or bounced back on the web) → locked (everything but the licence screen, sign-in/out, MFA, language, the logo and health redirects to the licence screen or answers 402 `licensing.locked`). Background jobs and scheduled commands keep running, so reconciliation and backups are never interrupted. A new installation has a free trial of 30 days with the same phases after it. All the day counts are settings (`LICENCE_*`).
+- **Enforcement** is on by default in production only (`LICENSING_ENFORCE` forces it either way), so development and tests are never locked out; the licence screen says so when it is off.
+- **Plan limits**: the module list of a licence is enforced (a module outside the plan answers 403 `core.module_not_licensed`). The **user limit is recorded and shown but not enforced yet**: there is no user-management screen to enforce it in; it will be enforced when users can be created from the product.
+- **Screen** (Administration → Licence, `licensing.manage`, held by admin): status, last day, days left, plan, modules, the **installation ID** to give the vendor, paste-a-licence form, history. The screen itself is open to every signed-in user (so it is reachable when locked) but only managers can install. **API**: `GET/POST /api/v1/licence`.
+- **Vendor tools**: `licence:keys`, `licence:issue` (secret key read from a file or `LICENCE_PRIVATE_KEY`, never an argument), and the daily `licence:check` notifications (7, 3, 1 and 0 days before the end, and at the start of each stricter phase; once each).
+- Core knows only a small contract (`LicenceGate`: banner and module check); without the module it allows everything.

@@ -101,6 +101,8 @@ return [
         ],
     ],
 
+    'licence_banner_link' => 'Licence',
+
     'common' => [
         'save' => 'Save',
         'sign_out' => 'Sign out',

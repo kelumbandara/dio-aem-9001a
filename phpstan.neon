@@ -21,3 +21,4 @@ parameters:
         - app/Modules/Finance/Database/Migrations
         - app/Modules/Sales/Database/Migrations
         - app/Modules/Procurement/Database/Migrations
+        - app/Modules/Licensing/Database/Migrations

@@ -102,6 +102,8 @@ return [
         ],
     ],
 
+    'licence_banner_link' => 'உரிமம்',
+
     'common' => [
         'save' => 'சேமி',
         'sign_out' => 'வெளியேறு',

@@ -13,6 +13,7 @@ use App\Modules\Core\Contracts\AuditLogger;
 use App\Modules\Core\Contracts\BranchDirectory;
 use App\Modules\Core\Contracts\CompanyInfo;
 use App\Modules\Core\Contracts\EventOutbox;
+use App\Modules\Core\Contracts\LicenceGate;
 use App\Modules\Core\Contracts\Notifier;
 use App\Modules\Core\Contracts\NumberingService;
 use App\Modules\Core\Contracts\SettingsService;
@@ -31,6 +32,7 @@ use App\Modules\Core\Services\EloquentBranchDirectory;
 use App\Modules\Core\Services\EloquentCompanyInfo;
 use App\Modules\Core\Services\EloquentUserDirectory;
 use App\Modules\Core\Services\NullAttachmentScanner;
+use App\Modules\Core\Services\OpenLicenceGate;
 use App\Modules\Core\Services\OutboxRecorder;
 use App\Modules\Core\Services\SettingsAppearance;
 use App\Support\ModuleServiceProvider;
@@ -86,6 +88,8 @@ class CoreServiceProvider extends ModuleServiceProvider
         $this->app->singleton(CompanyInfo::class, EloquentCompanyInfo::class);
         $this->app->singleton(SettingsAppearance::class);
         $this->app->singleton(Appearance::class, SettingsAppearance::class);
+        // Replaced by the Licensing module when it is installed.
+        $this->app->singleton(LicenceGate::class, OpenLicenceGate::class);
         $this->app->singleton(Notifier::class, DatabaseNotifier::class);
         $this->app->singleton(EventOutbox::class, OutboxRecorder::class);
         $this->app->singleton(AttachmentStore::class, AttachmentService::class);

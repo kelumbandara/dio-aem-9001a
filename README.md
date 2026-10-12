@@ -3,9 +3,9 @@
 AI-powered ERP and manual MES (IoT-ready) for Sri Lankan SMEs — manufacturing and trading.
 One shared codebase, independent deployment per customer (Coolify).
 
-**Status:** Sprint 7 (Procurement) and the Branding step (company name, logo, colours, font for every screen and document)
-are complete and awaiting owner review — see [docs/handover/sprint-7.md](docs/handover/sprint-7.md) and
-[docs/handover/branding.md](docs/handover/branding.md); earlier handovers: [Sprint 6](docs/handover/sprint-6.md),
+**Status:** Sprint 7 (Procurement), the Branding step and the Licensing module (signed monthly licence, grace → read-only →
+lock) are complete and awaiting owner review — see [docs/handover/sprint-7.md](docs/handover/sprint-7.md),
+[docs/handover/branding.md](docs/handover/branding.md) and [docs/handover/licensing.md](docs/handover/licensing.md); earlier handovers: [Sprint 6](docs/handover/sprint-6.md),
 [Sprint 5](docs/handover/sprint-5.md), [Sprint 4](docs/handover/sprint-4.md), [Sprint 3](docs/handover/sprint-3.md),
 [Sprint 2](docs/handover/sprint-2.md), [Sprint 1](docs/handover/sprint-1.md).
 Everything beyond Core, Approvals, Master Data, Inventory, Finance, Sales and Procurement (manufacturing, AI, mobile)

@@ -70,6 +70,7 @@
             </header>
 
             <main class="flex-1 px-4 py-6 sm:px-6">
+                <x-core::licence-banner />
                 @if (session('status'))
                     <x-core::alert type="success" class="mb-4">{{ session('status') }}</x-core::alert>
                 @endif

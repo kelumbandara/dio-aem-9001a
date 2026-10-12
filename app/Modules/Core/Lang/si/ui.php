@@ -102,6 +102,8 @@ return [
         ],
     ],
 
+    'licence_banner_link' => 'බලපත්‍රය',
+
     'common' => [
         'save' => 'සුරකින්න',
         'sign_out' => 'ඉවත් වන්න',
