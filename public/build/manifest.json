@@ -1,11 +1,52 @@
 {
+  "node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2": {
+    "file": "assets/inter-latin-wght-normal-Dx4kXJAl.woff2",
+    "src": "node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/noto-sans-sinhala/files/noto-sans-sinhala-sinhala-wght-normal.woff2": {
+    "file": "assets/noto-sans-sinhala-sinhala-wght-normal-Dqt08u3R.woff2",
+    "src": "node_modules/@fontsource-variable/noto-sans-sinhala/files/noto-sans-sinhala-sinhala-wght-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/noto-sans-tamil/files/noto-sans-tamil-tamil-wght-normal.woff2": {
+    "file": "assets/noto-sans-tamil-tamil-wght-normal-iihgzMBi.woff2",
+    "src": "node_modules/@fontsource-variable/noto-sans-tamil/files/noto-sans-tamil-tamil-wght-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/noto-sans/files/noto-sans-latin-wght-normal.woff2": {
+    "file": "assets/noto-sans-latin-wght-normal-BYSzYMf3.woff2",
+    "src": "node_modules/@fontsource-variable/noto-sans/files/noto-sans-latin-wght-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/open-sans/files/open-sans-latin-wght-normal.woff2": {
+    "file": "assets/open-sans-latin-wght-normal-CWNzRldh.woff2",
+    "src": "node_modules/@fontsource-variable/open-sans/files/open-sans-latin-wght-normal.woff2"
+  },
+  "node_modules/@fontsource/roboto/files/roboto-latin-400-normal.woff2": {
+    "file": "assets/roboto-latin-400-normal-BqEyEoaF.woff2",
+    "src": "node_modules/@fontsource/roboto/files/roboto-latin-400-normal.woff2"
+  },
+  "node_modules/@fontsource/roboto/files/roboto-latin-500-normal.woff2": {
+    "file": "assets/roboto-latin-500-normal-7RbcRiD8.woff2",
+    "src": "node_modules/@fontsource/roboto/files/roboto-latin-500-normal.woff2"
+  },
+  "node_modules/@fontsource/roboto/files/roboto-latin-700-normal.woff2": {
+    "file": "assets/roboto-latin-700-normal-BZpUvMxY.woff2",
+    "src": "node_modules/@fontsource/roboto/files/roboto-latin-700-normal.woff2"
+  },
   "resources/css/app.css": {
-    "file": "assets/app-0UWe0MnT.css",
+    "file": "assets/app-YylSCRB3.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
     "names": [
       "app.css"
+    ]
+  },
+  "resources/css/fonts.css": {
+    "file": "assets/fonts-Dqja4Y7B.css",
+    "src": "resources/css/fonts.css",
+    "isEntry": true,
+    "name": "fonts",
+    "names": [
+      "fonts.css"
     ]
   },
   "resources/js/app.js": {

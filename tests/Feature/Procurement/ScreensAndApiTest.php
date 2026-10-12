@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Core\Contracts\SettingsService;
 use App\Modules\Core\Database\Seeders\RolesAndPermissionsSeeder;
 use App\Modules\Finance\Database\Seeders\FinanceSeeder;
 use App\Modules\MasterData\Actions\SaveSupplier;
@@ -117,6 +118,14 @@ describe('screens', function () {
     it('prints a purchase order only once it is approved', function () {
         $this->actingAs($this->user)->get("/procurement/orders/{$this->order->public_id}/print")->assertOk()->assertSee($this->order->document_no)->assertSee('Purchase order')->assertSee('ACME Supplies')->assertSee('1,180.00');
         $this->actingAs($this->user)->get("/procurement/orders/{$this->draft->public_id}/print")->assertNotFound();
+    });
+
+    it('prints the purchase order in the colour of the installation, with its footer line', function () {
+        $settings = app(SettingsService::class);
+        $settings->set('appearance.primary', '#0f766e');
+        $settings->set('appearance.document_footer', 'Deliver to the stores entrance.');
+
+        $this->actingAs($this->user)->get("/procurement/orders/{$this->order->public_id}/print")->assertOk()->assertSee('--accent: #0f766e;', false)->assertSee('Deliver to the stores entrance.');
     });
 
     it('creates and acts through the forms and keeps what was typed when the rules say no', function () {

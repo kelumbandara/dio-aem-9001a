@@ -1,7 +1,9 @@
 <?php
 
+use App\Modules\Core\Http\Controllers\Web\AppearanceController;
 use App\Modules\Core\Http\Controllers\Web\AttachmentController;
 use App\Modules\Core\Http\Controllers\Web\AuditLogController;
+use App\Modules\Core\Http\Controllers\Web\BrandingController;
 use App\Modules\Core\Http\Controllers\Web\CompanyController;
 use App\Modules\Core\Http\Controllers\Web\DashboardController;
 use App\Modules\Core\Http\Controllers\Web\LocaleController;
@@ -12,6 +14,9 @@ use App\Modules\Core\Http\Controllers\Web\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('locale', [LocaleController::class, 'update'])->name('locale.update');
+
+// The company logo is public: the sign-in page shows it. Its address carries a version, so browsers keep it.
+Route::get('branding/logo', [BrandingController::class, 'logo'])->name('branding.logo');
 
 Route::middleware('guest')->group(function () {
     Route::get('login', [LoginController::class, 'create'])->name('login');
@@ -34,6 +39,11 @@ Route::middleware('auth')->group(function () {
 
         Route::get('admin/company', [CompanyController::class, 'edit'])->name('company.edit');
         Route::put('admin/company', [CompanyController::class, 'update'])->name('company.update');
+
+        Route::get('admin/appearance', [AppearanceController::class, 'edit'])->name('appearance.edit');
+        Route::put('admin/appearance', [AppearanceController::class, 'update'])->name('appearance.update');
+        Route::post('admin/appearance/reset', [AppearanceController::class, 'reset'])->name('appearance.reset');
+        Route::post('admin/appearance/preview', [AppearanceController::class, 'preview'])->name('appearance.preview');
 
         Route::get('admin/audit-log', [AuditLogController::class, 'index'])->name('audit-log.index');
 

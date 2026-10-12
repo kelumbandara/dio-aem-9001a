@@ -1,7 +1,9 @@
 @props(['title' => null])
 @php
+    $look = app(\App\Modules\Core\Contracts\Appearance::class);
+    $logo = $look->logoUrl();
     $menu = app(\App\Modules\Core\Contracts\ModuleRegistry::class)->menuFor(auth()->user());
-    $pageTitle = ($title ? $title.' · ' : '').__('core::ui.app_name');
+    $pageTitle = ($title ? $title.' · ' : '').$look->appName();
 @endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
@@ -11,22 +13,29 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $pageTitle }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>{!! $look->themeCss() !!}</style>
+    @if ($logo) <link rel="icon" href="{{ $logo }}"> @endif
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-800 antialiased" x-data="{ nav: false }" @keydown.escape.window="nav = false">
     <div class="flex min-h-screen">
         {{-- Sidebar: off-canvas below lg, fixed column from lg up --}}
         <div class="fixed inset-0 z-30 bg-slate-900/40 lg:hidden" x-show="nav" x-transition.opacity @click="nav = false" x-cloak></div>
-        <aside class="fixed inset-y-0 start-0 z-40 flex w-64 -translate-x-full flex-col bg-slate-900 text-slate-200 transition-transform lg:static lg:translate-x-0 rtl:translate-x-full lg:rtl:translate-x-0"
+        <aside class="fixed inset-y-0 start-0 z-40 flex w-64 -translate-x-full flex-col border-e border-(--sidebar-border) bg-(--sidebar-bg) text-(--sidebar-text) transition-transform lg:static lg:translate-x-0 rtl:translate-x-full lg:rtl:translate-x-0"
                :class="{ 'translate-x-0 rtl:translate-x-0': nav }">
-            <div class="flex h-16 items-center px-5 text-lg font-semibold tracking-tight text-white">{{ __('core::ui.app_name') }}</div>
+            <div class="flex h-16 items-center gap-3 px-5 text-lg font-semibold tracking-tight text-(--sidebar-title)">
+                @if ($logo)
+                    <img src="{{ $logo }}" alt="" class="h-9 max-w-28 shrink-0 rounded-md bg-white object-contain p-0.5">
+                @endif
+                <span class="min-w-0 truncate">{{ $look->appName() }}</span>
+            </div>
             <nav class="flex-1 space-y-1 px-3 py-2" aria-label="Main">
                 @foreach ($menu as $item)
                     @php $active = request()->routeIs($item->route); @endphp
                     <a href="{{ route($item->route) }}"
                        @class([
                            'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium',
-                           'bg-slate-800 text-white' => $active,
-                           'text-slate-300 hover:bg-slate-800/60 hover:text-white' => ! $active,
+                           'bg-(--sidebar-active-bg) text-(--sidebar-active-text)' => $active,
+                           'text-(--sidebar-text) hover:bg-(--sidebar-hover)' => ! $active,
                        ])
                        @if ($active) aria-current="page" @endif>
                         <x-core::icon :name="$item->icon" class="h-5 w-5 shrink-0" />
@@ -34,6 +43,9 @@
                     </a>
                 @endforeach
             </nav>
+            @if ($look->poweredBy())
+                <div class="px-5 py-3 text-xs text-(--sidebar-text) opacity-70">{{ $look->poweredBy() }}</div>
+            @endif
         </aside>
 
         <div class="flex min-w-0 flex-1 flex-col">

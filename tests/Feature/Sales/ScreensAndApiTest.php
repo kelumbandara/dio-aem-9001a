@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Core\Contracts\SettingsService;
 use App\Modules\Finance\Database\Seeders\FinanceSeeder;
 use App\Modules\Finance\Models\BankAccount;
 use App\Modules\MasterData\Actions\Reference\AddTaxRate;
@@ -127,6 +128,16 @@ describe('screens', function () {
         $this->actingAs($this->user)->get("/sales/invoices/{$this->invoice->public_id}/print")->assertOk()
             ->assertSee($this->invoice->document_no)->assertSee('Tax invoice')->assertSee('Lanka Traders')->assertSee('Social Security Contribution Levy')
             ->assertSee('1,205.00')->assertSee('Please pay to')->assertSee('My Company (Pvt) Ltd');
+    });
+
+    it('prints the tax invoice in the colour and font of the installation, with its footer line', function () {
+        $settings = app(SettingsService::class);
+        $settings->set('appearance.primary', '#be123c');
+        $settings->set('appearance.font', 'inter');
+        $settings->set('appearance.document_footer', 'Thank you for your business.');
+
+        $this->actingAs($this->user)->get("/sales/invoices/{$this->invoice->public_id}/print")->assertOk()
+            ->assertSee('--accent: #be123c;', false)->assertSee("'Inter Variable'", false)->assertSee('Thank you for your business.');
     });
 
     it('creates documents through the forms and keeps what was typed when the rules say no', function () {

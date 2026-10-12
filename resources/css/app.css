@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import './fonts.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -7,9 +8,13 @@
 @source '../../app/Modules/**/*.blade.php';
 
 @theme {
-    /* System fonts only; the Sinhala/Tamil families cover scripts the Latin stack lacks. */
-    --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans', 'Noto Sans Sinhala',
-        'Noto Sans Tamil', 'Iskoola Pota', 'Nirmala UI', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+    /*
+     | The default look. Everything below is overridden per installation by the Appearance setting (a small <style>
+     | block in the page head sets these variables), so no screen needs rebuilding to change colours, font or size.
+     | The Sinhala and Tamil families always follow the chosen Latin font, so those scripts look the same everywhere.
+    */
+    --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans Sinhala Variable', 'Noto Sans Tamil Variable',
+        'Noto Sans Sinhala', 'Noto Sans Tamil', 'Iskoola Pota', 'Nirmala UI', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
 }
 
 [x-cloak] {

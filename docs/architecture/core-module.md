@@ -167,3 +167,8 @@ The scheduler (`schedule:work` / the scheduler container) runs: `outbox:relay` (
 `CompanyInfo::profile()` gives other modules the legal name, trade name, tax ID (VAT/TIN), registration number, address lines, phone, email and website for
 document headers (today: the printed tax invoice). It is edited at **Administration → Company profile** (`core.company.manage`, admin only) through the
 `SaveCompanyProfile` action; until it is filled the placeholder name "My Company (Pvt) Ltd" is printed.
+
+## Appearance (added with the branding step)
+
+`Appearance` (contract) gives every layout and printed document the installation's name, logo, theme CSS and document CSS; it is edited at
+**Administration → Appearance** (`core.appearance.manage`) and over `/api/v1/appearance`. Full description: [branding.md](branding.md).

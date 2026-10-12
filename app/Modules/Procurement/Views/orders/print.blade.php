@@ -20,7 +20,7 @@
     <style>
         :root { --ink: #0f172a; --muted: #64748b; --line: #e2e8f0; --accent: #065f46; --soft: #f1f5f9; }
         * { box-sizing: border-box; }
-        body { margin: 0; background: #e2e8f0; color: var(--ink); font: 13px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Noto Sans Sinhala", "Noto Sans Tamil", sans-serif; }
+        body { margin: 0; background: #e2e8f0; color: var(--ink); font: 13px/1.45 var(--font, system-ui, sans-serif); }
         .bar { display: flex; gap: 8px; justify-content: center; padding: 12px; }
         .bar a, .bar button { font: inherit; padding: 8px 16px; border-radius: 8px; border: 1px solid #cbd5e1; background: #fff; color: var(--ink); cursor: pointer; text-decoration: none; }
         .bar button { background: var(--accent); color: #fff; border-color: var(--accent); }
@@ -55,6 +55,7 @@
         @page { size: A4; margin: 0; }
         @media print { body { background: #fff; } .bar { display: none; } .sheet { margin: 0; box-shadow: none; } }
     </style>
+    <x-core::branding.document-style />
 </head>
 <body>
 <div class="bar">
@@ -65,6 +66,7 @@
 <main class="sheet">
     <header>
         <div class="brand">
+            <x-core::branding.document-logo />
             <h1>{{ $name }}</h1>
             @if ($c['trade_name'] && $c['trade_name'] !== $c['legal_name'])<p>{{ $c['legal_name'] }}</p>@endif
             @foreach ($c['address'] as $line)<p>{{ $line }}</p>@endforeach
@@ -129,6 +131,7 @@
     </div>
 
     <footer>
+        <x-core::branding.document-footer />
         <div class="sign"><div>{{ __('procurement::ui.print.prepared_by') }}</div><div>{{ __('procurement::ui.print.authorised_by') }}</div></div>
         <div class="legal">{{ __('procurement::ui.print.computer_generated') }}</div>
     </footer>

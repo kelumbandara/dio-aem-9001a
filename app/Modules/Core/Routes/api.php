@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Core\Http\Controllers\Api\AppearanceController;
 use App\Modules\Core\Http\Controllers\Api\AttachmentController;
 use App\Modules\Core\Http\Controllers\Api\AuthController;
 use App\Modules\Core\Http\Controllers\Api\BranchController;
@@ -28,6 +29,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('branches/{branch}', [BranchController::class, 'show'])->name('branches.show');
         Route::patch('branches/{branch}', [BranchController::class, 'update'])->name('branches.update');
         Route::delete('branches/{branch}', [BranchController::class, 'destroy'])->name('branches.destroy');
+
+        Route::get('appearance', [AppearanceController::class, 'show'])->name('appearance.show');
+        Route::patch('appearance', [AppearanceController::class, 'update'])->name('appearance.update');
+        Route::post('appearance/logo', [AppearanceController::class, 'logo'])->name('appearance.logo');   // multipart: not idempotency-keyed
+        Route::delete('appearance/logo', [AppearanceController::class, 'removeLogo'])->name('appearance.logo.remove');
+        Route::post('appearance/reset', [AppearanceController::class, 'reset'])->name('appearance.reset');
 
         Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
         Route::post('notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');

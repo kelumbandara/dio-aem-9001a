@@ -6,6 +6,7 @@ use App\Modules\Core\Console\MaintainAuditLog;
 use App\Modules\Core\Console\PruneIdempotencyKeys;
 use App\Modules\Core\Console\PurgeAttachments;
 use App\Modules\Core\Console\RelayOutbox;
+use App\Modules\Core\Contracts\Appearance;
 use App\Modules\Core\Contracts\AttachmentScanner;
 use App\Modules\Core\Contracts\AttachmentStore;
 use App\Modules\Core\Contracts\AuditLogger;
@@ -31,6 +32,7 @@ use App\Modules\Core\Services\EloquentCompanyInfo;
 use App\Modules\Core\Services\EloquentUserDirectory;
 use App\Modules\Core\Services\NullAttachmentScanner;
 use App\Modules\Core\Services\OutboxRecorder;
+use App\Modules\Core\Services\SettingsAppearance;
 use App\Support\ModuleServiceProvider;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -58,6 +60,8 @@ class CoreServiceProvider extends ModuleServiceProvider
             'core.module.manage',
             'core.audit.view',
             'core.company.manage',
+            'core.appearance.manage',
+            'core.appearance.vendor', // held by nobody: only the super-admin (the vendor) passes
         ];
     }
 
@@ -67,6 +71,7 @@ class CoreServiceProvider extends ModuleServiceProvider
             new MenuItem('core::ui.menu.dashboard', 'dashboard', null, 'home', 10),
             new MenuItem('core::ui.menu.modules', 'modules.index', 'core.module.manage', 'puzzle', 900),
             new MenuItem('core::ui.menu.company', 'company.edit', 'core.company.manage', 'building', 905),
+            new MenuItem('core::ui.menu.appearance', 'appearance.edit', 'core.appearance.manage', 'palette', 906),
             new MenuItem('core::ui.menu.audit_log', 'audit-log.index', 'core.audit.view', 'shield', 910),
         ];
     }
@@ -79,6 +84,8 @@ class CoreServiceProvider extends ModuleServiceProvider
         $this->app->singleton(UserDirectory::class, EloquentUserDirectory::class);
         $this->app->singleton(BranchDirectory::class, EloquentBranchDirectory::class);
         $this->app->singleton(CompanyInfo::class, EloquentCompanyInfo::class);
+        $this->app->singleton(SettingsAppearance::class);
+        $this->app->singleton(Appearance::class, SettingsAppearance::class);
         $this->app->singleton(Notifier::class, DatabaseNotifier::class);
         $this->app->singleton(EventOutbox::class, OutboxRecorder::class);
         $this->app->singleton(AttachmentStore::class, AttachmentService::class);

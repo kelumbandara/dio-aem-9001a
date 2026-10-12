@@ -21,6 +21,14 @@ return [
         'max_attempts' => 8,
     ],
 
+    'branding' => [
+        // Where the uploaded company logo is kept (a private disk; it is served through /branding/logo, never from a public folder).
+        'disk' => env('BRANDING_DISK', 'local'),
+    ],
+
+    // Shown in the "Powered by" line unless the vendor switches it off or words it differently.
+    'vendor_name' => env('VENDOR_NAME', 'DIO ERP'),
+
     'attachments' => [
         // Private disk (S3-compatible in production); never served from the web root.
         'disk' => env('ATTACHMENTS_DISK', 'attachments'),
