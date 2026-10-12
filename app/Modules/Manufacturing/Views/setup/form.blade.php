@@ -42,6 +42,16 @@
                 </div>
             @endif
 
+            @if ($entity === 'downtime-reasons')
+                <div>
+                    <label for="f-category" class="mb-1 block text-sm font-medium text-slate-700">{{ __('manufacturing::ui.setup.category') }}</label>
+                    <select id="f-category" name="category" required class="{{ $field }}">
+                        @foreach (\App\Modules\Manufacturing\Models\DowntimeReason::CATEGORIES as $c) <option value="{{ $c }}" @selected($v('category', 'breakdown') === $c)>{{ __("manufacturing::ui.setup.categories.{$c}") }}</option> @endforeach
+                    </select>
+                    @error('category') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                </div>
+            @endif
+
             @if ($entity === 'shifts')
                 <x-core::input name="start_time" type="time" :label="__('manufacturing::ui.setup.starts')" :value="$v('start_time', '08:00')" required />
                 <x-core::input name="end_time" type="time" :label="__('manufacturing::ui.setup.ends')" :value="$v('end_time', '17:00')" :hint="__('manufacturing::ui.setup.ends_hint')" required />

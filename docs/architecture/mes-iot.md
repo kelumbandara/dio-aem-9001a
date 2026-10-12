@@ -2,7 +2,7 @@
 
 ## 1. Manual MES (MVP)
 
-Built so far (Sprint 8, planning and material control): [manufacturing.md](manufacturing.md). The quantity model below exists on production orders already; output reporting, QC and finished-goods receipt follow in Sprint 9.
+Built so far (Sprints 8 and 9): [manufacturing.md](manufacturing.md): planning, material control, output reporting per shift, rework, quality inspection, downtime, finished-goods receipt and completion. The quantity model below is on every production order; `source` and `external_event_id` are already on reports and downtime for IoT intake.
 
 Production flow: `Production Order → Release → Material Issue → Output Reports → QC → FG Receipt → Completion`.
 

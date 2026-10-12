@@ -107,6 +107,8 @@
         </form>
     </section>
 
+    @include('manufacturing::orders.partials.shopfloor')
+
     <section class="mb-6">
         <h2 class="mb-2 text-base font-semibold text-slate-900">{{ __('manufacturing::ui.boms.routing') }}</h2>
         <x-core::table>

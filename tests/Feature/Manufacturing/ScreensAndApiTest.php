@@ -231,7 +231,7 @@ describe('languages', function () {
     });
 
     it('uses a key for every text the screens ask for', function () {
-        $files = array_merge(glob(app_path('Modules/Manufacturing/Views/*/*.blade.php')), glob(app_path('Modules/Manufacturing/Http/Controllers/*/*.php')), glob(app_path('Modules/Manufacturing/Services/*.php')));
+        $files = array_merge(glob(app_path('Modules/Manufacturing/Views/*/*.blade.php')), glob(app_path('Modules/Manufacturing/Views/*/*/*.blade.php')), glob(app_path('Modules/Manufacturing/Http/Controllers/*/*.php')), glob(app_path('Modules/Manufacturing/Services/*.php')));
         $keys = [];
         foreach ($files as $f) {
             preg_match_all('/manufacturing::ui\.([A-Za-z0-9_.\-]+)/', file_get_contents($f), $m);
@@ -251,5 +251,5 @@ describe('languages', function () {
 });
 
 it('hands the setup service the same rules as the screens', function () {
-    expect(array_keys(SetupService::ENTITIES))->toBe(['work-centers', 'lines', 'machines', 'shifts']);
+    expect(array_keys(SetupService::ENTITIES))->toBe(['work-centers', 'lines', 'machines', 'shifts', 'downtime-reasons']);
 });

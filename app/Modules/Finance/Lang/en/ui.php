@@ -80,7 +80,7 @@ return [
 
     'mapping' => [
         'inventory' => 'Inventory (stock value)', 'wip' => 'Work in progress', 'grni' => 'Goods received, not yet invoiced', 'receivable_control' => 'Receivables control (customers)', 'payable_control' => 'Payables control (suppliers)',
-        'sales_revenue' => 'Sales revenue', 'cogs' => 'Cost of sales', 'stock_adjustment' => 'Stock adjustments and write-offs', 'sample_expense' => 'Samples given away', 'purchase_expense' => 'Purchases of services and non-stock items', 'purchase_variance' => 'Purchase price variance',
+        'sales_revenue' => 'Sales revenue', 'cogs' => 'Cost of sales', 'stock_adjustment' => 'Stock adjustments and write-offs', 'sample_expense' => 'Samples given away', 'purchase_expense' => 'Purchases of services and non-stock items', 'production_variance' => 'Production variance (unabsorbed material cost)', 'purchase_variance' => 'Purchase price variance',
         'discount_given' => 'Discounts given', 'discount_received' => 'Discounts received', 'vat_output' => 'VAT payable (on sales)', 'sscl_payable' => 'SSCL payable (on sales)', 'nbt_payable' => 'NBT payable (on sales)',
         'vat_input' => 'VAT receivable (on purchases)', 'opening_balance_equity' => 'Opening balance equity', 'retained_earnings' => 'Retained earnings', 'year_result' => 'Year profit / loss', 'fx_gain' => 'Foreign exchange gain', 'fx_loss' => 'Foreign exchange loss',
     ],

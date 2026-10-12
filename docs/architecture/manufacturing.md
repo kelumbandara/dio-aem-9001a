@@ -1,8 +1,8 @@
-# Manufacturing (Sprint 8: planning and material control)
+# Manufacturing (Sprint 8: planning and material control; Sprint 9: shop floor, quality, finished goods)
 
-**Status:** built in Sprint 8 and awaiting owner review. Output reporting, rejects, rework, downtime, quality inspection, finished-goods
-receipt and completion are Sprint 9. The module depends on Core, Approvals, MasterData and Inventory (never on Finance: the books
-follow from the stock events, as for every other module). Handover: [../handover/sprint-8.md](../handover/sprint-8.md).
+**Status:** built in Sprints 8 and 9 and awaiting owner review. The module depends on Core, Approvals, MasterData, Inventory and Finance
+(Finance only for the one production-variance journal at completion; every other posting follows from the stock events, as for every other
+module). Handovers: [Sprint 8](../handover/sprint-8.md), [Sprint 9](../handover/sprint-9.md).
 
 ## 1. Decisions taken for you (change any of them in review)
 
@@ -90,8 +90,56 @@ Items, units, warehouses, work centres, machines and lines are given by code; ma
 `manufacturing.*` codes. Events (outbox): `manufacturing.bom.activated`, `.bom.retired`, `manufacturing.order.released`, `.order.cancelled`,
 `manufacturing.materials.issued`, `.materials.returned`.
 
-## 8. Not built (next sprint or later)
+## 8. Sprint 9: output, quality, finished goods, downtime
 
-Output, reject, rework and downtime entry; quality inspection; finished-goods receipt and the costing of finished goods (labour/overhead from
-work-centre rates); completion and variances; operator touch screens; backflush; stock reservation for orders; approval chain for bill
-activation; capacity planning and scheduling by shift; alternate components.
+Owner decisions (2026-10-12): output is **reported per shift**; finished goods are **costed with materials only**; a bill is **activated by an admin only**.
+
+### Reporting output (operator screen)
+- **Manufacturing → Report production** lists released and running orders; one big-button page per order takes the shift (the running one is preselected,
+  a night shift after midnight belongs to the date it started), the shift date, units made, rejected, rework, optionally the routing step and machine.
+  The same page takes **machine downtime** (machine, reason, time it stopped, minutes) and shows the latest reports.
+- Every report and downtime entry **names a shift**; a report may be entered for today's shift or up to `MANUFACTURING_REPORT_BACKDATE_DAYS` (7) days back,
+  never for the future. A report says *units made* (good, reject and rework together), *of which rejected*, *of which rework*; the rest wait for inspection.
+- **Over-production** is capped at the plan plus `MANUFACTURING_OVER_PRODUCTION_PCT` (10 %).
+- Reports are **never edited**. A mistake is cancelled (`manufacturing.output.void`, with a reason) and entered again; the database refuses any other change or
+  delete. Cancelling is refused once its units were inspected or reworked. A device or client can send an `external_id`: the same id returns the report already made.
+- **Rework**: units sent to rework come back with a *rework done* report and wait for inspection again.
+
+### Quality inspection (permission `manufacturing.qc.inspect`)
+Decides, for units waiting (`reported − accepted − rejected − rework`), how many are accepted, rejected or sent to rework; a reason is required for rejects and rework.
+Nobody can judge more units than are waiting. The six quantities obey `accepted + rejected + rework ≤ reported` and `received ≤ accepted` (database checks).
+
+### Finished goods and cost (permission `manufacturing.receipt.post`)
+Accepted units are received into the order's output warehouse through the stock poster (`receipt` / `production`). **Materials-only costing**: a unit is costed at
+*work in progress still held ÷ units still expected*, where the units expected are the larger of "planned − received" and "accepted − received". So good units carry
+the material cost of the whole plan, **scrap included**, and what is left over (fewer good units than planned, or rounding) is the order's variance. Lots and expiry
+are taken for lot-tracked items. Finance books **debit Inventory / credit Work in progress** from the stock event.
+
+### Completing (permission `manufacturing.order.complete`)
+Needs: something reported, nothing waiting for inspection, no units in rework, every accepted unit received. Completion fixes the **variance** (material value still held
+by the order) and posts it once as **debit Production variance (2208) / credit Work in progress (1105)** (the reverse if rounding absorbed a little too much),
+so work in progress for the order is nil. Then the order accepts no more reports, inspections, issues or returns and cannot be cancelled. Statuses `closed` stays unused.
+
+### Downtime
+`downtime_reasons` (code, name, category planned / breakdown / changeover / material / quality / other; managed under *Work centres & machines*). An entry is *machine + shift +
+reason + start + minutes*; two entries for one machine cannot overlap (serialised per machine, so parallel entries cannot both win); `external_id` makes a device's entry idempotent.
+Also by `started_at` / `ended_at` through the API.
+
+### Shift report
+**Manufacturing → Shift report** and `GET /api/v1/shift-report`: for each shift date and shift, units made, good, rejected, rework, back from rework, downtime minutes and
+the number of entries; click a row for the individual entries. Cancelled entries are left out.
+
+### Permissions and roles (Sprint 9)
+`manufacturing.output.report`, `.output.void`, `.downtime.report`, `.qc.inspect`, `.receipt.post`, `.order.complete`. `admin` has all. Role `production` (planner / store keeper): report,
+downtime, inspect, receive, complete (not cancel a report). New role **`operator`**: view, report output, report downtime only (demo user `operator@dio.test`).
+
+### API and events (Sprint 9)
+`POST /api/v1/production-orders/{id}/output | rework-done | inspections | receipts | complete`, `POST /api/v1/production-reports/{id}/void`, `POST /api/v1/downtime-events`
+(+ `/{id}/void`), `GET /api/v1/shift-report`, setup `downtime-reasons`. Events: `manufacturing.output.reported`, `.output.voided`, `.rework.done`, `.inspection.recorded`,
+`.receipt.posted`, `.order.completed`, `.downtime.reported`.
+
+## 9. Not built (next sprint or later)
+
+Labour and overhead in the cost of finished goods (the work-centre rates and the recorded run times exist but are not used); backflush; stock reservation for orders; an
+undo for a wrong finished-goods receipt (correct with a stock adjustment); a multi-step inspection plan with measurements; downtime that is still running; OEE; approval chain for bill
+activation; capacity planning and scheduling by shift; alternate components; IoT intake (the `source` / `external_event_id` columns are ready).

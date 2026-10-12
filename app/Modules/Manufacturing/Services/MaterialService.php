@@ -126,7 +126,7 @@ final class MaterialService
         }
 
         return DB::transaction(function () use ($order, $lines, $by, $reason, $date): array {
-            $locked = $this->lockOpenOrder($order, ['released', 'in_progress', 'completed']);
+            $locked = $this->lockOpenOrder($order, ['released', 'in_progress']);
             $prepared = $this->prepare($locked, $lines);
             $stockLines = [];
             foreach ($prepared as $p) {

@@ -3,6 +3,7 @@
 use App\Modules\Manufacturing\Http\Controllers\Api\BomController;
 use App\Modules\Manufacturing\Http\Controllers\Api\OrderController;
 use App\Modules\Manufacturing\Http\Controllers\Api\SetupController;
+use App\Modules\Manufacturing\Http\Controllers\Api\ShopfloorController;
 use Illuminate\Support\Facades\Route;
 
 // Mounted at /api/v1 (names api.v1.*) with the `module:manufacturing` guard.
@@ -26,6 +27,17 @@ Route::middleware(['auth:sanctum', 'mfa.enrolled'])->group(function () {
     Route::post('production-orders/{order}/cancel', [OrderController::class, 'cancel'])->middleware('idempotent')->name('production-orders.cancel');
     Route::post('production-orders/{order}/issues', [OrderController::class, 'issue'])->middleware('idempotent')->name('production-orders.issue');
     Route::post('production-orders/{order}/returns', [OrderController::class, 'return'])->middleware('idempotent')->name('production-orders.return');
+
+    Route::post('production-orders/{order}/output', [OrderController::class, 'output'])->middleware('idempotent')->name('production-orders.output');
+    Route::post('production-orders/{order}/rework-done', [OrderController::class, 'reworkDone'])->middleware('idempotent')->name('production-orders.rework');
+    Route::post('production-orders/{order}/inspections', [OrderController::class, 'inspect'])->middleware('idempotent')->name('production-orders.inspect');
+    Route::post('production-orders/{order}/receipts', [OrderController::class, 'receive'])->middleware('idempotent')->name('production-orders.receive');
+    Route::post('production-orders/{order}/complete', [OrderController::class, 'complete'])->middleware('idempotent')->name('production-orders.complete');
+
+    Route::post('production-reports/{report}/void', [ShopfloorController::class, 'voidReport'])->middleware('idempotent')->name('production-reports.void');
+    Route::post('downtime-events', [ShopfloorController::class, 'downtime'])->middleware('idempotent')->name('downtime-events.store');
+    Route::post('downtime-events/{event}/void', [ShopfloorController::class, 'voidDowntime'])->middleware('idempotent')->name('downtime-events.void');
+    Route::get('shift-report', [ShopfloorController::class, 'shiftReport'])->name('shift-report');
 
     Route::get('manufacturing/{entity}', [SetupController::class, 'index'])->name('manufacturing.setup.index');
     Route::post('manufacturing/{entity}', [SetupController::class, 'store'])->name('manufacturing.setup.store');

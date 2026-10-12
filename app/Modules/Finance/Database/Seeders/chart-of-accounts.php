@@ -56,6 +56,7 @@ return [
         ['2200', 'OPENING STOCK'], ['2201', 'PURCHASES'],
         ['2206', 'COST OF SALES', null, 'added: cost of stock sold, posted when stock is issued'],
         ['2207', 'STOCK ADJUSTMENTS & WRITE-OFFS', null, 'added: stock counts, damage, expiry, scrap'],
+        ['2208', 'PRODUCTION VARIANCE', null, 'added: material cost of a production order not absorbed by its good output, posted when the order is completed'],
         ['2202', 'ELECTRICITY'], ['2204', 'BATA'], ['2213', 'EQUIPMENT MAINTENANCE'],
         ['2214', 'PURCHASE PRICE VARIENCE (DUPLICATE - USE 2217)', null, 'changed: duplicate of 2217, deactivated'],
         ['2215', 'DEPRECIATION- PLANT & MACHINERY'], ['2216', 'DEPRECIATION- TOOLS'], ['2217', 'PURCHASE PRICE VARIANCE'],

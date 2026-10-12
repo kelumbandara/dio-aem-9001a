@@ -41,6 +41,9 @@
 | `procurement.bill.posted` | Procurement (built S7; `bill_id, document_no, supplier_id, gross_total`) | Reporting (the payable journal is posted synchronously through `OpenItemPoster`) |
 | `manufacturing.bom.activated` / `.bom.retired` | Manufacturing (built S8; `bom_version_id, item_id, version_no`) | Reporting, AI |
 | `manufacturing.order.released` / `.order.cancelled` | Manufacturing (built S8; `order_id, order_no, item_id, planned_qty`) | Reporting, Communications |
+| `manufacturing.output.reported` / `.output.voided` / `.rework.done` | Manufacturing (built S9; `order_id, order_no, report_id, shift, produced, rejected, rework`) | Reporting, AI |
+| `manufacturing.inspection.recorded` / `.receipt.posted` / `.order.completed` | Manufacturing (built S9; receipts carry `qty, value, stock_document_no`, completion `received_qty, fg_value, variance_value`; the stock and work-in-progress postings come from `inventory.stock.moved`) | Reporting |
+| `manufacturing.downtime.reported` | Manufacturing (built S9; `machine, shift, reason, category, minutes`) | Reporting, AI |
 | `manufacturing.materials.issued` / `.materials.returned` | Manufacturing (built S8; `order_id, order_no, stock_document_no, value`; the stock and work-in-progress postings come from `inventory.stock.moved`) | Reporting |
 | `procurement.return.posted` | Procurement (built S7; `return_id, document_no, order_id, supplier_id, gross_total`) | Reporting |
 | `finance.journal.posted` | Finance (built S5; payload `journal_id, journal_no, entry_date, kind, total, source_type, source_id`) | Reporting |

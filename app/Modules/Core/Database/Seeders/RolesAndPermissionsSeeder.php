@@ -60,8 +60,13 @@ class RolesAndPermissionsSeeder extends Seeder
         // warehouses and stock but change none of them. Activating a bill, issuing more than required and the work-centre/machine/shift
         // setup stay with admin.
         $production = ['manufacturing.view', 'manufacturing.bom.manage', 'manufacturing.order.manage', 'manufacturing.order.release', 'manufacturing.issue.post',
+            'manufacturing.output.report', 'manufacturing.downtime.report', 'manufacturing.qc.inspect', 'manufacturing.receipt.post', 'manufacturing.order.complete',
             'masterdata.reference.view', 'masterdata.item.view', 'inventory.stock.view', 'inventory.warehouse.view'];
         Role::findOrCreate('production', 'web')->syncPermissions(array_values(array_filter($names, fn (string $name) => in_array($name, $production, true))));
+
+        // Machine operators only see the order list and report their shift's output and downtime; cancelling a report, inspecting and completing stay with supervisors.
+        $operator = ['manufacturing.view', 'manufacturing.output.report', 'manufacturing.downtime.report'];
+        Role::findOrCreate('operator', 'web')->syncPermissions(array_values(array_filter($names, fn (string $name) => in_array($name, $operator, true))));
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }

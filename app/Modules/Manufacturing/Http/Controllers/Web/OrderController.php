@@ -5,10 +5,14 @@ namespace App\Modules\Manufacturing\Http\Controllers\Web;
 use App\Modules\Manufacturing\Http\Controllers\Concerns\NeedsPermission;
 use App\Modules\Manufacturing\Http\Controllers\Web\Concerns\ReportsBusinessErrors;
 use App\Modules\Manufacturing\Models\ProductionOrder;
+use App\Modules\Manufacturing\Services\FinishedGoodsService;
 use App\Modules\Manufacturing\Services\FormOptions;
+use App\Modules\Manufacturing\Services\InspectionService;
 use App\Modules\Manufacturing\Services\ManufacturingPresenter;
 use App\Modules\Manufacturing\Services\MaterialService;
+use App\Modules\Manufacturing\Services\OutputService;
 use App\Modules\Manufacturing\Services\ProductionOrderService;
+use App\Modules\Manufacturing\Services\ShiftService;
 use App\Modules\MasterData\Contracts\ItemCatalog;
 use App\Support\Http\Controller;
 use Illuminate\Http\RedirectResponse;
@@ -58,7 +62,7 @@ class OrderController extends Controller
         });
     }
 
-    public function show(Request $request, ProductionOrder $order, ManufacturingPresenter $presenter): View
+    public function show(Request $request, ProductionOrder $order, ManufacturingPresenter $presenter, FormOptions $options): View
     {
         $this->need($request, 'manufacturing.view');
 
@@ -67,7 +71,11 @@ class OrderController extends Controller
             'can' => [
                 'manage' => $request->user()->can('manufacturing.order.manage'), 'release' => $request->user()->can('manufacturing.order.release'),
                 'issue' => $request->user()->can('manufacturing.issue.post'), 'over' => $request->user()->can('manufacturing.issue.over'),
+                'report' => $request->user()->can('manufacturing.output.report'), 'void' => $request->user()->can('manufacturing.output.void'),
+                'inspect' => $request->user()->can('manufacturing.qc.inspect'), 'receive' => $request->user()->can('manufacturing.receipt.post'), 'complete' => $request->user()->can('manufacturing.order.complete'),
             ],
+            'shifts' => app(ShiftService::class)->current(),
+            'options' => $options->operator(app(ShiftService::class)),
         ]);
     }
 
@@ -147,6 +155,58 @@ class OrderController extends Controller
             $result = $service->return($order, $lines, $request->user()->id, $data['reason'], $data['date'] ?? null);
 
             return redirect()->route('manufacturing.orders.show', $order)->with('status', __('manufacturing::ui.flash.returned', ['document' => $result['document_no']]));
+        });
+    }
+
+    public function reworkDone(Request $request, ProductionOrder $order, OutputService $service): RedirectResponse
+    {
+        $this->need($request, 'manufacturing.output.report');
+        $data = $request->validate(['shift' => ['required', 'string', 'max:30'], 'date' => ['nullable', 'date_format:Y-m-d'], 'qty' => ['required', 'string', 'regex:/^\d{1,12}(\.\d{1,6})?$/'], 'notes' => ['nullable', 'string', 'max:500']]);
+
+        return $this->attempt(function () use ($request, $order, $service, $data) {
+            $service->reworkDone($order, $data, $request->user()->id);
+
+            return redirect()->route('manufacturing.orders.show', $order)->with('status', __('manufacturing::ui.flash.rework_done'));
+        });
+    }
+
+    public function inspect(Request $request, ProductionOrder $order, InspectionService $service): RedirectResponse
+    {
+        $this->need($request, 'manufacturing.qc.inspect');
+        $data = $request->validate([
+            'date' => ['nullable', 'date_format:Y-m-d'], 'accepted' => self::QTY, 'rejected' => self::QTY, 'rework' => self::QTY,
+            'reject_reason' => ['nullable', 'string', 'max:255'], 'notes' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        return $this->attempt(function () use ($request, $order, $service, $data) {
+            $service->inspect($order, $data, $request->user()->id);
+
+            return redirect()->route('manufacturing.orders.show', $order)->with('status', __('manufacturing::ui.flash.inspected'));
+        });
+    }
+
+    public function receive(Request $request, ProductionOrder $order, FinishedGoodsService $service): RedirectResponse
+    {
+        $this->need($request, 'manufacturing.receipt.post');
+        $data = $request->validate([
+            'date' => ['nullable', 'date_format:Y-m-d'], 'qty' => ['required', 'string', 'regex:/^\d{1,12}(\.\d{1,6})?$/'], 'lot_no' => ['nullable', 'string', 'max:60'], 'expiry_date' => ['nullable', 'date_format:Y-m-d'],
+        ]);
+
+        return $this->attempt(function () use ($request, $order, $service, $data) {
+            $receipt = $service->receive($order, $data, $request->user()->id);
+
+            return redirect()->route('manufacturing.orders.show', $order)->with('status', __('manufacturing::ui.flash.received', ['document' => $receipt->stock_document_no]));
+        });
+    }
+
+    public function complete(Request $request, ProductionOrder $order, FinishedGoodsService $service): RedirectResponse
+    {
+        $this->need($request, 'manufacturing.order.complete');
+
+        return $this->attempt(function () use ($request, $order, $service) {
+            $done = $service->complete($order, $request->user()->id);
+
+            return redirect()->route('manufacturing.orders.show', $order)->with('status', __('manufacturing::ui.flash.completed', ['order' => $done->order_no]));
         });
     }
 

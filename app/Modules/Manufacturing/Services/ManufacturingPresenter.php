@@ -4,9 +4,11 @@ namespace App\Modules\Manufacturing\Services;
 
 use App\Modules\Inventory\Contracts\WarehouseDirectory;
 use App\Modules\Manufacturing\Models\BomVersion;
+use App\Modules\Manufacturing\Models\DowntimeReason;
 use App\Modules\Manufacturing\Models\Machine;
 use App\Modules\Manufacturing\Models\ProductionLine;
 use App\Modules\Manufacturing\Models\ProductionOrder;
+use App\Modules\Manufacturing\Models\Shift;
 use App\Modules\Manufacturing\Models\WorkCenter;
 use App\Modules\MasterData\Contracts\ItemCatalog;
 use App\Support\Decimal;
@@ -90,7 +92,7 @@ final class ManufacturingPresenter
     /** @return array<string, mixed> */
     public function order(ProductionOrder $o): array
     {
-        $o->load('materials', 'operations', 'movements', 'bomVersion');
+        $o->load('materials', 'operations', 'movements', 'bomVersion', 'reports', 'inspections', 'receipts', 'downtime');
         $product = $this->items->find($o->item_id);
         $infos = $this->items->findMany($o->materials->pluck('item_id')->all());
         $labels = $this->warehouses->labels([$o->source_warehouse_id, $o->output_warehouse_id]);
@@ -98,6 +100,10 @@ final class ManufacturingPresenter
         $machines = Machine::query()->whereIn('id', $o->operations->pluck('machine_id')->filter())->get()->keyBy('id');
         $line = $o->production_line_id ? ProductionLine::query()->find($o->production_line_id) : null;
         $byMaterial = $o->movements->groupBy('material_id');
+        $shifts = Shift::query()->get()->keyBy('id');
+        $allMachines = Machine::query()->whereIn('id', $o->reports->pluck('machine_id')->merge($o->downtime->pluck('machine_id'))->filter()->unique())->get()->keyBy('id');
+        $reasons = DowntimeReason::query()->get()->keyBy('id');
+        $opNo = $o->operations->pluck('op_no', 'id');
 
         $wip = '0';
         foreach ($o->materials as $m) {
@@ -115,6 +121,26 @@ final class ManufacturingPresenter
             'source_warehouse_code' => explode(' ', $labels[$o->source_warehouse_id] ?? '')[0], 'output_warehouse_code' => explode(' ', $labels[$o->output_warehouse_id] ?? '')[0],
             'notes' => $o->notes, 'cancel_reason' => $o->cancel_reason, 'released_at' => $o->released_at?->toIso8601String(),
             'wip_value' => Decimal::round($wip, 2),
+            'pending_qty' => Decimal::trim($o->pendingQty()), 'waiting_receipt_qty' => Decimal::trim(Decimal::sub((string) $o->accepted_qty, (string) $o->received_qty)),
+            'fg_value' => Decimal::round((string) $o->fg_value, 2), 'variance_value' => $o->variance_value === null ? null : Decimal::round((string) $o->variance_value, 2),
+            'completed_at' => $o->completed_at?->toIso8601String(),
+            'reports' => $o->reports->map(fn ($r) => [
+                'id' => $r->public_id, 'kind' => $r->kind, 'date' => $r->report_date->toDateString(), 'shift' => $shifts[$r->shift_id]->code ?? '', 'step' => $r->operation_id ? ($opNo[$r->operation_id] ?? null) : null,
+                'machine' => $r->machine_id ? ($allMachines[$r->machine_id]->code ?? null) : null, 'produced' => Decimal::trim((string) $r->produced_qty), 'rejected' => Decimal::trim((string) $r->reject_qty),
+                'rework' => Decimal::trim((string) $r->rework_qty), 'notes' => $r->notes, 'source' => $r->source, 'voided' => $r->voided_at !== null, 'void_reason' => $r->void_reason,
+            ])->values()->all(),
+            'inspections' => $o->inspections->map(fn ($i) => [
+                'id' => $i->public_id, 'date' => $i->inspected_on->toDateString(), 'accepted' => Decimal::trim((string) $i->accepted_qty), 'rejected' => Decimal::trim((string) $i->rejected_qty),
+                'rework' => Decimal::trim((string) $i->rework_qty), 'reason' => $i->reject_reason, 'notes' => $i->notes,
+            ])->values()->all(),
+            'receipts' => $o->receipts->map(fn ($r) => [
+                'id' => $r->public_id, 'date' => $r->received_on->toDateString(), 'qty' => Decimal::trim((string) $r->qty), 'unit_cost' => Decimal::trim((string) $r->unit_cost), 'value' => Decimal::round((string) $r->value, 2),
+                'lot_no' => $r->lot_no, 'document' => $r->stock_document_no,
+            ])->values()->all(),
+            'downtime' => $o->downtime->map(fn ($d) => [
+                'id' => $d->public_id, 'date' => $d->shift_date->toDateString(), 'shift' => $shifts[$d->shift_id]->code ?? '', 'machine' => $allMachines[$d->machine_id]->code ?? '',
+                'reason' => $reasons[$d->reason_id]->name ?? '', 'minutes' => Decimal::trim((string) $d->minutes), 'notes' => $d->notes, 'voided' => $d->voided_at !== null, 'void_reason' => $d->void_reason,
+            ])->values()->all(),
             'materials' => $o->materials->map(function ($m) use ($infos, $byMaterial) {
                 $net = $m->netQty();
 

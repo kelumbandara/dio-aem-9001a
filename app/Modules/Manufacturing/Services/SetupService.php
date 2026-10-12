@@ -3,6 +3,7 @@
 namespace App\Modules\Manufacturing\Services;
 
 use App\Modules\Core\Contracts\AuditLogger;
+use App\Modules\Manufacturing\Models\DowntimeReason;
 use App\Modules\Manufacturing\Models\Machine;
 use App\Modules\Manufacturing\Models\ProductionLine;
 use App\Modules\Manufacturing\Models\Shift;
@@ -25,6 +26,7 @@ final class SetupService
         'lines' => ProductionLine::class,
         'machines' => Machine::class,
         'shifts' => Shift::class,
+        'downtime-reasons' => DowntimeReason::class,
     ];
 
     public function __construct(private readonly AuditLogger $audit) {}
@@ -93,6 +95,7 @@ final class SetupService
                 'days' => ['required', 'regex:/^[01]{7}$/'],
                 'is_active' => ['sometimes', 'boolean'],
             ],
+            'downtime-reasons' => $base + ['category' => ['required', Rule::in(DowntimeReason::CATEGORIES)], 'is_active' => ['sometimes', 'boolean']],
             default => abort(404),
         };
     }
@@ -109,7 +112,7 @@ final class SetupService
         }
         if (array_key_exists('is_active', $values)) {
             $values['is_active'] = (bool) $values['is_active'];
-        } elseif (in_array($entity, ['work-centers', 'lines', 'shifts'], true) && $existing === null) {
+        } elseif (in_array($entity, ['work-centers', 'lines', 'shifts', 'downtime-reasons'], true) && $existing === null) {
             $values['is_active'] = true;
         }
         if ($entity === 'machines') {

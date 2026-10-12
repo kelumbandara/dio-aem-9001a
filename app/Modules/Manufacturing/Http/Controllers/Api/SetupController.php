@@ -43,7 +43,7 @@ class SetupController extends Controller
     /** @return array<string, mixed> */
     private function row(string $entity, Model $m): array
     {
-        $row = array_merge(['id' => $m->getAttribute('public_id')], $m->only(['code', 'name', 'description', 'capacity_hours_per_day', 'hourly_rate', 'is_active', 'status', 'notes', 'start_time', 'end_time', 'days']));
+        $row = array_merge(['id' => $m->getAttribute('public_id')], $m->only(['code', 'name', 'description', 'capacity_hours_per_day', 'hourly_rate', 'is_active', 'status', 'category', 'notes', 'start_time', 'end_time', 'days']));
         if ($entity === 'machines') {
             /** @var Machine $m */
             $row['work_center'] = WorkCenter::query()->whereKey($m->work_center_id)->value('code');

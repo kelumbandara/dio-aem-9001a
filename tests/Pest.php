@@ -31,6 +31,7 @@ use App\Modules\MasterData\Support\InputMapper;
 use App\Support\Exceptions\BusinessException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\Sanctum;
 use PragmaRX\Google2FA\Google2FA;
@@ -315,4 +316,10 @@ function mfgReleased(Item $product, string $qty, Warehouse $wh, array $o = []): 
     $order = mfgOrder($product, $qty, $wh, $o);
 
     return app(ProductionOrderService::class)->release($order, userWithPermissions('manufacturing.order.release')->id)['order'];
+}
+
+/** Run a statement the database is expected to refuse without poisoning the test's own transaction. */
+function inSavepoint(Closure $statement): mixed
+{
+    return DB::transaction($statement);
 }

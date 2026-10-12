@@ -11,7 +11,7 @@
 | 5 | **Finance** | Chart of accounts, periods, journals, posting rules, AR, AP, receipts, payments, reports ([detail](finance.md)) | MVP S5 |
 | 6 | **Sales** | Quotations, sales orders (credit-limit block, reservation), deliveries, tax invoices (VAT, SSCL/NBT), credit notes and returns ([detail](sales.md)); leads/activities later | MVP S6 |
 | 7 | **Procurement** | Purchase orders (approval gate), goods receipts, supplier bills with three-way match, returns and debit notes ([detail](procurement.md)); requisitions later | MVP S7 |
-| 8 | **Manufacturing** | BOM (versioned, multi-level) with routing, work centers, machines, lines, shifts, production orders, material issue/return ([detail](manufacturing.md), S8); output, rejects, rework, downtime, QC, FG receipt (S9) | MVP (after ERP core) |
+| 8 | **Manufacturing** | BOM (versioned, multi-level) with routing, work centers, machines, lines, shifts, production orders, material issue/return (S8); output per shift, rejects, rework, downtime, QC, FG receipt, completion ([detail](manufacturing.md), S9) | MVP (after ERP core) |
 | 9 | **Reporting** | Deterministic KPI queries, dashboards, exports | MVP (incremental) |
 | 10 | **AI** | Providers, orchestrator, agents, tools, conversation, usage, retrieval, safety, execution audit | MVP-lite, grows |
 | 11 | **Communications** | Channels (web/mobile chat, email, WhatsApp, voice), identity linkage, templates, delivery | Post-core MVP |

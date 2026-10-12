@@ -89,7 +89,7 @@ class SetupController extends Controller
     private function row(string $entity, Model $m): array
     {
         $row = ['id' => $m->getAttribute('public_id')];
-        foreach (['code', 'name', 'description', 'capacity_hours_per_day', 'hourly_rate', 'is_active', 'status', 'notes', 'start_time', 'end_time', 'days'] as $k) {
+        foreach (['code', 'name', 'description', 'capacity_hours_per_day', 'hourly_rate', 'is_active', 'status', 'category', 'notes', 'start_time', 'end_time', 'days'] as $k) {
             $row[$k] = $m->getAttribute($k);
         }
         if ($entity === 'machines') {

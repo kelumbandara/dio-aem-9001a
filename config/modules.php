@@ -85,7 +85,7 @@ return [
         'manufacturing' => [
             'name' => 'Manufacturing',
             'provider' => ManufacturingServiceProvider::class,
-            'depends_on' => ['core', 'approvals', 'masterdata', 'inventory'],
+            'depends_on' => ['core', 'approvals', 'masterdata', 'inventory', 'finance'],
             'enabled' => true,
             'required' => false,
         ],

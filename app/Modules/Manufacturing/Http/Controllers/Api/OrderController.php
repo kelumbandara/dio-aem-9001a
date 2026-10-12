@@ -4,8 +4,11 @@ namespace App\Modules\Manufacturing\Http\Controllers\Api;
 
 use App\Modules\Manufacturing\Http\Controllers\Concerns\NeedsPermission;
 use App\Modules\Manufacturing\Models\ProductionOrder;
+use App\Modules\Manufacturing\Services\FinishedGoodsService;
+use App\Modules\Manufacturing\Services\InspectionService;
 use App\Modules\Manufacturing\Services\ManufacturingPresenter;
 use App\Modules\Manufacturing\Services\MaterialService;
+use App\Modules\Manufacturing\Services\OutputService;
 use App\Modules\Manufacturing\Services\ProductionOrderService;
 use App\Support\Http\Controller;
 use Illuminate\Http\JsonResponse;
@@ -95,6 +98,56 @@ class OrderController extends Controller
         $result = $service->return($order, $data['lines'], $request->user()->id, $data['reason'], $data['date'] ?? null);
 
         return response()->json(['data' => $presenter->order($order->refresh()), 'meta' => ['stock_document' => $result['document_no']]], 201);
+    }
+
+    public function output(Request $request, ProductionOrder $order, OutputService $service, ManufacturingPresenter $presenter): JsonResponse
+    {
+        $this->need($request, 'manufacturing.output.report');
+        $data = $request->validate([
+            'shift' => ['required', 'string', 'max:30'], 'date' => ['nullable', 'date_format:Y-m-d'], 'produced' => self::QTY, 'rejected' => ['nullable', 'string', 'regex:/^\d{1,12}(\.\d{1,6})?$/'],
+            'rework' => ['nullable', 'string', 'regex:/^\d{1,12}(\.\d{1,6})?$/'], 'operation' => ['nullable', 'integer', 'min:1'], 'machine' => ['nullable', 'string', 'max:30'],
+            'notes' => ['nullable', 'string', 'max:500'], 'external_id' => ['nullable', 'string', 'max:100'],
+        ]);
+        $report = $service->report($order, $data, $request->user()->id, 'manual', $data['external_id'] ?? null);
+
+        return response()->json(['data' => $presenter->order($order->refresh()), 'meta' => ['report_id' => $report->public_id]], 201);
+    }
+
+    public function reworkDone(Request $request, ProductionOrder $order, OutputService $service, ManufacturingPresenter $presenter): JsonResponse
+    {
+        $this->need($request, 'manufacturing.output.report');
+        $data = $request->validate(['shift' => ['required', 'string', 'max:30'], 'date' => ['nullable', 'date_format:Y-m-d'], 'qty' => self::QTY, 'notes' => ['nullable', 'string', 'max:500']]);
+        $report = $service->reworkDone($order, $data, $request->user()->id);
+
+        return response()->json(['data' => $presenter->order($order->refresh()), 'meta' => ['report_id' => $report->public_id]], 201);
+    }
+
+    public function inspect(Request $request, ProductionOrder $order, InspectionService $service, ManufacturingPresenter $presenter): JsonResponse
+    {
+        $this->need($request, 'manufacturing.qc.inspect');
+        $data = $request->validate([
+            'date' => ['nullable', 'date_format:Y-m-d'], 'accepted' => ['nullable', 'string', 'regex:/^\d{1,12}(\.\d{1,6})?$/'], 'rejected' => ['nullable', 'string', 'regex:/^\d{1,12}(\.\d{1,6})?$/'],
+            'rework' => ['nullable', 'string', 'regex:/^\d{1,12}(\.\d{1,6})?$/'], 'reject_reason' => ['nullable', 'string', 'max:255'], 'notes' => ['nullable', 'string', 'max:500'],
+        ]);
+        $service->inspect($order, $data, $request->user()->id);
+
+        return response()->json(['data' => $presenter->order($order->refresh())], 201);
+    }
+
+    public function receive(Request $request, ProductionOrder $order, FinishedGoodsService $service, ManufacturingPresenter $presenter): JsonResponse
+    {
+        $this->need($request, 'manufacturing.receipt.post');
+        $data = $request->validate(['date' => ['nullable', 'date_format:Y-m-d'], 'qty' => self::QTY, 'lot_no' => ['nullable', 'string', 'max:60'], 'expiry_date' => ['nullable', 'date_format:Y-m-d']]);
+        $receipt = $service->receive($order, $data, $request->user()->id);
+
+        return response()->json(['data' => $presenter->order($order->refresh()), 'meta' => ['stock_document' => $receipt->stock_document_no]], 201);
+    }
+
+    public function complete(Request $request, ProductionOrder $order, FinishedGoodsService $service, ManufacturingPresenter $presenter): JsonResponse
+    {
+        $this->need($request, 'manufacturing.order.complete');
+
+        return response()->json(['data' => $presenter->order($service->complete($order, $request->user()->id))]);
     }
 
     /** @return array<string, mixed> */

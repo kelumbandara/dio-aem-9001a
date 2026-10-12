@@ -19,6 +19,8 @@
                 @elseif ($entity === 'machines')
                     <th class="px-4 py-3 text-start font-medium">{{ __('manufacturing::ui.setup.work-centers.one') }}</th>
                     <th class="px-4 py-3 text-start font-medium">{{ __('manufacturing::ui.setup.lines.one') }}</th>
+                @elseif ($entity === 'downtime-reasons')
+                    <th class="px-4 py-3 text-start font-medium">{{ __('manufacturing::ui.setup.category') }}</th>
                 @elseif ($entity === 'shifts')
                     <th class="px-4 py-3 text-start font-medium">{{ __('manufacturing::ui.setup.hours') }}</th>
                     <th class="px-4 py-3 text-start font-medium">{{ __('manufacturing::ui.setup.days') }}</th>
@@ -38,6 +40,8 @@
                     @elseif ($entity === 'machines')
                         <td class="px-4 py-3 font-mono text-xs">{{ $r['work_center'] }}</td>
                         <td class="px-4 py-3 font-mono text-xs">{{ $r['production_line'] ?? '—' }}</td>
+                    @elseif ($entity === 'downtime-reasons')
+                        <td class="px-4 py-3">{{ __("manufacturing::ui.setup.categories.{$r['category']}") }}</td>
                     @elseif ($entity === 'shifts')
                         <td class="px-4 py-3">{{ $r['start_time'] }} – {{ $r['end_time'] }}</td>
                         <td class="px-4 py-3 text-xs">{{ collect($days)->filter(fn ($d, $i) => ($r['days'][$i] ?? '0') === '1')->map(fn ($d) => __("manufacturing::ui.days.{$d}"))->implode(' ') }}</td>
