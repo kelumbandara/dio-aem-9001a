@@ -5,6 +5,7 @@ use App\Modules\Manufacturing\Http\Controllers\Web\OrderController;
 use App\Modules\Manufacturing\Http\Controllers\Web\ReportController;
 use App\Modules\Manufacturing\Http\Controllers\Web\SetupController;
 use App\Modules\Manufacturing\Http\Controllers\Web\ShiftReportController;
+use App\Modules\Manufacturing\Http\Controllers\Web\TargetController;
 use Illuminate\Support\Facades\Route;
 
 // Web screens call the same services as the API: one rule set, two front doors.
@@ -44,6 +45,9 @@ Route::middleware(['auth', 'mfa.enrolled'])->prefix('manufacturing')->group(func
     Route::post('reports/{report}/void', [ReportController::class, 'voidReport'])->name('manufacturing.reports.void');
     Route::post('downtime/{event}/void', [ReportController::class, 'voidDowntime'])->name('manufacturing.downtime.void');
     Route::get('shift-report', [ShiftReportController::class, 'index'])->name('manufacturing.shifts.report');
+
+    Route::get('targets', [TargetController::class, 'index'])->name('manufacturing.targets.index');
+    Route::post('targets', [TargetController::class, 'save'])->name('manufacturing.targets.save');
 
     Route::get('setup', [SetupController::class, 'overview'])->name('manufacturing.setup.index');
     Route::get('setup/{entity}', [SetupController::class, 'index'])->name('manufacturing.setup.list');

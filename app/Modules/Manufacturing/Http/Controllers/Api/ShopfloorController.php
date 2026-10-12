@@ -2,13 +2,18 @@
 
 namespace App\Modules\Manufacturing\Http\Controllers\Api;
 
+use App\Modules\Manufacturing\Exceptions\ManufacturingException;
 use App\Modules\Manufacturing\Http\Controllers\Concerns\NeedsPermission;
 use App\Modules\Manufacturing\Models\DowntimeEvent;
 use App\Modules\Manufacturing\Models\ProductionReport;
 use App\Modules\Manufacturing\Models\Shift;
+use App\Modules\Manufacturing\Models\ShiftTarget;
 use App\Modules\Manufacturing\Services\DowntimeService;
 use App\Modules\Manufacturing\Services\OutputService;
 use App\Modules\Manufacturing\Services\ShiftReport;
+use App\Modules\Manufacturing\Services\ShiftTargetService;
+use App\Modules\MasterData\Contracts\ItemCatalog;
+use App\Support\Decimal;
 use App\Support\Http\Controller;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
@@ -57,9 +62,35 @@ class ShopfloorController extends Controller
         $tz = config('core.display_timezone');
         $to = $data['to'] ?? CarbonImmutable::now($tz)->toDateString();
         $from = $data['from'] ?? CarbonImmutable::parse($to, $tz)->subDays(6)->toDateString();
+        if ($from > $to || CarbonImmutable::parse($from, $tz)->diffInDays(CarbonImmutable::parse($to, $tz)) > 92) {
+            throw ManufacturingException::make('manufacturing.range_invalid', 'Choose a period of at most 93 days, starting before it ends.', 422, 'from');
+        }
         $shift = ! empty($data['shift']) ? Shift::query()->whereRaw('lower(code) = ?', [strtolower($data['shift'])])->first() : null;
 
         return response()->json(['data' => $report->summary($from, $to, $shift?->id), 'meta' => ['from' => $from, 'to' => $to, 'shift' => $shift?->code]]);
+    }
+
+    public function targets(Request $request): JsonResponse
+    {
+        $this->need($request, 'manufacturing.view');
+        $shifts = Shift::query()->get()->keyBy('id');
+        $items = app(ItemCatalog::class);
+        $targets = ShiftTarget::query()->orderBy('shift_id')->orderBy('item_id')->get();
+        $infos = $items->findMany($targets->pluck('item_id')->all());
+
+        return response()->json(['data' => $targets->map(fn (ShiftTarget $t) => [
+            'shift' => $shifts[$t->shift_id]->code ?? '', 'item' => $infos[$t->item_id]->code ?? '', 'target' => Decimal::trim((string) $t->target_qty), 'is_active' => $t->is_active,
+        ])->all()]);
+    }
+
+    /** Set (create or change) the target of a shift for a product. */
+    public function setTarget(Request $request, ShiftTargetService $service): JsonResponse
+    {
+        $this->need($request, 'manufacturing.setup.manage');
+        $data = $request->validate(['shift' => ['required', 'string', 'max:30'], 'item' => ['required', 'string', 'max:60'], 'target' => ['required', 'string', 'regex:/^\d{1,12}(\.\d{1,6})?$/'], 'is_active' => ['sometimes', 'boolean']]);
+        $target = $service->save($data);
+
+        return response()->json(['data' => ['shift' => strtoupper($data['shift']), 'item' => $data['item'], 'target' => Decimal::trim((string) $target->target_qty), 'is_active' => $target->is_active]]);
     }
 
     /** @return array<string, mixed> */

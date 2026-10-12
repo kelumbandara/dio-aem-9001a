@@ -277,7 +277,18 @@ return [
         'nothing_yet' => 'Nothing reported yet.',
     ],
 
+    'targets' => [
+        'title' => 'Shift targets',
+        'hint' => 'How many good units each shift should make of each product.',
+        'intro' => 'A target is the good units a shift is expected to make of a product. The shift report sets what was made against it; a shift that was due to work and reported nothing shows 0 %.',
+        'target' => 'Target (per shift)',
+        'empty' => 'No targets yet.',
+        'add' => 'Set a target',
+        'set' => 'Save target',
+    ],
+
     'shifts' => [
+        'range' => 'Choose a period of at most 93 days, starting before it ends.',
         'title' => 'Shift report',
         'intro' => 'What each shift made and how long machines stood still. Open a row to see its entries.',
         'from' => 'From',

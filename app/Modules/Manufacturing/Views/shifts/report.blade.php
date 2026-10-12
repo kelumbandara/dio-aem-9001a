@@ -33,6 +33,19 @@
                     <td class="px-4 py-3 text-end">{{ $r['rejected'] }}</td><td class="px-4 py-3 text-end">{{ $r['rework'] }}</td><td class="px-4 py-3 text-end">{{ $r['rework_done'] }}</td>
                     <td class="px-4 py-3 text-end">{{ $r['downtime_minutes'] }} {{ __('manufacturing::ui.orders.min') }} <span class="text-xs text-slate-500">({{ $r['downtime_events'] }})</span></td>
                 </tr>
+                @foreach ($r['items'] as $i)
+                    <tr class="bg-slate-50/60 text-xs">
+                        <td></td>
+                        <td class="px-4 py-1.5" colspan="2"><span class="font-mono">{{ $i['item'] }}</span> {{ $i['item_name'] }}</td>
+                        <td class="px-4 py-1.5 text-end">{{ $i['good'] }} {{ $i['uom'] }}</td>
+                        <td class="px-4 py-1.5 text-end" colspan="2">@if ($i['target'] !== null) {{ __('manufacturing::ui.targets.target') }} {{ $i['target'] }} @endif</td>
+                        <td class="px-4 py-1.5 text-end" colspan="2">
+                            @if ($i['achievement'] !== null)
+                                <b @class(['text-emerald-700' => (float) $i['achievement'] >= 100, 'text-amber-700' => (float) $i['achievement'] >= 80 && (float) $i['achievement'] < 100, 'text-red-700' => (float) $i['achievement'] < 80])>{{ $i['achievement'] }} %</b>
+                            @endif
+                        </td>
+                    </tr>
+                @endforeach
             @empty
                 <tr><td colspan="8" class="px-4 py-8 text-center text-slate-500">{{ __('manufacturing::ui.shifts.empty') }}</td></tr>
             @endforelse

@@ -38,6 +38,8 @@ Route::middleware(['auth:sanctum', 'mfa.enrolled'])->group(function () {
     Route::post('downtime-events', [ShopfloorController::class, 'downtime'])->middleware('idempotent')->name('downtime-events.store');
     Route::post('downtime-events/{event}/void', [ShopfloorController::class, 'voidDowntime'])->middleware('idempotent')->name('downtime-events.void');
     Route::get('shift-report', [ShopfloorController::class, 'shiftReport'])->name('shift-report');
+    Route::get('shift-targets', [ShopfloorController::class, 'targets'])->name('shift-targets.index');
+    Route::put('shift-targets', [ShopfloorController::class, 'setTarget'])->name('shift-targets.set');
 
     Route::get('manufacturing/{entity}', [SetupController::class, 'index'])->name('manufacturing.setup.index');
     Route::post('manufacturing/{entity}', [SetupController::class, 'store'])->name('manufacturing.setup.store');

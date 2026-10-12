@@ -92,7 +92,7 @@ Items, units, warehouses, work centres, machines and lines are given by code; ma
 
 ## 8. Sprint 9: output, quality, finished goods, downtime
 
-Owner decisions (2026-10-12): output is **reported per shift**; finished goods are **costed with materials only**; a bill is **activated by an admin only**.
+Owner decisions (2026-10-12): output is **reported per shift**; finished goods are **costed with materials only**; a bill is **activated by an admin only**; **10 % over-production** is right; the cancel permission is enough (no approval); **targets per shift** are wanted.
 
 ### Reporting output (operator screen)
 - **Manufacturing → Report production** lists released and running orders; one big-button page per order takes the shift (the running one is preselected,
@@ -129,17 +129,24 @@ Also by `started_at` / `ended_at` through the API.
 **Manufacturing → Shift report** and `GET /api/v1/shift-report`: for each shift date and shift, units made, good, rejected, rework, back from rework, downtime minutes and
 the number of entries; click a row for the individual entries. Cancelled entries are left out.
 
+### Shift targets (owner decision 2026-10-12: targets per shift)
+**Manufacturing → Work centres & machines → Shift targets** (and `GET/PUT /api/v1/shift-targets`): for each shift and product, the good units the shift is expected to make
+(one target per shift and product; switched off, not deleted; managed with `manufacturing.setup.manage`, everybody with access can read). The **shift report** lists, under each
+date and shift, the products made: good units, the target and the **achievement %** (good ÷ target). *Good* = made − rejected − sent to rework. A shift that was due to work that
+day (its weekdays), has an active target and reported nothing still appears, with 0 %, so a missing shift cannot hide; days that have not come, days the shift does not work and
+switched-off targets add no rows. Periods are limited to 93 days.
+
 ### Permissions and roles (Sprint 9)
 `manufacturing.output.report`, `.output.void`, `.downtime.report`, `.qc.inspect`, `.receipt.post`, `.order.complete`. `admin` has all. Role `production` (planner / store keeper): report,
 downtime, inspect, receive, complete (not cancel a report). New role **`operator`**: view, report output, report downtime only (demo user `operator@dio.test`).
 
 ### API and events (Sprint 9)
 `POST /api/v1/production-orders/{id}/output | rework-done | inspections | receipts | complete`, `POST /api/v1/production-reports/{id}/void`, `POST /api/v1/downtime-events`
-(+ `/{id}/void`), `GET /api/v1/shift-report`, setup `downtime-reasons`. Events: `manufacturing.output.reported`, `.output.voided`, `.rework.done`, `.inspection.recorded`,
+(+ `/{id}/void`), `GET /api/v1/shift-report`, `GET/PUT /api/v1/shift-targets`, setup `downtime-reasons`. Events: `manufacturing.output.reported`, `.output.voided`, `.rework.done`, `.inspection.recorded`,
 `.receipt.posted`, `.order.completed`, `.downtime.reported`.
 
 ## 9. Not built (next sprint or later)
 
 Labour and overhead in the cost of finished goods (the work-centre rates and the recorded run times exist but are not used); backflush; stock reservation for orders; an
 undo for a wrong finished-goods receipt (correct with a stock adjustment); a multi-step inspection plan with measurements; downtime that is still running; OEE; approval chain for bill
-activation; capacity planning and scheduling by shift; alternate components; IoT intake (the `source` / `external_event_id` columns are ready).
+activation; capacity planning and scheduling by shift (targets per shift exist, scheduling does not); alternate components; IoT intake (the `source` / `external_event_id` columns are ready).
