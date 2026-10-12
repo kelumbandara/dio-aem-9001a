@@ -19,6 +19,8 @@ export const en = {
   sign_out_confirm: 'Sign out of this phone?',
   email: 'E-mail',
   password: 'Password',
+  show_password: 'Show password',
+  hide_password: 'Hide password',
   mfa_code: 'Authenticator code',
   mfa_needed: 'Enter the 6-digit code from your authenticator app.',
   server: 'Server address',

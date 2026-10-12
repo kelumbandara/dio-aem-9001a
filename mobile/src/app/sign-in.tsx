@@ -14,6 +14,7 @@ export default function SignIn() {
   const [server, setServer] = useState(serverUrl);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [code, setCode] = useState('');
   const [needCode, setNeedCode] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -59,7 +60,8 @@ export default function SignIn() {
       {error ? <Notice text={error} tone={needCode && error === t('mfa_needed') ? 'warn' : 'danger'} /> : null}
       <Field label={t('server')} hint={t('server_hint')} error={serverError ?? undefined} value={server} onChangeText={setServer} autoCapitalize="none" autoCorrect={false} keyboardType="url" textContentType="URL" />
       <Field label={t('email')} value={email} onChangeText={setEmail} autoCapitalize="none" autoCorrect={false} keyboardType="email-address" textContentType="username" autoComplete="email" />
-      <Field label={t('password')} value={password} onChangeText={setPassword} secureTextEntry textContentType="password" autoComplete="current-password" />
+      <Field label={t('password')} value={password} onChangeText={setPassword} secureTextEntry={!showPassword} autoCapitalize="none" autoCorrect={false} spellCheck={false} textContentType="password" autoComplete="current-password" />
+      <Button label={t(showPassword ? 'hide_password' : 'show_password')} onPress={() => setShowPassword((s) => !s)} kind="secondary" />
       {needCode ? <Field label={t('mfa_code')} value={code} onChangeText={setCode} keyboardType="number-pad" maxLength={20} autoComplete="one-time-code" textContentType="oneTimeCode" /> : null}
       <Button label={busy ? t('signing_in') : t('sign_in')} onPress={submit} busy={busy} disabled={!email || !password || (needCode && !code)} />
       <Choice label={t('language')} options={LOCALES.map((l) => ({ value: l.code, label: l.label }))} value={locale} onChange={setLocale} />
