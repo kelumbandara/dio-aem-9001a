@@ -3,8 +3,8 @@
 use App\Modules\Licensing\Exceptions\LicenceException;
 use App\Modules\Licensing\Support\LicenceToken;
 
-// A licence made by the separate vendor billing project (vendor-billing/; text kept in tests/Fixtures/vendor-billing-licence.txt), signed with a fixed test key. If the two projects
-// ever disagree about the licence format or the signature, this fails (and so does vendor-billing's own twin test).
+// A licence made by the separate vendor billing project (folder dio-vba-9002a/ver1; text kept in tests/Fixtures/vendor-billing-licence.txt), signed with a fixed test key. If the two projects
+// ever disagree about the licence format or the signature, this fails (and so does the billing project's own twin test).
 const VENDOR_TEST_PUBLIC_KEY = '6kpsY+KcUgq+9VB7Ey7F+ZVHdq6+vnuSQh7qaRRG0iw=';
 
 it('accepts a licence signed by the vendor billing project', function () {

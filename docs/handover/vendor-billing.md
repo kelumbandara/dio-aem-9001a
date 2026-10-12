@@ -1,7 +1,7 @@
 # Vendor billing project — handover
 
-Status: **ready for owner review.** Stop point per CLAUDE.md. Design, rules and limits: [../architecture/billing.md](../architecture/billing.md). Install and daily use: [../../vendor-billing/README.md](../../vendor-billing/README.md).
-Your answers are built in: separate project under `dio-aem-9001a/vendor-billing/`; invoices with VAT; number `SUB/2026-27/00001`; 30-day free trial; a customer stays shut out until they pay.
+Status: **ready for owner review.** Stop point per CLAUDE.md. Design, rules and limits: [billing.md](../architecture/billing.md) (pointer; the full design is in the billing project). Install and daily use: its `README.md`.
+Your answers are built in: separate project in its own folder and repository, `C:\xampp\htdocs\dio-vba-9002a\ver1`; invoices with VAT; number `SUB/2026-27/00001`; 30-day free trial; a customer stays shut out until they pay.
 
 ## 1. What was built
 
@@ -49,7 +49,7 @@ What the tests prove beyond "it runs":
 
 ## 4. What you need to do
 
-1. `cd vendor-billing`, follow its README: create `.env`, `php artisan migrate`, `php artisan billing:owner you@…` (asks the password), sign in and link your authenticator.
+1. Open `C:\xampp\htdocs\dio-vba-9002a\ver1`, follow its README: create `.env`, `php artisan migrate`, `php artisan billing:owner you@…` (asks the password), sign in and link your authenticator.
 2. **Settings**: plan price, VAT rate (18 %), your company name, address, VAT registration number, bank details.
 3. On a safe machine run the product's `php artisan licence:keys`; put the **secret** key in the billing server's `LICENCE_PRIVATE_KEY` and the **public** key in every installation's `LICENCE_PUBLIC_KEY`.
 4. PayHere: create the merchant account, set `PAYHERE_MERCHANT_ID`, `PAYHERE_MERCHANT_SECRET`, allow `https://<billing host>/payhere/notify` and try the **sandbox** first.

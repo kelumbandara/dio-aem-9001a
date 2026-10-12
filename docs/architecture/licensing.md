@@ -1,6 +1,6 @@
 # Licensing and subscription billing
 
-**Status:** part 1 (the Licensing module in this product) and part 2 (the separate vendor billing project, `vendor-billing/`, see [billing.md](billing.md)) are built. PayHere *recurring* charging is not; customers pay each monthly invoice through PayHere or by bank transfer.
+**Status:** part 1 (the Licensing module in this product) and part 2 (the separate vendor billing project in its own repository, see [billing.md](billing.md)) are built. PayHere *recurring* charging is not; customers pay each monthly invoice through PayHere or by bank transfer.
 
 Decisions by the owner (2026-10-12): the vendor **hosts every installation** on its own cloud servers (customers never run
 the software themselves); customers pay **monthly**, by **bank transfer** (recorded by hand) or **PayHere** (automatic);

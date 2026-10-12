@@ -124,7 +124,7 @@ Licensing commands (vendor):
 | `php artisan licence:fetch` | fetches this installation's newest licence from the vendor billing system when `VENDOR_BILLING_URL` / `VENDOR_BILLING_TOKEN` are set (scheduled every 4 hours) |
 | `php artisan licence:check` | tells administrators when the licence is about to end or has entered a stricter phase (scheduled 06:00; does nothing where licensing is not enforced) |
 
-The vendor billing system is a separate application in `vendor-billing/` with its own setup, commands and tests: see `vendor-billing/README.md`.
+The vendor billing system is a separate application in its own repository (`C:\xampp\htdocs\dio-vba-9002a\ver1`) with its own setup, commands and tests: see its `README.md`.
 
 Finance commands (S5):
 
