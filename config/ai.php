@@ -11,7 +11,7 @@
 
 return [
     'provider' => env('AI_PROVIDER', 'claude'),
-    'model' => env('AI_MODEL', 'claude-sonnet-5-5'),
+    'model' => env('AI_MODEL', 'claude-haiku-5-5'),
     'max_tokens' => (int) env('AI_MAX_TOKENS', 1500),
 
     'claude' => [
@@ -40,7 +40,10 @@ return [
     'budget_company_month_usd' => env('AI_BUDGET_COMPANY_MONTH_USD', '50.00'),
 
     // US dollars per million tokens, by model name. A model missing here is metered at the default.
+    // Prices as published by the provider (prompts up to 100,000 tokens); an unknown model is metered at the dearer default.
     'pricing' => [
+        'claude-haiku-5-5' => ['input' => '0.10', 'output' => '0.50'],
+        'claude-sonnet-5-5' => ['input' => '2.00', 'output' => '10.00'],
         'default' => ['input' => '3.00', 'output' => '15.00'],
     ],
 ];

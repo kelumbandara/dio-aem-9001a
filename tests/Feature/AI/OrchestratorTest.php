@@ -48,6 +48,7 @@ function aiLastRun(): Execution
 }
 
 beforeEach(function () {
+    config(['ai.pricing' => ['default' => ['input' => '3.00', 'output' => '15.00']]]);          // the tests work out money at a fixed price, whatever model is configured
     $this->seed(FinanceSeeder::class);
     $this->travelTo(CarbonImmutable::parse('2026-11-04 15:00', 'Asia/Colombo'));
     $this->boss = userWithPermissions('ai.use', 'sales.view', 'procurement.view', 'inventory.stock.view', 'finance.report.view', 'manufacturing.view');

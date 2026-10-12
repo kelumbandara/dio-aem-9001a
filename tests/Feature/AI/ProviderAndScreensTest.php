@@ -171,6 +171,7 @@ describe('the chat screens', function () {
     });
 
     it('shows the usage page to those allowed, with each person\'s cost', function () {
+        config(['ai.pricing' => ['default' => ['input' => '3.00', 'output' => '15.00']], 'ai.model' => 'some-model']);   // a fixed price, whatever the configured model costs
         ($this->script)([ScriptedProvider::say('a', 1000, 500)]);
         $this->actingAs($this->boss)->post('/assistant', ['message' => 'q']);
         $this->actingAs($this->admin)->get('/assistant/usage')->assertOk()->assertSee($this->boss->name)->assertSee('USD 0.010500')->assertSee('Monthly limit');

@@ -9,7 +9,7 @@ Status: **ready for owner review.** Stop point per CLAUDE.md. Design and rules: 
 - **It acts as the person asking.** It is offered a tool only if that person could open the matching screen (module on + permission). An administrator's chat is not visible to others, and nobody's is visible to an administrator.
 - **Safety**: tool inputs are checked (unknown fields refused, real dates, sensible ranges); text from records is cleaned, shortened, flagged if it reads like instructions, and labelled as data; the model can only ask, the platform decides.
 - **Audit and cost**: every run leaves one record that cannot be changed (who, which tools with what input, tokens, cost, result); conversations cannot be edited either. Limits: 10 questions a minute per person, **USD 5 a month per person, USD 50 a month for the company** (settings in `config/ai.php`/environment). **AI usage** page for admins.
-- **Model and key are configuration**: model name `claude-sonnet-5-5` by default (`AI_MODEL`), key only from the server environment (`ANTHROPIC_API_KEY`); without a key the page says the assistant is not set up and nothing is sent.
+- **Model and key are configuration**: model name `claude-haiku-5-5` by default (it was `claude-sonnet-5-5` until 2026-10-13) (`AI_MODEL`), key only from the server environment (`ANTHROPIC_API_KEY`); without a key the page says the assistant is not set up and nothing is sent.
 - Who gets it: admin, accountant, sales, purchasing, production (`ai.use`); machine operators do not; admin sees usage (`ai.usage.view`).
 
 ## 2. Verified results (dev machine: PHP 8.3, PostgreSQL 16, Redis 7)

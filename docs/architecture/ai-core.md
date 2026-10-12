@@ -43,7 +43,7 @@ Permissions: `ai.use` (ask; given to admin, accountant, sales, purchasing, produ
 
 ## 5. Going live
 
-Add `ANTHROPIC_API_KEY=…` to the server's `.env` (never to the repository), optionally `AI_MODEL`, `AI_BUDGET_USER_MONTH_USD`, `AI_BUDGET_COMPANY_MONTH_USD`. Without a key the page says the assistant is not set up and nothing is sent anywhere. Check the provider's data-retention terms for the customer before enabling (see security.md).
+The default model is **Claude Haiku 5.5** (`claude-haiku-5-5`, chosen 2026-10-13: about USD 0.001 a question against about USD 0.036 with Sonnet 5.5; prices in `config/ai.php` are the provider's published ones). Switch with `AI_MODEL=claude-sonnet-5-5` if answer quality needs it. Add `ANTHROPIC_API_KEY=…` to the server's `.env` (never to the repository), optionally `AI_MODEL`, `AI_BUDGET_USER_MONTH_USD`, `AI_BUDGET_COMPANY_MONTH_USD`. Without a key the page says the assistant is not set up and nothing is sent anywhere. Check the provider's data-retention terms for the customer before enabling (see security.md).
 
 ## 6. Not built (next sprints)
 
