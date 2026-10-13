@@ -65,4 +65,6 @@ Existing tests changed: tests that switch off Master Data/Approvals now also swi
 | 9 | ClamAV required | `ClamdAttachmentScanner` (streams to clamd, fails closed), switched on with `CLAMAV_ENABLED`. Tested against a stand-in daemon, **not against a real ClamAV** (none installed here) |
 | 10 | GitHub Actions + billing repo | Billing project pushed to https://github.com/kelumbandara/dio-vba-9002a.git (branch main). CI: the last 3 runs on the product were success, success, **cancelled**: the Sprint 14 run hit the 20-minute limit (my full suite takes ~24 min). Limit raised to 45 minutes |
 
-Changes in this step were checked with the related test files (131 pass); the full suite was not re-run for this step yet.
+After these changes a second full `composer check` ran clean: Pint passed, Larastan no errors, **1,314 passed** (11,066 assertions), 1,870 s (slower than the first run because the machine was in use; CI's new 45-minute limit covers it).
+
+**First real e-mail:** with the Hostinger mailbox `info@skytechsl.com` (smtp.hostinger.com, port 465 SSL, set only in the local `.env`) one test message was sent to the same address and the owner confirmed it arrived. The password was shared in chat, so the owner should change it. SPF/DKIM for the domain are the owner's to set. The WhatsApp channel stays unverified.
