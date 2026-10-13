@@ -10,7 +10,7 @@ use Spatie\Permission\Models\Role;
 /**
  * Starting approval rules for purchase orders (the action key is Procurement's `procurement.po.approve`):
  *  - every order needs one approval by a "purchase-approver";
- *  - an order of LKR 500,000 or more also needs a "finance-approver" after that.
+ *  - an order of LKR 100,000 or more also needs a "finance-approver" after that.
  * The amounts and approver roles are the owner's to change on the Approvals policy screens; this seeder only creates a
  * policy that is missing (it never overwrites or re-creates one that was edited or deactivated, matching by name).
  * Policies are tried by priority, lowest first, so the larger-order rule sits before the general one.
@@ -31,7 +31,7 @@ class PurchaseOrderPolicySeeder extends Seeder
         ];
 
         foreach ([
-            ['name' => 'Purchase orders from LKR 500,000', 'priority' => 50, 'min_amount' => '500000',
+            ['name' => 'Purchase orders from LKR 100,000', 'priority' => 50, 'min_amount' => '100000',
                 'steps' => [['order' => 1, 'type' => 'role', 'role' => 'purchase-approver', 'label' => 'Purchasing'], ['order' => 2, 'type' => 'role', 'role' => 'finance-approver', 'label' => 'Finance']]],
             ['name' => 'Purchase orders', 'priority' => 100, 'min_amount' => '0',
                 'steps' => [['order' => 1, 'type' => 'role', 'role' => 'purchase-approver', 'label' => 'Purchasing']]],

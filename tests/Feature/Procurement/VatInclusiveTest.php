@@ -97,11 +97,17 @@ it('creates the starting approval rules once: every order needs a purchase-appro
     asApi($approver)->postJson("/api/v1/approvals/{$order->approval_request_id}/approve", [], idemKey())->assertOk()->assertJsonPath('data.status', 'executed');
     expect($order->refresh()->status)->toBe('approved');
 
-    // from LKR 500,000 a second approval, by finance, is needed
+    // from LKR 100,000 a second approval, by finance, is needed
     $finance = userWithRole('finance-approver');
     $big = $this->orders->submit(($this->draft)('10', '60000'), $this->buyer->id);
     asApi($approver)->postJson("/api/v1/approvals/{$big->approval_request_id}/approve", [], idemKey())->assertOk()->assertJsonPath('data.status', 'pending');
     expect($big->refresh()->status)->toBe('pending_approval');
     asApi($finance)->postJson("/api/v1/approvals/{$big->approval_request_id}/approve", [], idemKey())->assertOk()->assertJsonPath('data.status', 'executed');
     expect($big->refresh()->status)->toBe('approved');
+
+    // the owner's threshold is LKR 100,000: just above needs finance too, well below needs only purchasing
+    $mid = $this->orders->submit(($this->draft)('10', '12000'), $this->buyer->id);
+    asApi($approver)->postJson("/api/v1/approvals/{$mid->approval_request_id}/approve", [], idemKey())->assertOk()->assertJsonPath('data.status', 'pending');
+    $small = $this->orders->submit(($this->draft)('10', '5000'), $this->buyer->id);
+    asApi($approver)->postJson("/api/v1/approvals/{$small->approval_request_id}/approve", [], idemKey())->assertOk()->assertJsonPath('data.status', 'executed');
 });

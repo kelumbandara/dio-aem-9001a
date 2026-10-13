@@ -33,11 +33,18 @@ reminders, expiry, audit partition maintenance and attachment purge all depend o
 being up – put alerts on both. Redis is required (queue, cache, rate limits); use `REDIS_CLIENT=phpredis` in the
 image if the extension is installed, otherwise `predis`.
 
-**Laravel Horizon was not installed in Sprint 2.** It needs the `pcntl`/`posix` extensions, which Windows PHP
-lacks, and could not be run or verified on the development machine; adding it blind would be unverified code.
-`queue:work` provides the same processing. Horizon (dashboard, metrics, balancing) is added together with the
-production Dockerfile (Sprint 15), or earlier if the owner wants to run the dev stack in Docker – the code
-needs no change except the dashboard gate (admin + MFA).
+**Laravel Horizon (installed after Sprint 14, owner's choice 2026-10-13).** Run `php artisan horizon` as the `worker`
+process on Linux (it needs `pcntl`/`posix`, which Windows PHP lacks, so the Windows dev machine keeps using
+`queue:work redis --tries=3` through `scripts/dev/run.ps1`; Horizon's own code could not be run there). Settings in
+`config/horizon.php` (3 tries, 90 s timeout, up to 10 processes in production); `horizon:snapshot` is scheduled every
+5 minutes for the metrics. The dashboard (`/horizon`) is limited by `App\Providers\HorizonServiceProvider` to people
+with `core.module.manage` (the administrator); it does not check MFA by itself beyond the normal sign-in.
+Horizon needs Redis (`QUEUE_CONNECTION=redis`). After each deploy run `php artisan horizon:terminate` so workers restart.
+
+**Virus scan (ClamAV).** Set `CLAMAV_ENABLED=true` with `CLAMAV_HOST`/`CLAMAV_PORT` (the `clamd` daemon, port 3310; run
+it as another container with the `clamav/clamav` image). Files are streamed to the daemon; an infected file is refused
+and audited; if the daemon cannot be reached the upload is refused (503, "virus scan not available") instead of being
+stored unscanned. With it off, scans are recorded as "skipped".
 
 ## 3. Build and release
 

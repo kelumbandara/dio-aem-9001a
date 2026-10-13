@@ -40,6 +40,7 @@ return [
     'channels' => [
         'intro' => 'Link your own phone number or e-mail address: a code is sent to it and you type it here. A linked address is recognised as yours.',
         'none' => 'Nothing is linked yet.', 'add' => 'Link a phone number or e-mail address', 'placeholder' => '077 123 4567 or you@company.lk', 'send_code' => 'Send a code',
+        'consent' => 'By submitting this form, you consent to receive order updates and account notifications via WhatsApp.',
         'enter_code' => 'Enter the code you received', 'confirm' => 'Confirm', 'verified' => 'verified', 'remove' => 'Remove',
     ],
     'unsubscribed' => ['title' => 'You will not receive these e-mails any more', 'body' => 'We have recorded your wish. If this was a mistake, tell the company that sent the e-mail.'],

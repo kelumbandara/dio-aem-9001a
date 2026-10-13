@@ -7,3 +7,4 @@ Schedule::command('outbox:relay')->everyMinute()->withoutOverlapping(5)->runInBa
 Schedule::command('idempotency:prune')->daily();
 Schedule::command('audit:maintain')->dailyAt('02:00');
 Schedule::command('attachments:purge')->dailyAt('02:30');
+Schedule::command('horizon:snapshot')->everyFiveMinutes();

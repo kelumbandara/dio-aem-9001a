@@ -24,6 +24,7 @@ use App\Modules\Core\Http\Middleware\EnsureModuleEnabled;
 use App\Modules\Core\Http\Middleware\RequireIdempotencyKey;
 use App\Modules\Core\Models\User;
 use App\Modules\Core\Services\AttachmentService;
+use App\Modules\Core\Services\ClamdAttachmentScanner;
 use App\Modules\Core\Services\DatabaseAuditLogger;
 use App\Modules\Core\Services\DatabaseNotifier;
 use App\Modules\Core\Services\DatabaseNumberingService;
@@ -93,8 +94,8 @@ class CoreServiceProvider extends ModuleServiceProvider
         $this->app->singleton(Notifier::class, DatabaseNotifier::class);
         $this->app->singleton(EventOutbox::class, OutboxRecorder::class);
         $this->app->singleton(AttachmentStore::class, AttachmentService::class);
-        // Replace with a real scanner (e.g. ClamAV) to turn on virus scanning; see AttachmentScanner.
-        $this->app->singleton(AttachmentScanner::class, NullAttachmentScanner::class);
+        // ClamAV when CLAMAV_ENABLED=true (config core.attachments.clamav), otherwise scans are recorded as "skipped".
+        $this->app->singleton(AttachmentScanner::class, fn () => config('core.attachments.clamav.enabled') ? new ClamdAttachmentScanner : new NullAttachmentScanner);
     }
 
     public function boot(): void

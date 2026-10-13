@@ -56,7 +56,8 @@ describe('linking a phone number', function () {
         expect($code)->toMatch('/^\d{6}$/');
         $identity = $this->svc->confirm($this->user->id, 'whatsapp', $code);
         expect($identity->address)->toBe('94771234567')->and($identity->user_id)->toBe($this->user->id)->and($identity->verified_at)->not->toBeNull();
-        expect(app(ConsentService::class)->status('whatsapp', '94771234567'))->toBe('opted_in')->and(Consent::where('source', 'identity_link')->count())->toBe(1);
+        expect(app(ConsentService::class)->status('whatsapp', '94771234567'))->toBe('opted_in')->and(Consent::where('source', 'identity_link')->count())->toBe(1)
+            ->and(Consent::where('source', 'identity_link')->value('note'))->toContain('you consent to receive order updates and account notifications via WhatsApp');
         idFails(fn () => $this->svc->confirm($this->user->id, 'whatsapp', $code), 'comm.code_expired');         // a code works once
     });
 

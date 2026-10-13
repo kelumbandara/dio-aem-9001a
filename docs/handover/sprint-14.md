@@ -50,3 +50,19 @@ Existing tests changed: tests that switch off Master Data/Approvals now also swi
 | Sending untested against real providers | surprises on first send | send to your own number/address first |
 | A wrong address on a master record | message to the wrong person | reminders are drafts, a person reads before sending; sensitive ones also need approval |
 | Sinhala/Tamil drafts | poor wording | your check |
+
+## 6. Owner's answers (2026-10-13) and what was done
+
+| # | Answer | Done |
+|---|---|---|
+| 1 | WhatsApp: not bought yet, later | Nothing to do; the channel stays off until `.env` has the credentials |
+| 2 | SMTP: Gmail or Hostinger? | Advice given in the chat (see below); settings go in `.env` by you, never in chat |
+| 4 | Finance-approver approves sensitive messages | Already so |
+| 5 | Consent wording: "By submitting this form, you consent to receive order updates and account notifications via WhatsApp." | Shown on "My phone and e-mail" under the number box, and stored as the note on the consent record (test added) |
+| 6 | No forwarding of notifications to WhatsApp | Not built, as before |
+| 7 | PO approvals from LKR 100,000 | Seeder, dev database and docs changed (before: 500,000): from LKR 100,000 a second approval by finance; tests added for 150,000 (two steps) and 59,000 (one step) |
+| 8 | Laravel Horizon | `laravel/horizon` installed, configured (3 tries), dashboard for the administrator only, snapshot scheduled. **Not run here:** Windows lacks the needed extensions, so Horizon itself is untested until a Linux run; the gate is tested |
+| 9 | ClamAV required | `ClamdAttachmentScanner` (streams to clamd, fails closed), switched on with `CLAMAV_ENABLED`. Tested against a stand-in daemon, **not against a real ClamAV** (none installed here) |
+| 10 | GitHub Actions + billing repo | Billing project pushed to https://github.com/kelumbandara/dio-vba-9002a.git (branch main). CI: the last 3 runs on the product were success, success, **cancelled**: the Sprint 14 run hit the 20-minute limit (my full suite takes ~24 min). Limit raised to 45 minutes |
+
+Changes in this step were checked with the related test files (131 pass); the full suite was not re-run for this step yet.

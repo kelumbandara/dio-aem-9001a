@@ -33,6 +33,14 @@ return [
         // Private disk (S3-compatible in production); never served from the web root.
         'disk' => env('ATTACHMENTS_DISK', 'attachments'),
         'max_kb' => 10240,
+        // Virus scan through a ClamAV daemon (clamd). When enabled and the daemon cannot be reached, uploads are refused
+        // (fail closed) rather than stored unscanned.
+        'clamav' => [
+            'enabled' => (bool) env('CLAMAV_ENABLED', false),
+            'host' => env('CLAMAV_HOST', '127.0.0.1'),
+            'port' => (int) env('CLAMAV_PORT', 3310),
+            'timeout' => (int) env('CLAMAV_TIMEOUT', 20),
+        ],
         // detected MIME type => allowed extensions. Anything else is rejected, whatever the client says.
         'allowed' => [
             'application/pdf' => ['pdf'],

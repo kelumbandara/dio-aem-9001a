@@ -39,6 +39,7 @@
             @error('form') <p class="text-sm text-red-700" role="alert">{{ $message }}</p> @enderror
             @error('channel') <p class="text-sm text-red-700" role="alert">{{ $message }}</p> @enderror
             @error('template') <p class="text-sm text-red-700" role="alert">{{ $message }}</p> @enderror
+            <p class="text-xs text-slate-600">{{ __('communications::ui.channels.consent') }}</p>
             <x-core::button type="submit">{{ __('communications::ui.channels.send_code') }}</x-core::button>
         </form>
     </div>
