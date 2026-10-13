@@ -29,6 +29,13 @@ services:
   worker:
     <<: *app
     command: ["worker"]
+    # The image's own health check asks the web port, which only `web` has: worker and scheduler check themselves instead.
+    healthcheck:
+      test: ["CMD-SHELL", "php artisan horizon:status | grep -q 'is running'"]
+      interval: 30s
+      timeout: 15s
+      retries: 3
+      start_period: 40s
     depends_on:
       migrate: { condition: service_completed_successfully }
       postgres: { condition: service_healthy }
@@ -37,6 +44,12 @@ services:
   scheduler:
     <<: *app
     command: ["scheduler"]
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f 'schedule:work' >/dev/null"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
     depends_on:
       migrate: { condition: service_completed_successfully }
       postgres: { condition: service_healthy }
@@ -47,6 +60,8 @@ services:
     <<: *app
     command: ["migrate"]
     restart: "no"
+    healthcheck:
+      disable: true
 
   postgres:
     image: postgres:16-alpine
