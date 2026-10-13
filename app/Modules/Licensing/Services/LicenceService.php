@@ -36,7 +36,8 @@ final class LicenceService implements LicenceGate
     {
         $setting = config('licensing.enforce');
 
-        return $setting === null ? app()->isProduction() : filter_var($setting, FILTER_VALIDATE_BOOLEAN);
+        // unset or empty = the default (on in production); only an explicit true/false decides otherwise
+        return $setting === null || $setting === '' ? app()->isProduction() : filter_var($setting, FILTER_VALIDATE_BOOLEAN);
     }
 
     /** The identity the vendor binds a licence to; created on first use. */

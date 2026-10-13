@@ -33,6 +33,8 @@ export default function Home() {
 
   const tiles: Tile[] = [
     ...(features.approvals ? [{ key: 'approvals', label: t('tile_approvals'), detail: waiting.data ? t('pending_approvals', { count: waiting.data }) : t('nothing_to_do'), href: '/approvals' }] : []),
+    ...(features.sales ? [{ key: 'sales', label: t('tile_sales'), href: '/sales' }] : []),
+    ...(features.purchasing ? [{ key: 'purchasing', label: t('tile_purchasing'), href: '/purchasing' }] : []),
     ...(features.production ? [{ key: 'output', label: t('tile_production'), href: '/work' }] : []),
     ...(features.downtime ? [{ key: 'downtime', label: t('tile_downtime'), href: '/work' }] : []),
     ...(features.quality ? [{ key: 'quality', label: t('tile_quality'), href: '/work' }] : []),

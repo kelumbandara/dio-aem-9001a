@@ -204,6 +204,17 @@ describe('enforcement on the screens and the API', function () {
         expect(app(LicenceGate::class)->banner())->toBeNull();
     });
 
+    it('treats an empty setting like an unset one: the default, never "off" (an empty value in the deployment settings must not switch licensing off)', function () {
+        config(['licensing.enforce' => '']);
+        expect(app(LicenceService::class)->enforcing())->toBeFalse();     // outside production the default is off
+        app()->detectEnvironment(fn () => 'production');
+        expect(app(LicenceService::class)->enforcing())->toBeTrue();      // in production the default is on, even with an empty value
+        config(['licensing.enforce' => 'false']);
+        expect(app(LicenceService::class)->enforcing())->toBeFalse();     // an explicit false still switches it off
+        config(['licensing.enforce' => 'true']);
+        expect(app(LicenceService::class)->enforcing())->toBeTrue();
+    });
+
     it('is off by default outside production, on in production', function () {
         config(['licensing.enforce' => null]);
         expect(app(LicenceService::class)->enforcing())->toBeFalse();

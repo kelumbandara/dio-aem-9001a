@@ -21,6 +21,16 @@ A phone app for people who are away from a desk: approve requests, report produc
 
 Sign-in · **Home** (what is waiting, offline entries to send, shortcuts) · **Approvals** (for me / sent by me; detail with steps and decisions; approve, or reject with a reason; confirmation before sending) · **Production** (running orders; order page with *Report output*, *Report downtime*, *Inspect*) · **Stock** (search, where an item is) · **Assistant** (conversations, choose an agent, ask; "based on" links) · **More** (notifications, entries on this phone with discard, language, sign out).
 
+### 2a. Sales and purchasing screens (added 2026-10-13)
+
+**Sales** tab (needs the Sales module and `sales.view`): lists of **quotations, orders and invoices** with search by document number, "show more", and a detail page for each (customer, dates, lines with quantities and prices, totals; orders show what is delivered and invoiced and link to their invoices; invoices link back to their order and show credit notes). With `sales.quotation.manage`: **New quotation** (customer, lines, optional reference and notes; saved as a draft, needs a connection) and, on a quotation, the moves the server's own flow allows: *mark as sent*, *customer accepted / rejected*, *cancel* (each after a confirmation).
+
+**Purchasing** tab (Procurement module and `procurement.view`): purchase orders list with search, and a detail page (supplier, dates, warehouse, lines with received and billed quantities, totals, receipts and bills). With `procurement.order.manage`: **New purchase order** (supplier, warehouse, lines; saved as a draft) and *send for approval* (approved at once or "waiting for approval", as the approval policy decides), *withdraw from approval*, *cancel* (a reason is required). Approving is done on the existing Approvals tab.
+
+How they behave: a customer, supplier or item is typed as a code and **suggestions appear as you type** (name and code); the suggestions only help, the typed code is what is sent and the server says plainly when it does not know it. A price left empty uses the price list; if the item has none, the server's sentence ("No price is set for ITM-00001; enter one.") appears on that line's price box, and the same for other line refusals (for example a fraction of a piece). Quantities, prices and percentages stay **text** from the keyboard to the server (never a float). Each new-document form has one request identity, so a double tap or an answer lost on the way back cannot make a second document; after the server refuses something a fresh identity is used, so the corrected form is not mistaken for a repeat. Creating documents is **online only**: the screen says "needs a connection, nothing was saved" (unlike production entries, a quotation depends on prices and customer rules that only the server can check).
+
+The tab bar holds at most six tabs: Stock and the Assistant stay tabs for people who work with at most two of Approvals, Sales, Purchasing and Production; for everyone else they are reached from the home page tiles. Links in notifications and AI answers to a sales document or a purchase order open these screens.
+
 ## 3. Server additions
 
 - `GET /api/v1/mobile/config`: company, modules switched on, oldest app version accepted (`MOBILE_MIN_APP_VERSION`; older apps are told to update), languages.
@@ -48,8 +58,8 @@ These steps use the company's own accounts and keys; nothing is stored in this r
 
 ## 5. Tests and checks
 
-`cd mobile; npm test` (Jest: API client, offline queue, formatting, permissions, translations, push in Expo Go: 50 tests), `npm run typecheck`, `npm run lint`, and `npx expo export --platform web|android` to prove the whole app bundles. Server side: `tests/Feature/Core/MobileTest.php` and `tests/Feature/Manufacturing/CurrentShiftApiTest.php`, part of `composer check`.
+`cd mobile; npm test` (Jest: API client, offline queue, formatting, permissions, translations, push in Expo Go, and the sales/purchasing rules (line checks, document moves, status colours, where server complaints belong): 72 tests), `npm run typecheck`, `npm run lint`, and `npx expo export --platform web|android` to prove the whole app bundles. Server side: `tests/Feature/Core/MobileTest.php` and `tests/Feature/Manufacturing/CurrentShiftApiTest.php`, part of `composer check`.
 
 ## 6. Not built
 
-Barcode/QR scanning, photos on inspections, a screen for sales and purchasing documents, finance figures and dashboards on the phone, biometric unlock, a stopwatch for downtime, reading push delivery receipts, offline reading of data, automatic update prompts from the stores, app store packaging.
+Barcode/QR scanning, photos on inspections, delivery, goods-receipt and credit-note screens and turning a quotation into an order on the phone, working offline on quotations and purchase orders, finance figures and dashboards on the phone, biometric unlock, a stopwatch for downtime, reading push delivery receipts, offline reading of data, automatic update prompts from the stores, app store packaging.

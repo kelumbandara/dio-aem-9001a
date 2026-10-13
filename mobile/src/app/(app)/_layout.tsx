@@ -23,6 +23,10 @@ export default function AppLayout() {
     void registerForPush(client, locale, APP_VERSION);
   }, [client, locale]);
 
+  // Up to six tabs fit: people who work in trade or approvals reach Stock and the assistant from the home page instead.
+  const primary = [features.approvals, features.sales, features.purchasing, features.production || features.downtime || features.quality].filter(Boolean).length;
+  const extras = primary <= 2;
+
   return (
     <Tabs
       screenOptions={{
@@ -34,9 +38,11 @@ export default function AppLayout() {
       }}>
       <Tabs.Screen name="index" options={{ title: t('app_name'), tabBarIcon: icon('🏠') }} />
       <Tabs.Screen name="approvals" options={{ title: t('approvals_title'), tabBarIcon: icon('✅'), href: features.approvals ? undefined : null }} />
+      <Tabs.Screen name="sales" options={{ title: t('sales_title'), tabBarIcon: icon('🧾'), href: features.sales ? undefined : null }} />
+      <Tabs.Screen name="purchasing" options={{ title: t('purchasing_title'), tabBarIcon: icon('🛒'), href: features.purchasing ? undefined : null }} />
       <Tabs.Screen name="work" options={{ title: t('work_title'), tabBarIcon: icon('🏭'), href: features.production || features.downtime || features.quality ? undefined : null }} />
-      <Tabs.Screen name="stock" options={{ title: t('stock_title'), tabBarIcon: icon('📦'), href: features.stock ? undefined : null }} />
-      <Tabs.Screen name="assistant" options={{ title: t('assistant_title'), tabBarIcon: icon('💬'), href: features.assistant ? undefined : null }} />
+      <Tabs.Screen name="stock" options={{ title: t('stock_title'), tabBarIcon: icon('📦'), href: features.stock && extras ? undefined : null }} />
+      <Tabs.Screen name="assistant" options={{ title: t('assistant_title'), tabBarIcon: icon('💬'), href: features.assistant && extras ? undefined : null }} />
       <Tabs.Screen name="more" options={{ title: t('more_title'), tabBarIcon: icon('⋯') }} />
     </Tabs>
   );

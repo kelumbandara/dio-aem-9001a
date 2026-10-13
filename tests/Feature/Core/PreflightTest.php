@@ -35,7 +35,6 @@ it('refuses to start production for each unsafe setting, naming the setting and 
         'APP_DEBUG' => ['app.debug' => true], 'APP_KEY' => ['app.key' => ''], 'APP_URL' => ['app.url' => 'http://erp.example.lk'],
         'SESSION_SECURE_COOKIE' => ['session.secure' => false], 'QUEUE_CONNECTION' => ['queue.default' => 'sync'], 'CACHE_STORE' => ['cache.default' => 'array'],
         'MAIL_MAILER' => ['mail.default' => 'log'], 'DB_CONNECTION' => ['database.default' => 'mysql'], 'HSTS_SECONDS' => ['core.security.hsts_seconds' => 0],
-        'LICENSING_ENFORCE' => ['licensing.enforce' => false],
     ];
     foreach ($cases as $name => $override) {
         goodProductionSettings();
@@ -43,6 +42,13 @@ it('refuses to start production for each unsafe setting, naming the setting and 
         [$code, $out] = preflight();
         expect($code)->toBe(1, "{$name} should stop the start")->and($out)->toContain($name);
     }
+});
+
+it('lets the vendor run their own system with licence checking off: it warns, it does not refuse', function () {
+    goodProductionSettings();
+    config(['licensing.enforce' => false, 'licensing.public_key' => null]);
+    [$code, $out] = preflight();
+    expect($code)->toBe(0)->and($out)->toContain('LICENSING_ENFORCE is off')->and($out)->not->toContain('PROBLEM');
 });
 
 it('refuses a remote database without SSL, but accepts a local one', function () {

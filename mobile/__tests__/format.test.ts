@@ -81,6 +81,17 @@ describe('opening what the server points at', () => {
   it('maps known paths to app screens and leaves the rest for the web', () => {
     expect(screenFor(`/approvals/${id}`)).toBe(`/approvals/${id}`);
     expect(screenFor(`/manufacturing/orders/${id}`)).toBe(`/work/${id}`);
+    expect(screenFor(`/sales/quotations/${id}`)).toBe(`/sales/quotations/${id}`);
+    expect(screenFor(`/sales/orders/${id}`)).toBe(`/sales/orders/${id}`);
+    expect(screenFor(`/sales/invoices/${id}`)).toBe(`/sales/invoices/${id}`);
+    expect(screenFor(`/procurement/orders/${id}`)).toBe(`/purchasing/${id}`);
+    expect(screenFor('/procurement/orders/abc')).toBeNull();
+    expect(screenFor('/procurement/orders/create')).toBeNull();
+    expect(screenFor(`/procurement/orders/${id}/../../admin`)).toBeNull();
+    expect(screenFor(`/procurement/receipts/${id}`)).toBeNull();
+    expect(screenFor('/sales/quotations/create')).toBeNull();
+    expect(screenFor('/sales/invoices/../../admin')).toBeNull();
+    expect(screenFor('/sales/deliveries/'+id)).toBeNull();
     expect(screenFor('/inventory/stock/items/ITM-001')).toBe('/stock/ITM-001');
     expect(screenFor('/sales/invoices/abc')).toBeNull();
     expect(screenFor('/approvals/not-a-uuid')).toBeNull();

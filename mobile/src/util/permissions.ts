@@ -7,6 +7,14 @@ export type Features = {
   quality: boolean;
   stock: boolean;
   assistant: boolean;
+  /** Look at quotations, orders and invoices. */
+  sales: boolean;
+  /** Make a quotation and send it, accept it or drop it. */
+  quotations: boolean;
+  /** Look at purchase orders. */
+  purchasing: boolean;
+  /** Make a purchase order and send it for approval. */
+  purchaseOrders: boolean;
 };
 
 export function featuresFor(permissions: string[], modules: string[]): Features {
@@ -20,6 +28,10 @@ export function featuresFor(permissions: string[], modules: string[]): Features 
     quality: on('manufacturing') && has('manufacturing.qc.inspect'),
     stock: on('inventory') && has('inventory.stock.view'),
     assistant: on('ai') && has('ai.use'),
+    sales: on('sales') && has('sales.view'),
+    quotations: on('sales') && has('sales.view') && has('sales.quotation.manage'),
+    purchasing: on('procurement') && has('procurement.view'),
+    purchaseOrders: on('procurement') && has('procurement.view') && has('procurement.order.manage'),
   };
 }
 

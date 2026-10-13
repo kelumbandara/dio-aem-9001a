@@ -36,7 +36,7 @@
     ],
     "scheme": "dioerp",
     "extra": {
-      "apiUrl": ""
+      "apiUrl": "https://erp.dio.lk"
     }
   }
 }

@@ -63,6 +63,8 @@ x-app: &app
     CLAMAV_HOST: clamav
     CLAMAV_PORT: "3310"
     PASSWORD_CHECK_BREACHED: ${PASSWORD_CHECK_BREACHED:-true}
+    # empty = the default (checked in production); set "false" only for the vendor's own system
+    LICENSING_ENFORCE: ${LICENSING_ENFORCE:-}
     LICENCE_PUBLIC_KEY: ${LICENCE_PUBLIC_KEY:-}
     VENDOR_BILLING_URL: ${VENDOR_BILLING_URL:-}
     VENDOR_BILLING_TOKEN: ${VENDOR_BILLING_TOKEN:-}

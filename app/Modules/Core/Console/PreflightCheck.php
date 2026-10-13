@@ -72,8 +72,8 @@ class PreflightCheck extends Command
         $this->must(config('database.connections.pgsql.sslmode', 'prefer') !== 'disable' || $this->local((string) config('database.connections.pgsql.host')), 'The database is not on this host and SSL is disabled (DB_SSLMODE).');
         $this->must((int) config('core.security.hsts_seconds') > 0, 'HSTS_SECONDS is 0: browsers are not told to insist on https.');
         $this->must(trim((string) config('core.security.trusted_proxies', '')) !== '', 'TRUSTED_PROXIES is empty: behind the proxy every visitor would look like one address (rate limits, audit log).');
-        $this->must(config('licensing.enforce') !== false, 'LICENSING_ENFORCE is switched off.');
 
+        $this->should(config('licensing.enforce') !== false, 'LICENSING_ENFORCE is off: an expired licence restricts nothing. Right for the vendor\'s own use, not for a customer.');
         $this->should(config('core.attachments.disk') !== 'attachments', 'ATTACHMENTS_DISK is the local disk: use object storage (s3) so a rebuilt container loses nothing.');
         $this->should((bool) config('core.attachments.clamav.enabled'), 'CLAMAV_ENABLED is false: uploaded files are not virus-scanned.');
         $this->should((bool) config('core.auth.check_breached'), 'PASSWORD_CHECK_BREACHED is off: known-breached passwords are accepted.');

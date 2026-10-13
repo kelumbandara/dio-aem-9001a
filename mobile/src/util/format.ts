@@ -62,6 +62,10 @@ export function screenFor(path: string | null): string | null {
   if (approval) return `/approvals/${approval[1]}`;
   const order = /^\/manufacturing\/orders\/([0-9a-f-]{36})\/?$/i.exec(path);
   if (order) return `/work/${order[1]}`;
+  const sales = /^\/sales\/(quotations|orders|invoices)\/([0-9a-f-]{36})\/?$/i.exec(path);
+  if (sales) return `/sales/${sales[1]}/${sales[2]}`;
+  const purchase = /^\/procurement\/orders\/([0-9a-f-]{36})\/?$/i.exec(path);
+  if (purchase) return `/purchasing/${purchase[1]}`;
   const stock = /^\/inventory\/stock\/items\/([A-Za-z0-9._-]+)\/?$/.exec(path);
   if (stock) return `/stock/${stock[1]}`;
 
