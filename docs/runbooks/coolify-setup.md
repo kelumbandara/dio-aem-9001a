@@ -6,9 +6,9 @@ Server for the rehearsal and the first pilot. **No passwords, keys or tokens are
 
 | | |
 |---|---|
-| Address | 91.99.129.228 (Hetzner Cloud, KVM), domain `dio.lk` to be pointed at it |
+| Address | 91.99.129.228 (Hetzner Cloud, KVM). Names: `erp.dio.lk` (the ERP), `coolify.dio.lk` (the Coolify dashboard), `dio.lk` and `www.dio.lk` (the website); all with Let's Encrypt certificates issued by Coolify's proxy |
 | System | Ubuntu 22.04.5 LTS, 3 vCPU, 3.8 GB RAM + 4 GB swap (swappiness 10), 75 GB disk |
-| Set up on 2026-10-13 | security updates + reboot; swap file; `ufw` active (open: 22, 80, 443, 8000 Coolify dashboard, 6001/6002 Coolify realtime); Coolify v4.4.6 installed with its official installer (installs Docker 29) |
+| Set up on 2026-10-13 | security updates + reboot; swap file; `ufw` active (open from outside: **22, 80, 443 only**); Coolify v4.4.6 installed with its official installer (installs Docker 29); the dashboard has its own HTTPS address and ports 8000/6001/6002 are closed (see §7) |
 | Access | SSH as root with a key created on the vendor's development machine (`~/.ssh/dio_server_ed25519`, never in the repository). **Password login is still enabled** until the owner agrees to turn it off (then: set `PasswordAuthentication no` in `/etc/ssh/sshd_config.d/50-cloud-init.conf`, restart `ssh`) |
 | Outbound checks | SMTP 465/587 (Hostinger), the AI provider, the breached-password service and WhatsApp's servers are all reachable (some providers block them) |
 
@@ -50,3 +50,15 @@ After changing them: close port 8000 in `ufw` once Coolify itself is reachable o
 Build and start from an empty database: succeeded (about 4 minutes on this server); all 41 migrations ran; seed and first administrator created (password to be chosen by the owner through the one-time link); `GET /api/v1/health/ready` → ok; Horizon running; **ClamAV: clean file passes, EICAR test file flagged infected**; security headers present on the real address; first encrypted backup written and checksummed; `app:preflight --strict` reports only the rehearsal departures listed in §3 (plus the local file storage and missing licence-key warnings).
 
 Not yet done on this server: a restore drill, the S3 backup copy, real e-mail, HTTPS, the domain, a load test.
+
+## 6. The website `dio.lk` (static)
+
+Coolify service **dio.lk website** (compose given inline, image `php:8.3-apache`, 192 MB / 0.5 CPU cap, `.htaccess` and `mod_rewrite` enabled, Apache version hidden, security headers). The files are in **`/data/sites/dio.lk/`** on the server, mounted read-only into the container; the site is a single-page application (its `.htaccess` sends unknown paths to `index.html`). Domains `https://dio.lk` and `https://www.dio.lk`. Memory use at rest: about 30 MB.
+
+**Updating the site:** copy the new files into `/data/sites/dio.lk/` with SFTP (WinSCP). Two accounts can do it: `root` (everything) and **`dio-site`**, an SFTP-only account locked into `/data/sites` (it can write only `dio.lk` and `incoming`; it has no shell; its password is known to the owner only). Zip files go in `/data/sites/incoming/` (not served), never into `dio.lk` (anything there is public). The `dio-site` account is configured by a `Match User dio-site` block at the end of `/etc/ssh/sshd_config` (backup: `sshd_config.bak-before-dio-site`).
+
+Not backed up automatically (the nightly backup covers the ERP database only). The site is easy to rebuild from its source zip: keep that zip outside the server.
+
+## 7. Closed ports and the Docker firewall catch
+
+`ufw` alone does **not** protect ports that Docker publishes (Docker adds its own rules ahead of it): deleting the `ufw` rules for 8000/6001/6002 left them open to the internet until a rule was added in Docker's `DOCKER-USER` chain. The script `/usr/local/sbin/dio-docker-firewall.sh`, run at boot by the systemd unit `dio-docker-firewall.service` (after Docker), drops outside traffic to 8000 (dashboard by IP), 6001 and 6002 (realtime/terminal; Coolify reaches them through its proxy on `https://coolify.dio.lk`). Verified from outside: 80 and 443 and 22 open; 8000, 6001, 6002, 8080, 5432, 6379, 3310 closed. **Any new container that publishes a port is reachable from the internet regardless of `ufw`**: check with a port test after each new deployment, and prefer Coolify domains (the proxy) over published ports.
