@@ -12,6 +12,7 @@ return [
         'inventory' => 'Inventory',
         'finance' => 'Finance',
         'reporting' => 'Reports',
+        'communications' => 'Messages',
         'masterdata' => 'Master data',
         'admin' => 'Administration',
         'find' => 'Find a page',

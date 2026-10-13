@@ -29,7 +29,7 @@
                 <span class="min-w-0 truncate">{{ $look->appName() }}</span>
             </div>
             @php
-                $order = ['main', 'approvals', 'sales', 'purchasing', 'inventory', 'manufacturing', 'finance', 'reporting', 'masterdata', 'admin'];
+                $order = ['main', 'approvals', 'sales', 'purchasing', 'inventory', 'manufacturing', 'finance', 'reporting', 'communications', 'masterdata', 'admin'];
                 $sections = collect($menu)->groupBy('group')->sortBy(fn ($items, $g) => (($i = array_search($g, $order, true)) === false ? 99 : $i));
                 $activeGroup = optional(collect($menu)->first(fn ($i) => request()->routeIs($i->route)))->group;
                 $labels = collect($menu)->map(fn ($i) => mb_strtolower(__($i->labelKey)))->values();

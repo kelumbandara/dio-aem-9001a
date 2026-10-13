@@ -13,6 +13,7 @@ return [
         'inventory' => 'சரக்கு',
         'finance' => 'நிதி',
         'reporting' => 'அறிக்கைகள்',
+        'communications' => 'செய்திகள்',
         'masterdata' => 'முதன்மைத் தரவு',
         'admin' => 'நிர்வாகம்',
         'find' => 'பக்கத்தைத் தேடு',

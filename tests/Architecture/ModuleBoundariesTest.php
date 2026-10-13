@@ -5,6 +5,7 @@ use App\Modules\Approvals\Contracts\Approvable;
 use App\Modules\Approvals\Demo\DemoExpense;
 use App\Modules\Approvals\DTOs\ExecutionToken;
 use App\Modules\Approvals\Jobs\ExecuteApprovedRequestJob;
+use App\Modules\Communications\Approvals\MessageSend;
 use App\Modules\Finance\Approvals\ManualJournalPost;
 use App\Modules\Finance\Approvals\SupplierPaymentPost;
 use App\Modules\Finance\Models\JournalEntry;
@@ -100,6 +101,7 @@ arch('an approved action can only be executed through the approval engine')
         ManualJournalPost::class,            // Finance's approval-gated manual journal
         SupplierPaymentPost::class,          // Finance's approval-gated supplier payment
         PurchaseOrderApprove::class,         // Procurement's approval-gated purchase order
+        MessageSend::class,                  // Communications' approval-gated sensitive message
     ]);
 arch('approvals are never executed from controllers or commands')
     ->expect(ExecuteApprovedRequest::class)

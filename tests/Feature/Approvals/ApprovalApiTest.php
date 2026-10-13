@@ -194,6 +194,7 @@ it('keeps the module switchable: a disabled Approvals module blocks its API', fu
     expect(fn () => $modules->disable('approvals'))->toThrow(ModuleException::class, 'still required by');
 
     $modules->disable('manufacturing');
+    $modules->disable('communications');
     $modules->disable('procurement');
 
     $modules->disable('sales');       // dependents first

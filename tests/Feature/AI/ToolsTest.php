@@ -57,7 +57,7 @@ describe('the tool list', function () {
 
     it('only offers read and draft tools, each with a name, a description, a schema, a permission and a module', function () {
         $tools = app(ToolCatalog::class)->all();
-        expect($tools)->toHaveCount(26);
+        expect($tools)->toHaveCount(27);
         $names = [];
         foreach ($tools as $t) {
             expect($t->risk())->toBeIn(['R0', 'R1'])->and($t->name())->toMatch('/^[a-z_]+\.[a-z_]+$/')->and(strlen($t->description()))->toBeGreaterThan(20)

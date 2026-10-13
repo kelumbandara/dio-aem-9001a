@@ -33,8 +33,8 @@ final class AgentRegistry
         return [
             self::DEFAULT => ['tools' => null, 'needs' => null, 'role' => 'You are a general business assistant. You answer questions across sales, purchasing, stock, money and production.'],
             'ceo' => ['tools' => null, 'needs' => null, 'role' => 'You are the owner\'s adviser. You summarise how the whole business is doing, compare periods, point out what changed and what needs attention, and rank the problems by how much they matter. You look across every department.'],
-            'sales' => ['needs' => [...self::SALES_READ, 'sales.draft_quotation'], 'tools' => [...self::SALES_READ, ...self::FIND, 'stock.item', 'finance.receivables', 'production.late_orders', 'sales.draft_quotation'],
-                'role' => 'You are the sales assistant. You help with customers, sales results, open orders, whether items are in stock, and what customers owe. When asked, you prepare a DRAFT quotation for the salesperson to review.'],
+            'sales' => ['needs' => [...self::SALES_READ, 'sales.draft_quotation'], 'tools' => [...self::SALES_READ, ...self::FIND, 'stock.item', 'finance.receivables', 'production.late_orders', 'sales.draft_quotation', 'comm.draft_message'],
+                'role' => 'You are the sales assistant. You help with customers, sales results, open orders, whether items are in stock, and what customers owe. When asked, you prepare a DRAFT quotation or a draft message to a customer for the salesperson to review.'],
             'purchasing' => ['needs' => [...self::PURCHASING_READ, 'procurement.draft_purchase_order'], 'tools' => [...self::PURCHASING_READ, ...self::FIND, ...self::STOCK_READ, 'finance.payables', 'production.late_orders', 'procurement.draft_purchase_order'],
                 'role' => 'You are the purchasing assistant. You help with suppliers, what was bought, what is still to arrive, what is running low, and what is owed to suppliers. When asked, you prepare a DRAFT purchase order for the buyer to review and submit.'],
             'inventory' => ['needs' => self::STOCK_READ, 'tools' => [...self::STOCK_READ, ...self::FIND, 'sales.open_orders', 'purchasing.open_orders', 'production.late_orders'],
@@ -43,8 +43,8 @@ final class AgentRegistry
                 'role' => 'You are the production assistant. You help supervisors with output against targets, late orders, machine downtime and the reasons behind them, and rejects.'],
             'quality' => ['needs' => ['quality.summary'], 'tools' => ['quality.summary', 'production.summary', 'production.late_orders', 'stock.item', 'master.find_item'],
                 'role' => 'You are the quality assistant. You help with reject and rework rates, the reasons, the products that reject most, and whether quality is improving.'],
-            'finance' => ['needs' => self::FINANCE_READ, 'tools' => [...self::FINANCE_READ, 'sales.summary', 'purchasing.summary', 'stock.valuation'],
-                'role' => 'You are the finance assistant. You help with profit, cost of sales, what customers owe and how late, what is owed to suppliers, and cash at the bank.'],
+            'finance' => ['needs' => self::FINANCE_READ, 'tools' => [...self::FINANCE_READ, 'sales.summary', 'purchasing.summary', 'stock.valuation', ...self::FIND, 'comm.draft_message'],
+                'role' => 'You are the finance assistant. You help with profit, cost of sales, what customers owe and how late, what is owed to suppliers, and cash at the bank. When asked, you prepare a DRAFT payment reminder to a customer or supplier for a person to review and send.'],
         ];
     }
 

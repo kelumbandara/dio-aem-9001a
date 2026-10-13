@@ -13,6 +13,7 @@ return [
         'inventory' => 'තොග',
         'finance' => 'මූල්‍ය',
         'reporting' => 'වාර්තා',
+        'communications' => 'පණිවිඩ',
         'masterdata' => 'ප්‍රධාන දත්ත',
         'admin' => 'පරිපාලනය',
         'find' => 'පිටුවක් සොයන්න',

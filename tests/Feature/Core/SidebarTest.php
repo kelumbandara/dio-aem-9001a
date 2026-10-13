@@ -47,14 +47,14 @@ it('keeps the section of the page you are on open, and offers a search box', fun
 
 it('has the group headings and search texts in all three languages', function () {
     foreach (['en', 'si', 'ta'] as $locale) {
-        foreach (['approvals', 'sales', 'purchasing', 'inventory', 'manufacturing', 'finance', 'reporting', 'masterdata', 'admin', 'find', 'none'] as $key) {
+        foreach (['approvals', 'sales', 'purchasing', 'inventory', 'manufacturing', 'finance', 'reporting', 'communications', 'masterdata', 'admin', 'find', 'none'] as $key) {
             expect(Lang::get("core::ui.menu_groups.{$key}", [], $locale))->not->toBe("core::ui.menu_groups.{$key}");
         }
     }
 });
 
 it('puts every menu item in a known section', function () {
-    $known = ['main', 'approvals', 'sales', 'purchasing', 'inventory', 'manufacturing', 'finance', 'reporting', 'masterdata', 'admin'];
+    $known = ['main', 'approvals', 'sales', 'purchasing', 'inventory', 'manufacturing', 'finance', 'reporting', 'communications', 'masterdata', 'admin'];
     $user = userWithPermissions(...array_keys(array_flip(Permission::pluck('name')->all())));
     $menu = app(ModuleRegistry::class)->menuFor($user);
 

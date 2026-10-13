@@ -57,6 +57,14 @@ final class DatabasePartyDirectory implements PartyDirectory
         return $ids->map(fn ($id) => $model === Supplier::class ? $this->supplier((int) $id) : $this->customer((int) $id))->filter()->values()->all();
     }
 
+    public function contact(string $side, int $partyId): array
+    {
+        $row = ($side === 'supplier' ? Supplier::query() : Customer::query())->whereKey($partyId)->first(['email', 'phone']);
+        $clean = fn (?string $v) => $v === null || trim($v) === '' ? null : trim($v);
+
+        return ['email' => $clean($row?->email), 'phone' => $clean($row?->phone)];
+    }
+
     public function billingAddress(string $side, int $partyId): array
     {
         $query = $side === 'supplier' ? SupplierAddress::query()->where('supplier_id', $partyId) : CustomerAddress::query()->where('customer_id', $partyId);

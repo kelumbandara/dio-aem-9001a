@@ -25,6 +25,15 @@ interface PartyDirectory
     public function search(string $side, string $term, int $limit = 50): array;
 
     /**
+     * The main e-mail address and phone number on file for a customer or supplier (as typed; null when there is none), so other
+     * modules can contact them without reading the party tables.
+     *
+     * @param  'customer'|'supplier'  $side
+     * @return array{email: string|null, phone: string|null}
+     */
+    public function contact(string $side, int $partyId): array;
+
+    /**
      * The address lines for a document header: the default billing address, else the first address on file.
      *
      * @param  'customer'|'supplier'  $side

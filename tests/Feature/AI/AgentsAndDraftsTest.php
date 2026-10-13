@@ -82,7 +82,7 @@ describe('the agents', function () {
             $prompts[$key] = $reg->get($key, 'en', $today)['system'];
         }
         expect(count(array_unique($prompts)))->toBe(count($prompts))->and($prompts['sales'])->toContain('sales assistant')->and($prompts['sales'])->toContain('DRAFT')->and($prompts['sales'])->toContain('Never say that something has been sent')
-            ->and($prompts['finance'])->toContain('only read')->and($prompts['finance'])->not->toContain('DRAFT')->and($prompts['ceo'])->toContain('owner')
+            ->and($prompts['inventory'])->toContain('only read')->and($prompts['inventory'])->not->toContain('DRAFT')->and($prompts['finance'])->toContain('payment reminder')->and($prompts['ceo'])->toContain('owner')
             ->and($prompts['sales'])->toContain('2026-11-04')->and($reg->get('sales', 'si', $today)['system'])->toContain('Sinhala')->and($reg->get('nonsense', 'en', $today)['name'])->toBe('assistant');
     });
 

@@ -7,6 +7,7 @@ use App\Modules\AI\DTOs\ToolContext;
 use App\Modules\AI\DTOs\ToolResult;
 use App\Modules\AI\Exceptions\AiException;
 use App\Modules\AI\Services\DraftLimiter;
+use App\Modules\Communications\Contracts\MessageDrafter;
 use App\Modules\Inventory\Contracts\StockAvailability;
 use App\Modules\MasterData\Contracts\ItemCatalog;
 use App\Modules\MasterData\Contracts\PartyDirectory;
@@ -109,6 +110,27 @@ final class WorkTools
                     ['created' => 'draft purchase order', 'document_no' => $d['document_no'], 'supplier' => $d['supplier'], 'lines' => $d['lines'], 'net_total' => $d['net_total'], 'gross_total' => $d['gross_total'], 'note' => 'A draft was saved. It has not been submitted or approved; the person must review and submit it on its page.'],
                     [['label' => $d['document_no'], 'url' => route('procurement.orders.show', [$d['id']])]],
                     ['document_no' => $d['document_no']],
+                );
+            }, 'R1'),
+            new ClosureTool('comm.draft_message', 'Prepare a DRAFT payment reminder or document notice (e-mail or WhatsApp) to a customer or supplier. It is not sent: a person reads it on the Messages page and presses Send; reminders also need an approval. Get the exact party code first with master.find_customer or master.find_supplier. You cannot write free text; you fill the template values.', 'communications', 'comm.message.draft', [
+                'party_type' => ['type' => 'string', 'enum' => ['customer', 'supplier'], 'description' => 'Who the message is for.'],
+                'party' => ['type' => 'string', 'maxLength' => 40, 'description' => 'Exact customer or supplier code.'],
+                'channel' => ['type' => 'string', 'enum' => ['email', 'whatsapp']],
+                'template' => ['type' => 'string', 'enum' => ['payment_reminder', 'document_notice'], 'description' => 'payment_reminder needs document_no, amount and due_date; document_notice needs document_type and document_no.'],
+                'document_no' => ['type' => 'string', 'maxLength' => 60],
+                'document_type' => ['type' => 'string', 'maxLength' => 60, 'description' => 'For example invoice or quotation.'],
+                'amount' => ['type' => 'string', 'maxLength' => 40, 'description' => 'For example LKR 25,000.00'],
+                'due_date' => ['type' => 'string', 'maxLength' => 40, 'description' => 'For example 2026-11-30'],
+            ], ['party_type', 'party', 'channel', 'template'], function (array $i, ToolContext $ctx) use ($limiter) {
+                $limiter()->assertCanDraft($ctx);
+                $params = array_intersect_key($i, array_flip(['document_no', 'document_type', 'amount', 'due_date']));
+                $d = $this->container->make(MessageDrafter::class)->draft($ctx->user, $ctx->userId, ['party_type' => $i['party_type'], 'party' => $i['party'], 'channel' => $i['channel'], 'template' => $i['template'], 'params' => $params]);
+                $limiter()->made($ctx);
+
+                return new ToolResult(
+                    ['created' => 'draft message', 'channel' => $d['channel'], 'to' => $d['to'], 'template' => $d['template'], 'note' => 'A draft was saved. It has not been sent; the person must read it on the Messages page and press Send (reminders also need an approval).'],
+                    [['label' => 'Message to '.$d['to'], 'url' => route('comm.messages.show', [$d['id']])]],
+                    ['message' => $d['id']],
                 );
             }, 'R1'),
         ];

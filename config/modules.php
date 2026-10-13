@@ -2,6 +2,7 @@
 
 use App\Modules\AI\AIServiceProvider;
 use App\Modules\Approvals\ApprovalsServiceProvider;
+use App\Modules\Communications\CommunicationsServiceProvider;
 use App\Modules\Core\CoreServiceProvider;
 use App\Modules\Finance\FinanceServiceProvider;
 use App\Modules\Inventory\InventoryServiceProvider;
@@ -100,12 +101,19 @@ return [
             'enabled' => true,
             'required' => false,
         ],
+        'communications' => [
+            'name' => 'Communications',
+            'provider' => CommunicationsServiceProvider::class,
+            'depends_on' => ['core', 'approvals', 'masterdata'],
+            'enabled' => true,
+            'required' => false,
+        ],
         'ai' => [
             'name' => 'AI assistant',
             'provider' => AIServiceProvider::class,
             'depends_on' => ['core'],
             // Reads these modules through their read-only metrics Contracts; each tool disappears with its module.
-            'optional_depends_on' => ['masterdata', 'inventory', 'finance', 'sales', 'procurement', 'manufacturing'],
+            'optional_depends_on' => ['masterdata', 'inventory', 'finance', 'sales', 'procurement', 'manufacturing', 'communications'],
             'enabled' => true,
             'required' => false,
         ],

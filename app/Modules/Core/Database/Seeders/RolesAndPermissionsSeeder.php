@@ -40,8 +40,10 @@ class RolesAndPermissionsSeeder extends Seeder
             // Manufacturing: sees production orders, bills of materials and what is in work in progress.
             'manufacturing.view',
             // The assistant answers from what the person may already see.
-            'ai.use'];
-        $salesStaff = ['ai.use', 'sales.view', 'sales.quotation.manage', 'sales.order.manage', 'sales.order.confirm', 'sales.delivery.post',
+            'ai.use',
+            // Messages to customers and suppliers: reads, prepares and sends them (sensitive ones still need their approval), and records who allowed or refused contact.
+            'comm.message.view', 'comm.message.draft', 'comm.message.send', 'comm.consent.manage'];
+        $salesStaff = ['ai.use', 'comm.message.view', 'comm.message.draft', 'sales.view', 'sales.quotation.manage', 'sales.order.manage', 'sales.order.confirm', 'sales.delivery.post',
             'masterdata.reference.view', 'masterdata.item.view', 'masterdata.customer.view', 'masterdata.price_list.view', 'inventory.stock.view', 'inventory.warehouse.view'];
         Role::findOrCreate('accountant', 'web')->syncPermissions(array_values(array_filter(
             $names,
@@ -54,7 +56,7 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // Purchasing staff raise purchase orders, receive goods and send them back; they read suppliers, items, prices and stock but change none
         // of them, do not enter supplier bills (the accountant does) and cannot accept a price difference or reverse a receipt (admin only).
-        $purchasing = ['ai.use', 'procurement.view', 'procurement.order.manage', 'procurement.receipt.post', 'procurement.return.post',
+        $purchasing = ['ai.use', 'comm.message.view', 'comm.message.draft', 'procurement.view', 'procurement.order.manage', 'procurement.receipt.post', 'procurement.return.post',
             'masterdata.reference.view', 'masterdata.item.view', 'masterdata.supplier.view', 'masterdata.price_list.view', 'inventory.stock.view', 'inventory.warehouse.view'];
         Role::findOrCreate('purchasing', 'web')->syncPermissions(array_values(array_filter($names, fn (string $name) => in_array($name, $purchasing, true))));
 

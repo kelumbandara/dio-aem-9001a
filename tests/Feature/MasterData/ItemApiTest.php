@@ -41,6 +41,7 @@ describe('permissions', function () {
         app(ModuleRegistry::class)->disable('sales');
         app(ModuleRegistry::class)->disable('finance');     // these depend on Master Data
         app(ModuleRegistry::class)->disable('inventory');
+        app(ModuleRegistry::class)->disable('communications');
         app(ModuleRegistry::class)->disable('masterdata');
 
         asApi(masterDataUser())->getJson('/api/v1/items')->assertForbidden()->assertJsonPath('error.code', 'core.module_disabled');

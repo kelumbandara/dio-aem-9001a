@@ -168,6 +168,10 @@ Procurement adds only new tables (`purchase_*`, `goods_*`, `supplier_bill*`). Fi
 New immutability triggers: posted supplier bills, their lines, purchase returns and their lines, and goods-receipt lines reject UPDATE and DELETE; receipts may only change
 `status`/`reversal_document_id` (no delete). Order lines carry received/returned/billed quantities with CHECKs (returned ≤ received, received − returned ≤ ordered, billed ≤ ordered).
 
+## 3g. Sprint 14 notes
+
+Communications adds `comm_templates`, `comm_consents`, `comm_messages`, `comm_identities`, `comm_identity_challenges`. `comm_consents` is append-only (trigger `comm_refuse_change` rejects UPDATE and DELETE). Webhook events reuse `inbox_events` for de-duplication.
+
 ## 4. Migration policy
 
 Forward-only in production; destructive changes (drop column/table) need explicit approval and a
