@@ -11,6 +11,6 @@
     <h1 class="mb-1 text-xl font-semibold">{{ $d['title'] }}</h1>
     <p class="mb-4 text-xs text-slate-500">{{ __('reporting::ui.printed', ['at' => now(config('core.display_timezone'))->format('Y-m-d H:i')]) }}</p>
     @include('reporting::dashboards._body')
-    <script>window.addEventListener('load', function () { window.print(); });</script>
+    <script nonce="{{ Vite::cspNonce() }}">window.addEventListener('load', function () { window.print(); });</script>
 </body>
 </html>

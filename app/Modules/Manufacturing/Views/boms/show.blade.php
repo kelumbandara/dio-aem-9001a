@@ -19,11 +19,11 @@
                 <a href="{{ route('manufacturing.boms.edit', $bom['id']) }}" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">{{ __('manufacturing::ui.common.edit') }}</a>
             @endif
             @if ($isDraft && $canActivate)
-                <form method="POST" action="{{ route('manufacturing.boms.activate', $bom['id']) }}" onsubmit="return confirm(@js(__('manufacturing::ui.boms.confirm_activate')))">@csrf
+                <form method="POST" action="{{ route('manufacturing.boms.activate', $bom['id']) }}" x-on:submit="if (! confirm(@js(__('manufacturing::ui.boms.confirm_activate')))) $event.preventDefault()">@csrf
                     <x-core::button type="submit">{{ __('manufacturing::ui.boms.activate') }}</x-core::button></form>
             @endif
             @if ($bom['status'] === 'active' && $canActivate)
-                <form method="POST" action="{{ route('manufacturing.boms.retire', $bom['id']) }}" onsubmit="return confirm(@js(__('manufacturing::ui.boms.confirm_retire')))">@csrf
+                <form method="POST" action="{{ route('manufacturing.boms.retire', $bom['id']) }}" x-on:submit="if (! confirm(@js(__('manufacturing::ui.boms.confirm_retire')))) $event.preventDefault()">@csrf
                     <x-core::button type="submit" variant="secondary">{{ __('manufacturing::ui.boms.retire') }}</x-core::button></form>
             @endif
             @if ($canManage)
@@ -31,7 +31,7 @@
                     <x-core::button type="submit" variant="secondary">{{ __('manufacturing::ui.boms.copy') }}</x-core::button></form>
             @endif
             @if ($isDraft && $canManage)
-                <form method="POST" action="{{ route('manufacturing.boms.destroy', $bom['id']) }}" onsubmit="return confirm(@js(__('manufacturing::ui.boms.confirm_delete')))">@csrf @method('DELETE')
+                <form method="POST" action="{{ route('manufacturing.boms.destroy', $bom['id']) }}" x-on:submit="if (! confirm(@js(__('manufacturing::ui.boms.confirm_delete')))) $event.preventDefault()">@csrf @method('DELETE')
                     <x-core::button type="submit" variant="danger">{{ __('manufacturing::ui.common.delete') }}</x-core::button></form>
             @endif
             @if ($bom['status'] === 'active' && auth()->user()->can('manufacturing.order.manage'))

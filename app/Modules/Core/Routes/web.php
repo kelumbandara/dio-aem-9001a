@@ -11,6 +11,8 @@ use App\Modules\Core\Http\Controllers\Web\LoginController;
 use App\Modules\Core\Http\Controllers\Web\MfaController;
 use App\Modules\Core\Http\Controllers\Web\ModuleController;
 use App\Modules\Core\Http\Controllers\Web\NotificationController;
+use App\Modules\Core\Http\Controllers\Web\PasswordController;
+use App\Modules\Core\Http\Controllers\Web\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('locale', [LocaleController::class, 'update'])->name('locale.update');
@@ -21,6 +23,11 @@ Route::get('branding/logo', [BrandingController::class, 'logo'])->name('branding
 Route::middleware('guest')->group(function () {
     Route::get('login', [LoginController::class, 'create'])->name('login');
     Route::post('login', [LoginController::class, 'store'])->middleware('throttle:login')->name('login.store');
+
+    Route::get('forgot-password', [PasswordController::class, 'request'])->name('password.request');
+    Route::post('forgot-password', [PasswordController::class, 'email'])->middleware('throttle:5,1')->name('password.email');
+    Route::get('reset-password/{token}', [PasswordController::class, 'reset'])->name('password.reset');
+    Route::post('reset-password', [PasswordController::class, 'update'])->middleware('throttle:10,1')->name('password.update');
 });
 
 Route::middleware('auth')->group(function () {
@@ -44,6 +51,17 @@ Route::middleware('auth')->group(function () {
         Route::put('admin/appearance', [AppearanceController::class, 'update'])->name('appearance.update');
         Route::post('admin/appearance/reset', [AppearanceController::class, 'reset'])->name('appearance.reset');
         Route::post('admin/appearance/preview', [AppearanceController::class, 'preview'])->name('appearance.preview');
+
+        Route::get('admin/users', [UserController::class, 'index'])->name('users.index');
+        Route::get('admin/users/create', [UserController::class, 'create'])->name('users.create');
+        Route::post('admin/users', [UserController::class, 'store'])->name('users.store');
+        Route::get('admin/users/{user}', [UserController::class, 'edit'])->name('users.edit');
+        Route::put('admin/users/{user}', [UserController::class, 'update'])->name('users.update');
+        Route::post('admin/users/{user}/password-link', [UserController::class, 'sendLink'])->middleware('throttle:10,1')->name('users.password-link');
+        Route::post('admin/users/{user}/reset-mfa', [UserController::class, 'resetMfa'])->name('users.reset-mfa');
+
+        Route::get('account/password', [PasswordController::class, 'edit'])->name('account.password');
+        Route::put('account/password', [PasswordController::class, 'change'])->middleware('throttle:10,1')->name('account.password.update');
 
         Route::get('admin/audit-log', [AuditLogController::class, 'index'])->name('audit-log.index');
 

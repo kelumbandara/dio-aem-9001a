@@ -25,7 +25,7 @@
                                 @php $acts = ['open' => ['close'], 'closed' => ['reopen', 'lock'], 'locked' => []][$p->status]; @endphp
                                 @foreach ($acts as $act)
                                     @if (($act === 'lock' && $canLock) || ($act !== 'lock' && $canManage))
-                                        <form method="POST" action="{{ route('finance.periods.change', [$p, $act]) }}" class="inline" @if ($act === 'lock') onsubmit="return confirm('{{ __('finance::ui.periods.lock_confirm') }}')" @endif>@csrf<button type="submit" class="ms-3 {{ $act === 'lock' ? 'text-red-600' : 'text-indigo-600' }} hover:underline">{{ __("finance::ui.periods.{$act}") }}</button></form>
+                                        <form method="POST" action="{{ route('finance.periods.change', [$p, $act]) }}" class="inline" @if ($act === 'lock') x-on:submit="if (! confirm(@js(__('finance::ui.periods.lock_confirm')))) $event.preventDefault()" @endif>@csrf<button type="submit" class="ms-3 {{ $act === 'lock' ? 'text-red-600' : 'text-indigo-600' }} hover:underline">{{ __("finance::ui.periods.{$act}") }}</button></form>
                                     @endif
                                 @endforeach
                             </td>

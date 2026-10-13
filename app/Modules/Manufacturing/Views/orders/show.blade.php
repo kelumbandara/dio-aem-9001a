@@ -140,7 +140,7 @@
     </section>
 
     @if (in_array($order['status'], ['draft', 'released', 'in_progress'], true) && $can['manage'])
-        <form method="POST" action="{{ route('manufacturing.orders.cancel', $order['id']) }}" class="flex flex-wrap items-end gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm" onsubmit="return confirm(@js(__('manufacturing::ui.orders.confirm_cancel')))">
+        <form method="POST" action="{{ route('manufacturing.orders.cancel', $order['id']) }}" class="flex flex-wrap items-end gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm" x-on:submit="if (! confirm(@js(__('manufacturing::ui.orders.confirm_cancel')))) $event.preventDefault()">
             @csrf
             <div class="min-w-64 flex-1">
                 <label for="cancel-reason" class="mb-1 block text-sm font-medium text-slate-700">{{ __('manufacturing::ui.orders.cancel_reason') }}</label>

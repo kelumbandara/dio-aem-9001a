@@ -135,14 +135,14 @@
                 <p class="mt-2 text-xs text-slate-500">{{ __('core::ui.appearance.preview_hint') }}</p>
             </section>
 
-            <form method="POST" action="{{ route('appearance.reset') }}" onsubmit="return confirm(@js(__('core::ui.appearance.reset_confirm')))">
+            <form method="POST" action="{{ route('appearance.reset') }}" x-on:submit="if (! confirm(@js(__('core::ui.appearance.reset_confirm')))) $event.preventDefault()">
                 @csrf
                 <x-core::button type="submit" variant="secondary">{{ __('core::ui.appearance.reset') }}</x-core::button>
             </form>
         </div>
     </div>
 
-    <script>
+    <script nonce="{{ Vite::cspNonce() }}">
         function appearanceForm(state, previewUrl) {
             return {
                 s: state, scoped: '', zoom: 1,

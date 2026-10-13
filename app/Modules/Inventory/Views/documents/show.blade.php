@@ -50,7 +50,7 @@
 
     @can('reverse', $model)
         @if ($doc['status'] === 'posted' && ! $doc['reverses'])
-            <form method="POST" action="{{ route('inventory.documents.reverse', $model) }}" class="mt-6 max-w-xl space-y-3 rounded-xl border border-slate-200 bg-white p-5 shadow-sm" onsubmit="return confirm('{{ __('inventory::ui.documents.reverse_confirm') }}')">
+            <form method="POST" action="{{ route('inventory.documents.reverse', $model) }}" class="mt-6 max-w-xl space-y-3 rounded-xl border border-slate-200 bg-white p-5 shadow-sm" x-on:submit="if (! confirm(@js(__('inventory::ui.documents.reverse_confirm')))) $event.preventDefault()">
                 @csrf
                 <h2 class="text-base font-semibold text-slate-900">{{ __('inventory::ui.documents.reverse') }}</h2>
                 <p class="text-sm text-slate-600">{{ __('inventory::ui.documents.reverse_hint') }}</p>

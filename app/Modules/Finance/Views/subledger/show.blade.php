@@ -46,7 +46,7 @@
     @endif
 
     @if ($canReverse && $s['status'] === 'posted')
-        <form method="POST" action="{{ route($r.'settlements.reverse', $model) }}" class="mt-6 max-w-xl space-y-3 rounded-xl border border-slate-200 bg-white p-5 shadow-sm" onsubmit="return confirm('{{ __('finance::ui.journals.reverse_confirm') }}')">
+        <form method="POST" action="{{ route($r.'settlements.reverse', $model) }}" class="mt-6 max-w-xl space-y-3 rounded-xl border border-slate-200 bg-white p-5 shadow-sm" x-on:submit="if (! confirm(@js(__('finance::ui.journals.reverse_confirm')))) $event.preventDefault()">
             @csrf
             <h2 class="text-base font-semibold text-slate-900">{{ __('finance::ui.sub.reverse') }}</h2>
             <p class="text-sm text-slate-600">{{ __('finance::ui.sub.reverse_hint') }}</p>

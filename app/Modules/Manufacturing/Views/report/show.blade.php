@@ -142,7 +142,7 @@
                             @if ($r['machine']) · {{ $r['machine'] }} @endif</td>
                         <td class="px-4 py-3 text-end">
                             @if ($canVoid)
-                                <form method="POST" action="{{ route('manufacturing.reports.void', $r['id']) }}" class="inline-flex items-center gap-1" onsubmit="return this.reason.value !== ''">
+                                <form method="POST" action="{{ route('manufacturing.reports.void', $r['id']) }}" class="inline-flex items-center gap-1" x-on:submit="if ($el.reason.value === '') $event.preventDefault()">
                                     @csrf <input name="reason" required maxlength="255" class="w-36 rounded-lg border-0 px-2 py-1 text-sm ring-1 ring-inset ring-slate-300" placeholder="{{ __('manufacturing::ui.report.void_reason') }}">
                                     <button class="text-sm text-red-600 hover:underline">{{ __('manufacturing::ui.report.void') }}</button>
                                 </form>

@@ -23,8 +23,31 @@ return [
         'dashboard' => 'Dashboard',
         'modules' => 'Modules',
         'company' => 'Company profile',
+        'users' => 'Users',
+        'password' => 'Change password',
         'appearance' => 'Appearance',
         'audit_log' => 'Audit log',
+    ],
+
+    'users' => [
+        'title' => 'Users', 'add' => 'Add a user', 'search' => 'Search name or e-mail', 'name' => 'Name', 'email' => 'E-mail', 'roles' => 'Roles',
+        'last_login' => 'Last sign-in', 'search_button' => 'Search', 'status' => 'Status', 'active' => 'Active', 'inactive' => 'Switched off', 'language' => 'Language',
+        'new_hint' => 'The person gets an e-mail with a link to choose their own password. Switching a person off ends their sign-ins at once.',
+        'created' => 'User created. A link to choose a password was sent to :email.', 'saved' => 'Saved.',
+        'security_hint' => 'Sign-in help for this person.', 'send_link' => 'E-mail a password link', 'link_sent' => 'If :email can sign in, a link was sent.',
+        'reset_mfa' => 'Reset authenticator', 'mfa_confirm' => 'Remove this person\'s authenticator? They will be signed out and must set it up again.',
+        'mfa_reset' => 'Authenticator removed and sign-ins ended.', 'mfa_on' => 'An authenticator is set up.', 'mfa_off' => 'No authenticator set up.',
+        'password_has_name' => 'The password must not contain the e-mail name.',
+    ],
+
+    'password' => [
+        'forgot_title' => 'Forgot your password?', 'forgot_hint' => 'Enter your e-mail address. If it belongs to an account, we send a link to choose a new password.',
+        'send_link' => 'Send the link', 'back_to_login' => 'Back to sign in', 'link_requested' => 'If that address belongs to an account, a link has been sent. It works once and for a limited time.',
+        'reset_title' => 'Choose a new password', 'reset_done' => 'Your password was changed. Sign in with the new one.',
+        'rules' => 'At least 12 characters, with a capital letter, a small letter and a number. Not your e-mail name.',
+        'new' => 'New password', 'confirm' => 'Repeat the new password', 'current' => 'Current password', 'save' => 'Save password',
+        'change_title' => 'Change password', 'change_hint' => 'Your other browsers and phones will be signed out.', 'changed' => 'Password changed.',
+        'forgot_link' => 'Forgot your password?',
     ],
 
     'company' => [

@@ -60,7 +60,7 @@
 <body>
 <div class="bar">
     <a href="{{ route('procurement.orders.show', $doc['id']) }}">&larr; {{ __('procurement::ui.common.back') }}</a>
-    <button type="button" onclick="window.print()">{{ __('procurement::ui.print.print') }}</button>
+    <button type="button" id="print-now">{{ __('procurement::ui.print.print') }}</button>
 </div>
 
 <main class="sheet">
@@ -136,5 +136,6 @@
         <div class="legal">{{ __('procurement::ui.print.computer_generated') }}</div>
     </footer>
 </main>
+<script nonce="{{ Vite::cspNonce() }}">document.getElementById('print-now').addEventListener('click', function () { window.print(); });</script>
 </body>
 </html>

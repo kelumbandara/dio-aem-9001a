@@ -153,7 +153,7 @@
         <p class="mt-1 text-xs">{{ __('manufacturing::ui.orders.variance_hint') }}</p>
     </section>
 @elseif ($running && $can['complete'])
-    <form method="POST" action="{{ route('manufacturing.orders.complete', $order['id']) }}" class="mb-6" onsubmit="return confirm(@js(__('manufacturing::ui.orders.confirm_complete')))">@csrf
+    <form method="POST" action="{{ route('manufacturing.orders.complete', $order['id']) }}" class="mb-6" x-on:submit="if (! confirm(@js(__('manufacturing::ui.orders.confirm_complete')))) $event.preventDefault()">@csrf
         <x-core::button type="submit" variant="secondary">{{ __('manufacturing::ui.orders.complete') }}</x-core::button>
         <span class="ms-2 text-xs text-slate-500">{{ __('manufacturing::ui.orders.complete_hint') }}</span>
     </form>

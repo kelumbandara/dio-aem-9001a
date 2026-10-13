@@ -62,8 +62,18 @@ return [
         'recovery_code_count' => 8,
     ],
 
+    'security' => [
+        // Strict-Transport-Security max-age on https answers (0 = off). One year once the site is fully on https.
+        'hsts_seconds' => (int) env('HSTS_SECONDS', 31536000),
+    ],
+
     'auth' => [
         'login_attempts_per_minute' => 5,
+        // An account is locked for a while after this many wrong passwords or codes, whatever address they come from.
+        // Reject passwords found in known breaches (needs outbound access to api.pwnedpasswords.com; fails open if unreachable).
+        'check_breached' => (bool) env('PASSWORD_CHECK_BREACHED', env('APP_ENV') === 'production'),
+        'lockout_attempts' => 10,
+        'lockout_minutes' => 15,
         'api_requests_per_minute' => 120,
     ],
 

@@ -65,7 +65,7 @@
 <body>
 <div class="bar">
     <a href="{{ route('sales.invoices.show', $doc['id']) }}">&larr; {{ __('sales::ui.common.back') }}</a>
-    <button type="button" onclick="window.print()">{{ __('sales::ui.print.print') }}</button>
+    <button type="button" id="print-now">{{ __('sales::ui.print.print') }}</button>
 </div>
 
 <main class="sheet">
@@ -166,5 +166,6 @@
         <div class="legal">{{ __('sales::ui.print.computer_generated') }}</div>
     </footer>
 </main>
+<script nonce="{{ Vite::cspNonce() }}">document.getElementById('print-now').addEventListener('click', function () { window.print(); });</script>
 </body>
 </html>

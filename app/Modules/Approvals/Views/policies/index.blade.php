@@ -32,7 +32,7 @@
                     <td class="px-4 py-3"><x-core::status-badge :tone="$p->is_active ? 'success' : 'neutral'">{{ $p->is_active ? __('core::ui.common.active') : __('core::ui.common.inactive') }}</x-core::status-badge></td>
                     <td class="px-4 py-3 text-end">
                         <a class="text-sm text-indigo-700 hover:underline" href="{{ route('approvals.policies.edit', $p) }}">{{ __('approvals::ui.policies.edit') }}</a>
-                        <form method="POST" action="{{ route('approvals.policies.destroy', $p) }}" class="ms-3 inline" onsubmit="return confirm('{{ __('approvals::ui.policies.confirm_delete') }}')">
+                        <form method="POST" action="{{ route('approvals.policies.destroy', $p) }}" class="ms-3 inline" x-on:submit="if (! confirm(@js(__('approvals::ui.policies.confirm_delete')))) $event.preventDefault()">
                             @csrf @method('DELETE')
                             <button type="submit" class="text-sm text-red-600 hover:underline">{{ __('approvals::ui.policies.delete') }}</button>
                         </form>
