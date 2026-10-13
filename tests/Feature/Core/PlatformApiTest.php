@@ -3,7 +3,11 @@
 use App\Modules\Core\Contracts\ModuleRegistry;
 use App\Modules\Core\Database\Seeders\DemoAdminSeeder;
 use App\Modules\Core\Database\Seeders\RolesAndPermissionsSeeder;
+use App\Modules\Core\Jobs\WorkerHeartbeat;
 use App\Modules\Core\Models\User;
+use App\Modules\Core\Services\Heartbeat;
+use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Role;
@@ -114,4 +118,56 @@ it('gives the accountant Finance in full, read access to what Finance reports on
         ->and($granted->contains('finance.period.lock'))->toBeTrue()->and($granted->contains('inventory.stock.view'))->toBeTrue()->and($granted->contains('masterdata.customer.view'))->toBeTrue()
         ->and($granted->contains('inventory.adjust'))->toBeFalse()->and($granted->contains('masterdata.item.manage'))->toBeFalse()
         ->and(config('core.mfa.required_roles'))->toContain('accountant');
+});
+
+describe('readiness and heartbeats', function () {
+    beforeEach(function () {
+        config(['core.health.require_heartbeats' => true, 'cache.default' => 'array']);
+        Cache::flush();
+    });
+
+    it('is ready right after a start, then needs both background processes to show life', function () {
+        $this->getJson('/api/v1/health/ready')->assertOk();                      // first look: forgiven
+        $this->travel(4)->minutes();
+        $this->getJson('/api/v1/health/ready')->assertOk();                      // still inside the 5 minutes
+        $this->travel(2)->minutes();
+        $this->getJson('/api/v1/health/ready')->assertStatus(503)->assertExactJson(['status' => 'unavailable']);   // nobody ever stamped
+    });
+
+    it('stays ready while the scheduler and the worker keep stamping, and names neither in the answer', function () {
+        $heartbeat = app(Heartbeat::class);
+        for ($i = 0; $i < 12; $i++) {
+            $heartbeat->stamp('scheduler');
+            (new WorkerHeartbeat)->handle($heartbeat);
+            $this->getJson('/api/v1/health/ready')->assertOk()->assertExactJson(['status' => 'ok']);
+            $this->travel(1)->minutes();
+        }
+    });
+
+    it('goes unavailable when only one of them stops, and recovers when it returns', function () {
+        $heartbeat = app(Heartbeat::class);
+        $heartbeat->stamp('scheduler');
+        $heartbeat->stamp('worker');
+        $this->travel(6)->minutes();
+        $heartbeat->stamp('scheduler');                                         // the worker stays silent
+        $this->getJson('/api/v1/health/ready')->assertStatus(503);
+        $heartbeat->stamp('worker');
+        $this->getJson('/api/v1/health/ready')->assertOk();
+    });
+
+    it('does not ask for heartbeats where they are switched off (development)', function () {
+        config(['core.health.require_heartbeats' => false]);
+        $this->travel(2)->hours();
+        $this->getJson('/api/v1/health/ready')->assertOk();
+    });
+
+    it('is unavailable when the database is not', function () {
+        DB::shouldReceive('select')->andThrow(new RuntimeException('connection refused: secret-host'));
+        $this->getJson('/api/v1/health/ready')->assertStatus(503)->assertExactJson(['status' => 'unavailable']);
+    });
+
+    it('schedules both heartbeats every minute', function () {
+        $events = collect(app(Schedule::class)->events())->map(fn ($e) => $e->description)->all();
+        expect($events)->toContain('heartbeat:scheduler')->toContain('heartbeat:worker');
+    });
 });

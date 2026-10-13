@@ -315,3 +315,48 @@ it('knows the active branches by code, for modules above Core', function () {
         ->and($directory->labels([$col->id, $old->id]))->toBe([$col->id => 'COL — Colombo', $old->id => 'OLD — Closed'])
         ->and($directory->active())->toHaveKey($col->id)->not->toHaveKey($old->id);
 });
+
+describe('listing parties for a form', function () {
+    it('does it in a fixed number of queries, however many parties there are, and gives the same answer as a single lookup', function () {
+        $terms = PaymentTerm::query()->first();
+        foreach (range(1, 40) as $i) {
+            app(SaveCustomer::class)(['name' => "Bulk customer {$i}", 'payment_terms_id' => $terms?->id]);
+            app(SaveSupplier::class)(['name' => "Bulk supplier {$i}"]);
+        }
+        $directory = app(PartyDirectory::class);
+
+        foreach (['customer', 'supplier'] as $side) {
+            DB::flushQueryLog();
+            DB::enableQueryLog();
+            $found = $directory->search($side, '', 500);
+            $queries = count(DB::getQueryLog());
+            DB::disableQueryLog();
+
+            expect($found)->toHaveCount(40)->and($queries)->toBeLessThanOrEqual(3);      // the parties, their currencies, their payment terms
+            $one = $side === 'customer' ? $directory->customer($found[7]->id) : $directory->supplier($found[7]->id);
+            expect($found[7])->toEqual($one);
+        }
+        expect($directory->search('customer', 'bulk customer 3', 500))->toHaveCount(11)       // 3, 30..39
+            ->and($directory->search('customer', '', 5))->toHaveCount(5);
+    });
+});
+
+describe('looking up many parties at once', function () {
+    it('returns them by id in two queries, leaves out ids that do not exist, and matches the one-by-one answer', function () {
+        $c = collect(range(1, 12))->map(fn ($i) => app(SaveCustomer::class)(['name' => "Many {$i}"]));
+        $s = collect(range(1, 12))->map(fn ($i) => app(SaveSupplier::class)(['name' => "Many S {$i}"]));
+        $directory = app(PartyDirectory::class);
+
+        DB::flushQueryLog();
+        DB::enableQueryLog();
+        $customers = $directory->customers([...$c->pluck('id')->all(), 999999, $c->first()->id]);
+        $suppliers = $directory->suppliers($s->pluck('id')->all());
+        $queries = count(DB::getQueryLog());
+        DB::disableQueryLog();
+
+        expect($customers)->toHaveCount(12)->and($suppliers)->toHaveCount(12)->and(array_key_exists(999999, $customers))->toBeFalse()
+            ->and($queries)->toBeLessThanOrEqual(6)
+            ->and($customers[$c[3]->id])->toEqual($directory->customer($c[3]->id))->and($suppliers[$s[5]->id])->toEqual($directory->supplier($s[5]->id))
+            ->and($directory->customers([]))->toBe([]);
+    });
+});

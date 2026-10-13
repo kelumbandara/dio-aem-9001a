@@ -62,9 +62,16 @@ return [
         'recovery_code_count' => 8,
     ],
 
+    'health' => [
+        // /api/v1/health/ready also reports "unavailable" when the scheduler or queue worker has not been seen for 5 minutes.
+        'require_heartbeats' => (bool) env('HEALTH_REQUIRE_HEARTBEATS', env('APP_ENV') === 'production'),
+    ],
+
     'security' => [
         // Strict-Transport-Security max-age on https answers (0 = off). One year once the site is fully on https.
         'hsts_seconds' => (int) env('HSTS_SECONDS', 31536000),
+        // Proxies whose X-Forwarded-* headers are believed: "*" (the proxy in front of the app), a comma-separated list, or empty (none).
+        'trusted_proxies' => env('TRUSTED_PROXIES', ''),
     ],
 
     'auth' => [

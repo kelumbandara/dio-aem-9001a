@@ -3,12 +3,14 @@
 use App\Modules\Core\Http\Middleware\AssignRequestContext;
 use App\Modules\Core\Http\Middleware\SecurityHeaders;
 use App\Modules\Core\Http\Middleware\SetLocale;
+use App\Modules\Core\Http\Middleware\TrustProxiesFromConfig;
 use App\Support\Exceptions\BusinessException;
 use App\Support\Http\ApiErrorRenderer;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -20,12 +22,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Behind Coolify/Traefik the app sees the proxy, not the visitor: TRUSTED_PROXIES ('*' = the proxy in front, which is the only way in)
-        // makes https, the host and the client address come from its headers (rate limits and the audit log need the real address).
-        $proxies = trim((string) env('TRUSTED_PROXIES', ''));
-        if ($proxies !== '') {
-            $middleware->trustProxies(at: $proxies === '*' ? '*' : array_map('trim', explode(',', $proxies)));
-        }
+        // Behind Coolify/Traefik the proxy's X-Forwarded-* headers are believed when TRUSTED_PROXIES says so (see the class).
+        $middleware->replace(TrustProxies::class, TrustProxiesFromConfig::class);
         $middleware->prepend(AssignRequestContext::class);
         $middleware->append(SecurityHeaders::class);
         $middleware->web(append: [SetLocale::class]);

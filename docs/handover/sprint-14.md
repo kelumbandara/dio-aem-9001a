@@ -58,7 +58,7 @@ Existing tests changed: tests that switch off Master Data/Approvals now also swi
 | 1 | WhatsApp: not bought yet, later | Nothing to do; the channel stays off until `.env` has the credentials |
 | 2 | SMTP: Gmail or Hostinger? | Advice given in the chat (see below); settings go in `.env` by you, never in chat |
 | 4 | Finance-approver approves sensitive messages | Already so |
-| 5 | Consent wording: "By submitting this form, you consent to receive order updates and account notifications via WhatsApp." | Shown on "My phone and e-mail" under the number box, and stored as the note on the consent record (test added) |
+| 5 | Consent wording: "By submitting this form, you consent to receive order updates and account notifications via WhatsApp." | Shown on "My phone and e-mail" under the number box and stored as the note on the consent record (test added). **Per channel (2026-10-13, owner's request):** WhatsApp uses the owner's sentence; e-mail has its own ("…notifications by e-mail."); only the sentence for the selected channel is shown |
 | 6 | No forwarding of notifications to WhatsApp | Not built, as before |
 | 7 | PO approvals from LKR 100,000 | Seeder, dev database and docs changed (before: 500,000): from LKR 100,000 a second approval by finance; tests added for 150,000 (two steps) and 59,000 (one step) |
 | 8 | Laravel Horizon | `laravel/horizon` installed, configured (3 tries), dashboard for the administrator only, snapshot scheduled. **Not run here:** Windows lacks the needed extensions, so Horizon itself is untested until a Linux run; the gate is tested |

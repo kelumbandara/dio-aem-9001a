@@ -20,7 +20,9 @@ it('only schedules commands that exist', function () {
     $registered = array_keys(Artisan::all());
 
     foreach (app(Schedule::class)->events() as $event) {
-        preg_match('/artisan[\'"]? (\S+)/', $event->command, $m);
+        if (! preg_match('/artisan[\'"]? (\S+)/', (string) $event->command, $m)) {
+            continue;      // a queued job or a closure (the heartbeats), not an artisan command
+        }
         expect($registered)->toContain(trim($m[1], "'\""));
     }
 });

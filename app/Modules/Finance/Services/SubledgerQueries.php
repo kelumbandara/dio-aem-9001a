@@ -162,9 +162,10 @@ final class SubledgerQueries
      */
     public function names(string $side, array $ids): array
     {
+        $parties = $side === OpenItem::RECEIVABLE ? $this->parties->customers($ids) : $this->parties->suppliers($ids);
         $out = [];
         foreach ($ids as $id) {
-            $p = $side === OpenItem::RECEIVABLE ? $this->parties->customer((int) $id) : $this->parties->supplier((int) $id);
+            $p = $parties[(int) $id] ?? null;
             $out[(int) $id] = $p !== null ? "{$p->code} — {$p->name}" : '?';
         }
 

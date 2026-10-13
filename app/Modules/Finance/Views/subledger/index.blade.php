@@ -29,7 +29,7 @@
             @forelse ($ageing['rows'] as $row)
                 <tr>
                     <td class="px-4 py-2"><a href="{{ route($r.'ledger', explode(' — ', $row['party'])[0]) }}" class="text-indigo-600 hover:underline">{{ $row['party'] }}</a></td>
-                    @foreach (['current', 'd1_30', 'd31_60', 'd61_90', 'd90_plus', 'total'] as $b) <td class="px-4 py-2 text-end"><x-core::money :value="$row[$b]" /></td> @endforeach
+                    @foreach (['current', 'd1_30', 'd31_60', 'd61_90', 'd90_plus', 'total'] as $b) <td class="px-4 py-2 text-end">{!! \App\Support\MoneyText::cell($row[$b]) !!}</td> @endforeach
                 </tr>
             @empty
                 <tr><td colspan="7" class="px-4 py-6 text-center text-slate-500">{{ __('finance::ui.sub.nothing_owed') }}</td></tr>

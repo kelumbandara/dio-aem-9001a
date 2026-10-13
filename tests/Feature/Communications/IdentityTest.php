@@ -175,6 +175,7 @@ describe('linking an e-mail address', function () {
         expect($mail->getTo()[0]->getAddress())->toBe('me@company.test');
         preg_match('/\b(\d{6})\b/', $mail->getTextBody(), $m);
         $identity = $this->svc->confirm($this->user->id, 'email', $m[1]);
-        expect($identity->address)->toBe('me@company.test')->and(app(ConsentService::class)->status('email', 'me@company.test'))->toBe('opted_in');
+        expect($identity->address)->toBe('me@company.test')->and(app(ConsentService::class)->status('email', 'me@company.test'))->toBe('opted_in')
+            ->and(Consent::where('source', 'identity_link')->value('note'))->toContain('notifications by e-mail')->and(Consent::where('source', 'identity_link')->value('note'))->not->toContain('WhatsApp');
     });
 });

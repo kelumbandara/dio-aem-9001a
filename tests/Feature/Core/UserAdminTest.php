@@ -214,3 +214,29 @@ describe('changing your own password', function () {
 it('has the new permissions for the administrator role and not for others', function () {
     expect(Role::findByName('admin')->hasPermissionTo('core.user.manage'))->toBeTrue()->and(Role::findByName('sales')->hasPermissionTo('core.user.manage'))->toBeFalse();
 });
+
+describe('the first administrator of a new installation', function () {
+    it('is created without a password, and must choose one through a one-time link', function () {
+        $this->artisan('app:create-admin', ['email' => 'Owner@Company.LK', 'name' => 'The Owner', '--print-link' => true])->assertSuccessful()->expectsOutputToContain('/reset-password/');
+        $owner = User::where('email', 'owner@company.lk')->firstOrFail();
+        expect($owner->hasRole('admin'))->toBeTrue()->and($owner->is_active)->toBeTrue()->and(DB::table('audit_logs')->where('event', 'user.created_by_console')->exists())->toBeTrue();
+        expect(fn () => app(AuthenticateUser::class)('owner@company.lk', ''))->toThrow(BusinessException::class);
+
+        // the link works once
+        $token = Password::broker()->createToken($owner);
+        $this->post('/reset-password', ['token' => $token, 'email' => $owner->email, 'password' => 'Brand-New-Pass-77', 'password_confirmation' => 'Brand-New-Pass-77'])->assertRedirect('/login');
+        expect(Hash::check('Brand-New-Pass-77', $owner->refresh()->password))->toBeTrue();
+    });
+
+    it('mails the link by default', function () {
+        $this->artisan('app:create-admin', ['email' => 'owner@company.lk', 'name' => 'The Owner'])->assertSuccessful();
+        Notification::assertSentTo(User::where('email', 'owner@company.lk')->first(), ResetPassword::class);
+    });
+
+    it('refuses a duplicate, a bad address and an unknown role, and creates nothing', function () {
+        $this->artisan('app:create-admin', ['email' => $this->admin->email, 'name' => 'X'])->assertFailed();
+        $this->artisan('app:create-admin', ['email' => 'not-an-email', 'name' => 'X'])->assertFailed();
+        $this->artisan('app:create-admin', ['email' => 'x@company.lk', 'name' => 'X', '--role' => 'accountant'])->assertFailed();
+        expect(User::where('email', 'x@company.lk')->exists())->toBeFalse();
+    });
+});

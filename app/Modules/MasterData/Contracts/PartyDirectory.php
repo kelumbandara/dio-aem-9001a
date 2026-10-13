@@ -12,6 +12,20 @@ interface PartyDirectory
 
     public function supplier(int $supplierId): ?PartyInfo;
 
+    /**
+     * Many customers / suppliers in one go (for lists: one lookup per row would make a page slower with every row it shows).
+     *
+     * @param  list<int>  $ids
+     * @return array<int, PartyInfo> by id; ids that do not exist are left out
+     */
+    public function customers(array $ids): array;
+
+    /**
+     * @param  list<int>  $ids
+     * @return array<int, PartyInfo>
+     */
+    public function suppliers(array $ids): array;
+
     /** By code (CUS-00001), case-insensitive; for screens and APIs that refer to parties by code. */
     public function customerByCode(string $code): ?PartyInfo;
 

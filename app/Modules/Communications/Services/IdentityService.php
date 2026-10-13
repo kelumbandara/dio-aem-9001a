@@ -106,7 +106,7 @@ final class IdentityService
 
             $c->forceFill(['consumed_at' => now()])->save();
             $identity = Identity::query()->create(['user_id' => $userId, 'channel' => $channel, 'address' => $c->address, 'verified_at' => now()]);
-            $this->consents->record($channel, $c->address, 'opted_in', 'identity_link', __('communications::ui.channels.consent', [], 'en').' (linked and verified by the user)', $userId, 'user', $userId);
+            $this->consents->record($channel, $c->address, 'opted_in', 'identity_link', __('communications::ui.channels.consent.'.$channel, [], 'en').' (linked and verified by the user)', $userId, 'user', $userId);
             $this->audit->record('comm.identity_linked', $identity, [], ['channel' => $channel, 'address' => Address::mask($channel, $c->address)]);
 
             return $identity;

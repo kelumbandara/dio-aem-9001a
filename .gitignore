@@ -25,3 +25,8 @@ Thumbs.db
 .env.*
 !.env.example
 /storage/*.key
+
+/deploy/trial.env
+/deploy/production.env
+/storage/drill/
+/storage/perf-*.txt

@@ -2,7 +2,9 @@
 
 namespace App\Modules\Core;
 
+use App\Modules\Core\Console\CreateAdmin;
 use App\Modules\Core\Console\MaintainAuditLog;
+use App\Modules\Core\Console\PreflightCheck;
 use App\Modules\Core\Console\PruneIdempotencyKeys;
 use App\Modules\Core\Console\PurgeAttachments;
 use App\Modules\Core\Console\RelayOutbox;
@@ -125,6 +127,8 @@ class CoreServiceProvider extends ModuleServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 PruneIdempotencyKeys::class,
+                PreflightCheck::class,
+                CreateAdmin::class,
                 MaintainAuditLog::class,
                 RelayOutbox::class,
                 PurgeAttachments::class,

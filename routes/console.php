@@ -1,5 +1,7 @@
 <?php
 
+use App\Modules\Core\Jobs\WorkerHeartbeat;
+use App\Modules\Core\Services\Heartbeat;
 use Illuminate\Support\Facades\Schedule;
 
 // Run by `php artisan schedule:work` (dev) or the scheduler container (production).
@@ -8,3 +10,7 @@ Schedule::command('idempotency:prune')->daily();
 Schedule::command('audit:maintain')->dailyAt('02:00');
 Schedule::command('attachments:purge')->dailyAt('02:30');
 Schedule::command('horizon:snapshot')->everyFiveMinutes();
+
+// Proof of life, read by /api/v1/health/ready (a dead worker or scheduler is otherwise silent).
+Schedule::call(fn () => app(Heartbeat::class)->stamp('scheduler'))->name('heartbeat:scheduler')->everyMinute();
+Schedule::job(new WorkerHeartbeat)->name('heartbeat:worker')->everyMinute();

@@ -46,35 +46,31 @@ it as another container with the `clamav/clamav` image). Files are streamed to t
 and audited; if the daemon cannot be reached the upload is refused (503, "virus scan not available") instead of being
 stored unscanned. With it off, scans are recorded as "skipped".
 
-## 3. Build and release
+## 3. Build and release (as built in Sprint 15)
 
-- Multi-stage Dockerfile (composer install --no-dev, Vite build, opcache, non-root user).
-- GitHub Actions: lint (Pint), static analysis (Larastan), tests (Pest, PG service), architecture
-  tests, composer/npm audit, build image, push to registry. Release tag → Coolify deploy webhook
-  (manual approval for production; **no automatic production deploys**).
-- Migration strategy: `php artisan migrate --force` on deploy as a pre-start step; expand/contract
-  for breaking schema changes; destructive migrations require explicit approval.
-- Rollback: redeploy previous image tag; DB rollback only via restoring backup or compensating
-  migration (down migrations are not trusted in prod). Take a backup before each migration.
+- **One image, four roles.** `Dockerfile` (root): Node stage builds the Vite assets, a PHP stage installs Composer packages without dev packages, the runtime stage is `php:8.3-fpm-alpine` with nginx, supervisor, opcache, `pdo_pgsql`, `bcmath`, `intl`, `gd`, `zip`, `pcntl`, `posix`; runs as `www-data`, no `.env` in the image, ~310 MB. `docker/entrypoint.sh <role>`: `web` (nginx + php-fpm, :8080), `worker` (Horizon), `scheduler` (`schedule:work`), `migrate` (one-shot), `artisan …`.
+- **Fail fast.** Every role first runs `php artisan app:preflight`; a production deployment with debug on, no APP_KEY, http APP_URL, insecure cookies, a non-Redis queue/cache, a mail driver that sends nowhere, a remote database without SSL, no HSTS, no declared proxy, or licensing switched off **does not start**. It names the setting, never the value. Weaker-but-working settings (local file storage, no virus scan, no breach check) only warn. The migrate role tolerates pending migrations; a brand-new database is handled.
+- **Reference stack** `deploy/compose.production.yaml` (+ `deploy/production.env.example`): web, worker, scheduler, migrate, postgres 16, redis 7 with password, clamav, backup sidecar. The same pieces are created as Coolify resources.
+- GitHub Actions (`.github/workflows/ci.yml`): Pint, Larastan, all tests with a PostgreSQL service, composer audit; a second job builds the production image, checks it is non-root, caches routes, and that an unsafe configuration refuses to start. Release tag → image → Coolify deploy **started by a person** (no automatic production deploys).
+- Migration strategy: the `migrate` role runs `php artisan migrate --force` before `web`/`worker`/`scheduler` start (compose `depends_on: service_completed_successfully`); additive changes; destructive migrations need the owner's explicit approval.
+- Rollback: redeploy the previous image tag; the database only by restoring a backup (down-migrations are not trusted in production). **Back up before every deploy.** Steps: [runbooks/deploy.md](../runbooks/deploy.md).
 
-## 4. Backup and restore
+## 4. Backup and restore (as built in Sprint 15)
 
-- Nightly `pg_dump` (+ WAL archiving where available) to external object storage, encrypted,
-  retention e.g. 7 daily / 4 weekly / 12 monthly. Attachments bucket versioned/replicated.
-- Restore runbook in `docs/runbooks/restore.md` (written in Sprint 0/1) and a **restore drill
-  on a staging copy before any go-live**; record date/result.
-- No production go-live without verified backup + rollback.
+- `docker/backup`: nightly (01:00 Sri Lanka time) `pg_dump` custom format → AES-256 (`BACKUP_PASSPHRASE`) → file + SHA-256 → optional S3-compatible copy; retention 7 daily, then about one a week to 4 weeks, one a month to 12 months. `restore.sh` verifies checksum and passphrase before touching anything, refuses to overwrite, removes a half-restored database.
+- Attachments: object storage with bucket versioning (provider setting). Redis is not backed up (queues and caches only; the event outbox is in PostgreSQL).
+- Runbook and the drill record: [runbooks/backup-restore.md](../runbooks/backup-restore.md). **No go-live without a restored-and-checked backup**; the drill is repeated every quarter.
 
-## 5. Health and monitoring
+## 5. Health and monitoring (as built in Sprint 15)
 
-`/health/live` (process), `/health/ready` (DB, Redis, storage, queue lag) — no secrets in output.
-Horizon dashboard (admin + MFA, once installed), failed-job alerts, Sentry-compatible error tracking, uptime
-checks, disk/DB size alerts, AI cost alerts.
+- `GET /up` (process) and `GET /api/v1/health` (live): always 200 while the process answers.
+- `GET /api/v1/health/ready`: 503 `{"status":"unavailable"}` when PostgreSQL or Redis does not answer, or — in production — when the **scheduler** or the **queue worker** has shown no sign of life for 5 minutes (each stamps a heartbeat every minute). The answer never says which; the log line does. Point the uptime monitor at it.
+- Horizon dashboard `/horizon` for the administrator (`core.module.manage`; Horizon only runs on Linux). Not built: Sentry-compatible error tracking, disk/DB size alerts, AI cost alerts (the in-app AI budgets exist); the vendor sets these up with the hosting provider.
+- Operations guide: [runbooks/incident.md](../runbooks/incident.md).
 
 ## 6. Environments
 
-local → CI → staging (per customer optional) → production. `.env.example` documents every
-variable; production config validated at boot (fail fast).
+local → CI → staging (per customer optional) → production. `.env.example` documents every local variable and `deploy/production.env.example` every production variable; the production configuration is validated at start by `app:preflight` (fail fast).
 
 ## 7. Git
 

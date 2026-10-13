@@ -28,18 +28,19 @@
             </form>
         @endif
 
-        <form method="POST" action="{{ route('comm.channels.start') }}" class="space-y-3 rounded-xl border border-slate-200 bg-white p-4">
+        <form method="POST" action="{{ route('comm.channels.start') }}" class="space-y-3 rounded-xl border border-slate-200 bg-white p-4" x-data="{ channel: @js(old('channel') === 'email' ? 'email' : 'whatsapp') }">
             @csrf
             <p class="text-sm font-medium">{{ __('communications::ui.channels.add') }}</p>
             <div class="grid grid-cols-3 gap-3">
-                <select name="channel" class="{{ $field }}" aria-label="{{ __('communications::ui.messages.channel') }}">@foreach (['whatsapp', 'email'] as $c) <option value="{{ $c }}" @selected(old('channel') === $c)>{{ __('communications::ui.channel.'.$c) }}</option> @endforeach</select>
+                <select name="channel" x-model="channel" class="{{ $field }}" aria-label="{{ __('communications::ui.messages.channel') }}">@foreach (['whatsapp', 'email'] as $c) <option value="{{ $c }}" @selected(old('channel') === $c)>{{ __('communications::ui.channel.'.$c) }}</option> @endforeach</select>
                 <input name="address" value="{{ old('address') }}" class="{{ $field }} col-span-2" placeholder="{{ __('communications::ui.channels.placeholder') }}" aria-label="{{ __('communications::ui.consents.address') }}" required>
             </div>
             @error('address') <p class="text-sm text-red-700" role="alert">{{ $message }}</p> @enderror
             @error('form') <p class="text-sm text-red-700" role="alert">{{ $message }}</p> @enderror
             @error('channel') <p class="text-sm text-red-700" role="alert">{{ $message }}</p> @enderror
             @error('template') <p class="text-sm text-red-700" role="alert">{{ $message }}</p> @enderror
-            <p class="text-xs text-slate-600">{{ __('communications::ui.channels.consent') }}</p>
+            <p class="text-xs text-slate-600" x-show="channel === 'whatsapp'">{{ __('communications::ui.channels.consent.whatsapp') }}</p>
+            <p class="text-xs text-slate-600" x-show="channel === 'email'" x-cloak>{{ __('communications::ui.channels.consent.email') }}</p>
             <x-core::button type="submit">{{ __('communications::ui.channels.send_code') }}</x-core::button>
         </form>
     </div>

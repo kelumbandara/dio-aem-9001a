@@ -1,0 +1,113 @@
+# Reference production stack for ONE customer (docs/runbooks/deploy.md). On Coolify the same services are created as
+# separate resources of one project (or this file is deployed as a "Docker Compose" resource); every value comes from
+# Coolify's secret store, never from a file in the repository.
+#
+# Local trial of the whole stack (no TLS here: send  -H "X-Forwarded-Proto: https"  to mimic the proxy):
+#   docker compose -f deploy/compose.production.yaml --env-file deploy/trial.env up -d
+#
+# Roles of the one application image: web (nginx + php-fpm), worker (Horizon), scheduler (schedule:work), migrate (one-shot).
+name: dio-erp
+
+x-app: &app
+  image: ${APP_IMAGE:?set APP_IMAGE (e.g. registry.example.com/dio-erp:2026.10.1)}
+  env_file: ${APP_ENV_FILE:-production.env}
+  restart: unless-stopped
+  depends_on:
+    postgres: { condition: service_healthy }
+    redis: { condition: service_healthy }
+
+services:
+  web:
+    <<: *app
+    command: ["web"]
+    ports: ["${WEB_PORT:-8080}:8080"]          # on Coolify the proxy (Traefik) reaches port 8080; nothing is published
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+
+  worker:
+    <<: *app
+    command: ["worker"]
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+
+  scheduler:
+    <<: *app
+    command: ["scheduler"]
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+
+  # Runs once per deploy, before web/worker/scheduler start. TAKE A BACKUP FIRST (docs/runbooks/deploy.md step 2).
+  migrate:
+    <<: *app
+    command: ["migrate"]
+    restart: "no"
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:?}
+      POSTGRES_USER: ${DB_USERNAME:?}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?}
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["sh", "-c", "exec redis-server --requirepass \"$$REDIS_PASSWORD\" --appendonly yes"]
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?}
+    volumes: ["redisdata:/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" --no-auth-warning ping | grep -q PONG"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # Virus scan of uploaded files (CLAMAV_ENABLED=true, CLAMAV_HOST=clamav). Takes a minute or two to load its signatures.
+  clamav:
+    image: clamav/clamav:1.4
+    restart: unless-stopped
+    volumes: ["clamdata:/var/lib/clamav"]
+    healthcheck:
+      test: ["CMD", "clamdcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+
+  # Nightly encrypted database backup (docs/runbooks/backup-restore.md). Build:  docker build -f docker/backup/Dockerfile -t dio-erp-backup .
+  backup:
+    image: ${BACKUP_IMAGE:-dio-erp-backup}
+    restart: unless-stopped
+    environment:
+      PGHOST: postgres
+      PGUSER: ${DB_USERNAME:?}
+      PGPASSWORD: ${DB_PASSWORD:?}
+      PGDATABASE: ${DB_DATABASE:?}
+      BACKUP_PASSPHRASE: ${BACKUP_PASSPHRASE:?}
+      BACKUP_S3_URI: ${BACKUP_S3_URI:-}
+      BACKUP_S3_ENDPOINT: ${BACKUP_S3_ENDPOINT:-}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-us-east-1}
+    volumes: ["backups:/backups"]
+    depends_on:
+      postgres: { condition: service_healthy }
+
+volumes:
+  pgdata:
+  redisdata:
+  clamdata:
+  backups:

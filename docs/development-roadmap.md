@@ -34,7 +34,7 @@ bank reconciliation import, Maintenance module, pgvector RAG.
 | **S12 AI Agents** (done, pending review: [handover](handover/sprint-12.md)) | 7 department agents (Maintenance/HR/Customer-service wait for their modules and channels), lookups, draft quotation and purchase order, safety suite; approvals integration deliberately not needed (the assistant never submits) |
 | **S13 Mobile** (done, pending review: [handover](handover/sprint-13.md)) | Expo/React Native app: sign-in with MFA, approvals, production output and downtime (works offline), inspection, stock, AI assistant, notifications and push; server additions for devices, shift and settings |
 | **S14 Communications** ✅ | Email, WhatsApp, templates, consent, identity linking (built; awaiting owner review) |
-| **S15 Hardening & Release** | Security review, performance, backup/restore drill, Coolify runbooks, pilot |
+| **S15 Hardening & Release** (done, pending review: [handover](handover/sprint-15.md)) | Security review and fixes, user administration, production image, preflight, Horizon + ClamAV verified on Linux, backup/restore drill, performance at volume, runbooks, pilot plan |
 | **Post-MVP** | IoT phases, voice, etc. |
 
 ### Added by ADR-0005 (internal-first, replace existing tools)

@@ -16,18 +16,52 @@ final class DatabasePartyDirectory implements PartyDirectory
     {
         $customer = Customer::query()->with(['currency', 'paymentTerms'])->find($customerId);
 
-        return $customer === null ? null : new PartyInfo(
-            $customer->id, $customer->public_id, $customer->code, $customer->name, $customer->kind, $customer->tax_id,
-            $customer->currency_id, $customer->currency?->code, $customer->paymentTerms?->days,
-            $customer->credit_limit, $customer->price_list_id, $customer->is_active,
-        );
+        return $customer === null ? null : $this->customerInfo($customer);
     }
 
     public function supplier(int $supplierId): ?PartyInfo
     {
         $supplier = Supplier::query()->with(['currency', 'paymentTerms'])->find($supplierId);
 
-        return $supplier === null ? null : new PartyInfo(
+        return $supplier === null ? null : $this->supplierInfo($supplier);
+    }
+
+    public function customers(array $ids): array
+    {
+        $out = [];
+        foreach (array_chunk(array_values(array_unique(array_map('intval', $ids))), 1000) as $chunk) {
+            foreach (Customer::query()->with(['currency', 'paymentTerms'])->whereIn('id', $chunk)->get() as $customer) {
+                $out[$customer->id] = $this->customerInfo($customer);
+            }
+        }
+
+        return $out;
+    }
+
+    public function suppliers(array $ids): array
+    {
+        $out = [];
+        foreach (array_chunk(array_values(array_unique(array_map('intval', $ids))), 1000) as $chunk) {
+            foreach (Supplier::query()->with(['currency', 'paymentTerms'])->whereIn('id', $chunk)->get() as $supplier) {
+                $out[$supplier->id] = $this->supplierInfo($supplier);
+            }
+        }
+
+        return $out;
+    }
+
+    private function customerInfo(Customer $customer): PartyInfo
+    {
+        return new PartyInfo(
+            $customer->id, $customer->public_id, $customer->code, $customer->name, $customer->kind, $customer->tax_id,
+            $customer->currency_id, $customer->currency?->code, $customer->paymentTerms?->days,
+            $customer->credit_limit, $customer->price_list_id, $customer->is_active,
+        );
+    }
+
+    private function supplierInfo(Supplier $supplier): PartyInfo
+    {
+        return new PartyInfo(
             $supplier->id, $supplier->public_id, $supplier->code, $supplier->name, $supplier->kind, $supplier->tax_id,
             $supplier->currency_id, $supplier->currency?->code, $supplier->paymentTerms?->days,
             null, $supplier->price_list_id, $supplier->is_active,
@@ -50,11 +84,17 @@ final class DatabasePartyDirectory implements PartyDirectory
 
     public function search(string $side, string $term, int $limit = 50): array
     {
-        $model = $side === 'payable' || $side === 'supplier' ? Supplier::class : Customer::class;
         $like = '%'.str_replace(['%', '_'], ['\%', '\_'], mb_strtolower(trim($term))).'%';
-        $ids = $model::query()->where(fn ($q) => $q->whereRaw('lower(code) like ?', [$like])->orWhereRaw('lower(name) like ?', [$like]))->orderBy('code')->limit($limit)->pluck('id');
+        $match = fn ($q) => $q->whereRaw('lower(code) like ?', [$like])->orWhereRaw('lower(name) like ?', [$like]);
+        // One query with the currency and payment terms loaded together (not one lookup per party: a form listing 500 customers
+        // used to make 500 queries).
+        if ($side === 'payable' || $side === 'supplier') {
+            return Supplier::query()->with(['currency', 'paymentTerms'])->where($match)->orderBy('code')->limit($limit)->get()
+                ->map(fn (Supplier $s) => $this->supplierInfo($s))->values()->all();
+        }
 
-        return $ids->map(fn ($id) => $model === Supplier::class ? $this->supplier((int) $id) : $this->customer((int) $id))->filter()->values()->all();
+        return Customer::query()->with(['currency', 'paymentTerms'])->where($match)->orderBy('code')->limit($limit)->get()
+            ->map(fn (Customer $c) => $this->customerInfo($c))->values()->all();
     }
 
     public function contact(string $side, int $partyId): array

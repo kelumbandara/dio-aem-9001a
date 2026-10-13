@@ -6,6 +6,7 @@ use App\Support\Exceptions\BusinessException;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Vite;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpFoundation\Request;
 
 describe('browser protections', function () {
     it('sends the protective headers on every kind of answer, with a nonce that matches the page', function () {
@@ -34,6 +35,18 @@ describe('browser protections', function () {
         config(['core.security.hsts_seconds' => 0]);
         $this->withServerVariables(['HTTPS' => 'on'])->get('https://localhost/login')->assertHeaderMissing('Strict-Transport-Security');
     });
+
+    it('believes a proxy saying "this was https" only when that proxy is trusted', function (string $setting, bool $believed) {
+        Request::setTrustedProxies([], 0);       // the framework keeps this in a static: start clean
+        config(['core.security.trusted_proxies' => $setting]);
+        $response = $this->get('/login', ['X-Forwarded-Proto' => 'https']);
+        $believed ? $response->assertHeader('Strict-Transport-Security') : $response->assertHeaderMissing('Strict-Transport-Security');
+    })->with([
+        'nobody is trusted: anyone could send that header' => ['', false],
+        'the proxy in front (*)' => ['*', true],
+        'a list that does not include the caller' => ['10.0.0.0/8, 192.168.0.1', false],
+        'a list that includes the caller' => ['127.0.0.1, 10.0.0.0/8', true],
+    ]);
 
     it('has no inline event handlers and no un-nonced inline scripts in any screen (the policy would silently block them)', function () {
         $bad = [];
@@ -98,6 +111,13 @@ describe('account lockout', function () {
             }
         }
         expect(($this->login)('Right-Password-1')->id)->toBe($this->user->id);       // 2 mistakes then success: counter cleared
+        for ($i = 0; $i < 2; $i++) {                                                  // 2 more mistakes would make 4 if nothing had been cleared (limit 3)
+            try {
+                ($this->login)('wrong');
+            } catch (BusinessException) {
+            }
+        }
+        expect(($this->login)('Right-Password-1')->id)->toBe($this->user->id);
         for ($i = 0; $i < 3; $i++) {
             try {
                 ($this->login)('wrong');

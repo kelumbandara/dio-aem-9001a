@@ -108,7 +108,7 @@ final class SaveUser
     {
         sort($names);
 
-        return array_values($names);
+        return $names;
     }
 
     private function sendLink(User $user): void
