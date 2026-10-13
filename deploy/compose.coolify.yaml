@@ -2,6 +2,10 @@
 # (Dockerfile at the root, docker/backup/Dockerfile for the backup sidecar) and asks for every ${VARIABLE} below on its
 # "Environment variables" screen: nothing secret is in this file or anywhere in the repository.
 #
+# Required settings are NOT marked with `:?` here: Coolify resolves this file at BUILD time, where runtime-only secrets (which we
+# deliberately keep out of image builds) are not available. A missing value is caught at start instead: `app:preflight` refuses
+# to run without APP_KEY/APP_URL and PostgreSQL refuses an empty password.
+#
 # Differences from deploy/compose.production.yaml (the local reference): images are built here, settings come from Coolify's
 # screen instead of an env file, and the web service gets its address (domain + HTTPS certificate) from Coolify.
 name: dio-erp
@@ -18,8 +22,8 @@ x-app: &app
     APP_NAME: ${APP_NAME:-DIO ERP}
     APP_ENV: production
     APP_DEBUG: "false"
-    APP_KEY: "${APP_KEY:?generate with docker run --rm IMAGE artisan key:generate --show}"
-    APP_URL: "${APP_URL:?https address of the site, for example https://erp.dio.lk}"
+    APP_KEY: ${APP_KEY:-}
+    APP_URL: ${APP_URL:-}
     LOG_CHANNEL: stderr
     LOG_LEVEL: ${LOG_LEVEL:-warning}
     TRUSTED_PROXIES: ${TRUSTED_PROXIES:-*}
@@ -29,12 +33,12 @@ x-app: &app
     DB_PORT: "5432"
     DB_DATABASE: ${DB_DATABASE:-dio_erp}
     DB_USERNAME: ${DB_USERNAME:-dio_erp}
-    DB_PASSWORD: ${DB_PASSWORD:?}
+    DB_PASSWORD: ${DB_PASSWORD:-}
     DB_SSLMODE: prefer
     REDIS_CLIENT: predis
     REDIS_HOST: redis
     REDIS_PORT: "6379"
-    REDIS_PASSWORD: ${REDIS_PASSWORD:?}
+    REDIS_PASSWORD: ${REDIS_PASSWORD:-}
     QUEUE_CONNECTION: redis
     CACHE_STORE: redis
     SESSION_DRIVER: database
@@ -114,7 +118,7 @@ services:
     environment:
       POSTGRES_DB: ${DB_DATABASE:-dio_erp}
       POSTGRES_USER: ${DB_USERNAME:-dio_erp}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:?}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-}
     volumes: ["pgdata:/var/lib/postgresql/data"]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
@@ -127,7 +131,7 @@ services:
     restart: unless-stopped
     command: ["sh", "-c", "exec redis-server --requirepass \"$$REDIS_PASSWORD\" --appendonly yes --maxmemory 256mb --maxmemory-policy noeviction"]
     environment:
-      REDIS_PASSWORD: ${REDIS_PASSWORD:?}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
     volumes: ["redisdata:/data"]
     healthcheck:
       test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" --no-auth-warning ping | grep -q PONG"]
@@ -157,9 +161,9 @@ services:
     environment:
       PGHOST: postgres
       PGUSER: ${DB_USERNAME:-dio_erp}
-      PGPASSWORD: ${DB_PASSWORD:?}
+      PGPASSWORD: ${DB_PASSWORD:-}
       PGDATABASE: ${DB_DATABASE:-dio_erp}
-      BACKUP_PASSPHRASE: "${BACKUP_PASSPHRASE:?keep a copy outside the server}"
+      BACKUP_PASSPHRASE: ${BACKUP_PASSPHRASE:-}
       BACKUP_S3_URI: ${BACKUP_S3_URI:-}
       BACKUP_S3_ENDPOINT: ${BACKUP_S3_ENDPOINT:-}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
