@@ -1,6 +1,7 @@
 # CLAUDE.md — DIO AI ERP + MES
 
 Read `docs/architecture/overview.md` and `docs/brief/original-brief.md` before changing anything.
+**Current state, owner decisions, live-server facts, lessons and how to resume from a copied folder: `docs/handover/project-state.md` (read it first).**
 
 ## Non-negotiables
 - Modular monolith in `app/Modules/*`; respect dependency direction in `docs/architecture/modules.md`.

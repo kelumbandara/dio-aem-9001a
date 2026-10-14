@@ -35,6 +35,7 @@ bank reconciliation import, Maintenance module, pgvector RAG.
 | **S13 Mobile** (done, pending review: [handover](handover/sprint-13.md)) | Expo/React Native app: sign-in with MFA, approvals, production output and downtime (works offline), inspection, stock, AI assistant, notifications and push; server additions for devices, shift and settings |
 | **S14 Communications** ✅ | Email, WhatsApp, templates, consent, identity linking (built; awaiting owner review) |
 | **S15 Hardening & Release** (done, pending review: [handover](handover/sprint-15.md)) | Security review and fixes, user administration, production image, preflight, Horizon + ClamAV verified on Linux, backup/restore drill, performance at volume, runbooks, pilot plan |
+| **Ops: live server, backups, restore** (done 2026-10-14: [state](handover/project-state.md)) | Coolify server rehearsal on `mes.dio.lk` (renamed from `erp.dio.lk`), sample data loaded through the services, downloadable weekly database copies (Monday 08:00), Restore for the super-admin (safety copy, scratch load, name swap, undo), mail-refusal fix; tested on the real server |
 | **Post-MVP** | IoT phases, voice, etc. |
 
 ### Added by ADR-0005 (internal-first, replace existing tools)

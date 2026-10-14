@@ -86,7 +86,7 @@ it('lets a super admin through every permission check', function () {
 
 it('gives the admin role every declared permission except the vendor-only ones, and the plain user role none', function () {
     $admin = Role::findByName('admin', 'web');
-    $declared = array_values(array_diff(app(ModuleRegistry::class)->permissions(onlyEnabled: false), ['core.appearance.vendor']));   // held by nobody: only the super-admin passes
+    $declared = array_values(array_diff(app(ModuleRegistry::class)->permissions(onlyEnabled: false), ['core.appearance.vendor', 'core.backup.restore']));   // held by nobody: only the super-admin passes
 
     expect($admin->permissions->pluck('name')->sort()->values()->all())->toBe(collect($declared)->sort()->values()->all())
         ->and(Role::findByName('user', 'web')->permissions)->toHaveCount(0);
