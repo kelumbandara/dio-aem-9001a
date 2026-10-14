@@ -18,7 +18,7 @@ RUN npm run build
 
 FROM php:8.3-fpm-alpine AS base
 # Extensions the product needs: PostgreSQL, bcmath (money), intl, gd + zip (documents, logos), pcntl/posix (Horizon), opcache.
-RUN apk add --no-cache icu-libs libpq libzip libpng libjpeg-turbo freetype nginx supervisor curl tini \
+RUN apk add --no-cache icu-libs libpq libzip libpng libjpeg-turbo freetype nginx supervisor curl tini postgresql-client \
  && apk add --no-cache --virtual .build-deps $PHPIZE_DEPS icu-dev postgresql-dev libzip-dev libpng-dev libjpeg-turbo-dev freetype-dev \
  && docker-php-ext-configure gd --with-freetype --with-jpeg \
  && docker-php-ext-install -j"$(nproc)" pdo_pgsql pgsql bcmath intl gd zip pcntl opcache \

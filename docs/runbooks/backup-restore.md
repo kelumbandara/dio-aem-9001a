@@ -69,3 +69,16 @@ Record each drill here (or in the customer's log): date, who, which backup file,
 3. Point the object storage settings at the same bucket; deploy the image tag that matches the backup (or newer; migrations run first).
 4. Move the DNS name; verify ([deploy.md](deploy.md) step 6).
 Expected time: the restore time in the drill table plus about an hour of setup.
+
+## 6. Downloadable copies (Database backups page)
+
+Administrators (`admin`, `super-admin`) can open **Database backups** in the Admin menu to make a copy now, see the saved copies and download one. These are in addition to the nightly encrypted backups above, not a replacement.
+
+- **What they are:** `pg_dump` in PostgreSQL's compressed custom format, **not encrypted**, kept on the server in `storage/app/private/db-backups/` (the `appstorage` volume, which survives deploys), with a `.sha256` checksum beside each file. The newest 8 are kept (`DB_BACKUP_KEEP`).
+- **Every Monday at 08:00 (Sri Lanka time)** the scheduler makes a new copy and sends the administrators a notification to download it. A failed copy also notifies them.
+- **Audit:** making and downloading a copy are recorded in the audit log (who, which file).
+- **Restore a downloaded copy** into a NEW, empty database (never over the live one without a backup first):
+  `createdb restore_check` then `pg_restore --no-owner --dbname restore_check dio_db-YYYYMMDDTHHMMSSZ.dump`. Verify with the reconciliations ([§3](#3-restore-and-the-drill)).
+- **Handling:** the file holds every customer, price, account and password hash and is readable by anyone who has it. Keep it private, delete old downloads, and do not e-mail it.
+- Uploaded files (attachments) are not part of these copies; they are planned for the cloud storage later.
+- The image needs `pg_dump` (`postgresql-client` in the Dockerfile); the first deploy after this change rebuilds it.

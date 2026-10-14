@@ -27,6 +27,7 @@ return [
         'password' => 'Change password',
         'appearance' => 'Appearance',
         'audit_log' => 'Audit log',
+        'backups' => 'Database backups',
     ],
 
     'users' => [
@@ -186,6 +187,20 @@ return [
         'disabled' => 'The :module module is now disabled.',
         'confirm_disable_title' => 'Disable :module?',
         'confirm_disable_body' => 'Its menu items, pages and API endpoints will stop working until it is enabled again. Existing data is kept.',
+    ],
+
+    'backups' => [
+        'title' => 'Database backups',
+        'subtitle' => 'Copies of the whole database, kept on this server (the newest :count). Download one every week and keep it somewhere safe.',
+        'warning' => 'These copies are NOT encrypted: anyone who has the file can read all customers, prices and accounts. Keep downloaded files private and delete old ones.',
+        'make_now' => 'Make a backup now',
+        'weekly' => 'A new copy is also made every Monday at 08:00, and the administrators are reminded.',
+        'made_at' => 'Made',
+        'size' => 'Size',
+        'checksum' => 'Checksum',
+        'download' => 'Download',
+        'empty' => 'No backup has been made yet.',
+        'created' => 'Backup saved: :file',
     ],
 
     'audit' => [

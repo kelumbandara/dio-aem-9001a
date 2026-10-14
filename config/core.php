@@ -16,6 +16,14 @@ return [
         'retention_months' => (int) env('AUDIT_RETENTION_MONTHS', 3),
     ],
 
+    // Plain database copies an administrator can download (Settings > Database backups). The nightly encrypted backups are separate.
+    'backups' => [
+        'disk' => env('DB_BACKUP_DISK', 'local'),
+        'keep' => (int) env('DB_BACKUP_KEEP', 8),
+        'pg_dump' => env('PG_DUMP_BINARY', 'pg_dump'),
+        'timeout' => 600,
+    ],
+
     'outbox' => [
         'batch_size' => 100,
         'max_attempts' => 8,

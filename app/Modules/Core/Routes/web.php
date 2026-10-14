@@ -3,6 +3,7 @@
 use App\Modules\Core\Http\Controllers\Web\AppearanceController;
 use App\Modules\Core\Http\Controllers\Web\AttachmentController;
 use App\Modules\Core\Http\Controllers\Web\AuditLogController;
+use App\Modules\Core\Http\Controllers\Web\BackupController;
 use App\Modules\Core\Http\Controllers\Web\BrandingController;
 use App\Modules\Core\Http\Controllers\Web\CompanyController;
 use App\Modules\Core\Http\Controllers\Web\DashboardController;
@@ -62,6 +63,10 @@ Route::middleware('auth')->group(function () {
 
         Route::get('account/password', [PasswordController::class, 'edit'])->name('account.password');
         Route::put('account/password', [PasswordController::class, 'change'])->middleware('throttle:10,1')->name('account.password.update');
+
+        Route::get('admin/backups', [BackupController::class, 'index'])->name('backups.index');
+        Route::post('admin/backups', [BackupController::class, 'store'])->middleware('throttle:6,1')->name('backups.store');
+        Route::get('admin/backups/{name}/download', [BackupController::class, 'download'])->middleware('throttle:20,1')->where('name', '[A-Za-z0-9_.\-]+')->name('backups.download');
 
         Route::get('admin/audit-log', [AuditLogController::class, 'index'])->name('audit-log.index');
 
