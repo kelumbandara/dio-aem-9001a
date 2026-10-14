@@ -36,6 +36,7 @@ return [
         'new_hint' => 'The person gets an e-mail with a link to choose their own password. Switching a person off ends their sign-ins at once.',
         'created' => 'User created. A link to choose a password was sent to :email.', 'saved' => 'Saved.',
         'security_hint' => 'Sign-in help for this person.', 'send_link' => 'E-mail a password link', 'link_sent' => 'If :email can sign in, a link was sent.',
+        'link_failed' => 'The e-mail could not be sent to :email. Check the address.',
         'reset_mfa' => 'Reset authenticator', 'mfa_confirm' => 'Remove this person\'s authenticator? They will be signed out and must set it up again.',
         'mfa_reset' => 'Authenticator removed and sign-ins ended.', 'mfa_on' => 'An authenticator is set up.', 'mfa_off' => 'No authenticator set up.',
         'password_has_name' => 'The password must not contain the e-mail name.',

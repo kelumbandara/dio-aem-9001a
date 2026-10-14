@@ -111,8 +111,11 @@ final class SaveUser
         return $names;
     }
 
+    /** @throws BusinessException core.user_mail_failed (the whole save is rolled back: no account without a way to set a password) */
     private function sendLink(User $user): void
     {
-        ($this->sendLink)($user);
+        if (! ($this->sendLink)($user)) {
+            throw new BusinessException('core.user_mail_failed', "The e-mail could not be sent to {$user->email}, so the user was not created. Check the address and try again.", 422, [['field' => 'email', 'message' => 'The e-mail could not be sent to this address.']]);
+        }
     }
 }

@@ -77,7 +77,9 @@ class UserController extends Controller
     {
         $this->allow($request, 'core.user.manage');
         abort_unless($user->user_type === User::TYPE_INTERNAL, 404);
-        $send($user, $request->user());
+        if (! $send($user, $request->user())) {
+            return back()->withErrors(['form' => __('core::ui.users.link_failed', ['email' => $user->email])]);
+        }
 
         return back()->with('status', __('core::ui.users.link_sent', ['email' => $user->email]));
     }
