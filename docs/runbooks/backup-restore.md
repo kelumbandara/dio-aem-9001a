@@ -81,4 +81,25 @@ Administrators (`admin`, `super-admin`) can open **Database backups** in the Adm
   `createdb restore_check` then `pg_restore --no-owner --dbname restore_check dio_db-YYYYMMDDTHHMMSSZ.dump`. Verify with the reconciliations ([§3](#3-restore-and-the-drill)).
 - **Handling:** the file holds every customer, price, account and password hash and is readable by anyone who has it. Keep it private, delete old downloads, and do not e-mail it.
 - Uploaded files (attachments) are not part of these copies; they are planned for the cloud storage later.
-- The image needs `pg_dump` (`postgresql-client` in the Dockerfile); the first deploy after this change rebuilds it.
+- The image needs `pg_dump` (`postgresql16-client` in the Dockerfile, matching the server); the first deploy after this change rebuilds it.
+
+### 6.1 Restoring a copy from the page (super-admin only)
+
+**Database backups** → **Restore** on a row. Only the super-admin sees the button (permission `core.backup.restore`, held by nobody else). It asks for the word `RESTORE`, the person's own password and a fresh authenticator code.
+
+What happens, in order (`DatabaseRestoreService`):
+1. A **safety copy** of what is live now is saved (listed with the badge "Made before a restore", kept: the newest 5).
+2. The chosen copy is loaded into a **new scratch database** and checked (it must hold users and the migration history). A copy made by a **newer release** than the running code is refused. The live database is untouched up to here, so any failure here changes nothing.
+3. The system goes into maintenance mode, connections are shut out and the two databases **swap names in one transaction**. The previous live database stays whole as `<name>_before_restore_<time>` (the newest two are kept, older ones dropped).
+4. Migrations run (an older copy is brought forward), roles/permissions are re-applied, caches are cleared, maintenance ends. If this step fails the swap is **reversed** automatically.
+5. Everyone is signed out (the sessions table is part of the database); the audit log of the restored database gets an entry `core.backup_restored` (file, safety copy, who).
+
+**Undo a restore:** restore the "made before a restore" copy. Or, by hand over SSH, rename the kept `<name>_before_restore_<time>` database back (stop web, worker and scheduler first).
+
+**Emergency (web page not usable):** `docker exec <web container> php artisan database:restore` lists the copies; `... database:restore <file> --force` restores one.
+
+**Limits:** it runs while you wait (about a minute for a small database; nginx stops a request after 120 s, so for a database of many gigabytes use the command line). Jobs waiting in Redis at that moment are not rolled back. Uploaded files are not part of the copies.
+
+**Tested for real on 2026-10-14** (throwaway container against a scratch copy of the production database on the Coolify server): restore removes a user added after the copy, keeps the old database, writes the audit entry, ends maintenance; undo brings the user back; a copy containing a migration unknown to the code is refused with nothing changed; a failing load leaves the live database alone. Done with both a PostgreSQL 18 and a 16 client.
+
+**PostgreSQL client version:** the image installs `postgresql16-client` to match the server (PostgreSQL 16). Copies made earlier by a 17/18 client contain `SET transaction_timeout`, which a 16 server rejects; the restore removes only that line, so those copies still load. Raise the client together with the server version.

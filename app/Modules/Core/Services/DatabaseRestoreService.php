@@ -116,11 +116,45 @@ class DatabaseRestoreService
         $this->admin()->exec('CREATE DATABASE '.$this->ident($name));
     }
 
+    /**
+     * Loads the archive as SQL in ONE transaction that stops at the first error. It goes through SQL rather than straight
+     * into the database so that a copy made by a newer PostgreSQL client (which writes settings an older server does not
+     * know) can still be loaded: see {@see self::stripUnsupportedSettings()}.
+     */
     protected function loadInto(string $database, string $file): void
     {
         $c = $this->connection();
-        $this->run([(string) config('core.backups.pg_restore', 'pg_restore'), '--no-owner', '--no-privileges', '--exit-on-error',
-            '--host', (string) $c['host'], '--port', (string) $c['port'], '--username', (string) $c['username'], '--dbname', $database, $file]);
+        $sql = (string) tempnam(sys_get_temp_dir(), 'dio-restore-');
+        try {
+            $this->run([(string) config('core.backups.pg_restore', 'pg_restore'), '--no-owner', '--no-privileges', '--file', $sql, $file]);
+            $this->stripUnsupportedSettings($sql);
+            $this->run([(string) config('core.backups.psql', 'psql'), '--quiet', '--single-transaction', '--set', 'ON_ERROR_STOP=1',
+                '--host', (string) $c['host'], '--port', (string) $c['port'], '--username', (string) $c['username'], '--dbname', $database, '--file', $sql]);
+        } finally {
+            @unlink($sql);
+            @unlink($sql.'.filtered');
+        }
+    }
+
+    /**
+     * Removes the one setting newer clients put at the top of a dump that PostgreSQL 16 does not know
+     * (`SET transaction_timeout = 0;`). Nothing else is changed, so any other problem still stops the restore.
+     */
+    public function stripUnsupportedSettings(string $sqlFile): void
+    {
+        $in = fopen($sqlFile, 'rb');
+        $out = fopen($sqlFile.'.filtered', 'wb');
+        if ($in === false || $out === false) {
+            throw new \RuntimeException('Could not prepare the restore file.');
+        }
+        while (($line = fgets($in)) !== false) {
+            if (preg_match('/^SET transaction_timeout = \d+;\r?\n?$/', $line) !== 1) {
+                fwrite($out, $line);
+            }
+        }
+        fclose($in);
+        fclose($out);
+        rename($sqlFile.'.filtered', $sqlFile);
     }
 
     /** The scratch database must hold the system's own tables and at least one user. */
@@ -165,6 +199,7 @@ class DatabaseRestoreService
             throw $e;
         }
         $this->tryAllowConnections($admin, $live);
+        $this->tryAllowConnections($admin, $oldName);   // the kept database can be opened by hand to look something up
         DB::purge();
     }
 

@@ -23,6 +23,7 @@ return [
         'keep_safety' => (int) env('DB_BACKUP_KEEP_SAFETY', 5),   // the "before restore" copies
         'pg_dump' => env('PG_DUMP_BINARY', 'pg_dump'),
         'pg_restore' => env('PG_RESTORE_BINARY', 'pg_restore'),
+        'psql' => env('PSQL_BINARY', 'psql'),
         'timeout' => 600,
     ],
 

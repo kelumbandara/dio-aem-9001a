@@ -170,6 +170,18 @@ describe('putting a copy back', function () {
     });
 });
 
+describe('copies made by a newer PostgreSQL client', function () {
+    it('drops only the setting an older server does not know', function () {
+        $file = tempnam(sys_get_temp_dir(), 'strip-');
+        file_put_contents($file, "SET statement_timeout = 0;\nSET transaction_timeout = 0;\nSET lock_timeout = 0;\nCREATE TABLE t (transaction_timeout int);\n-- SET transaction_timeout = 5;\n");
+
+        restoreFakeService()->stripUnsupportedSettings($file);
+
+        expect(file_get_contents($file))->toBe("SET statement_timeout = 0;\nSET lock_timeout = 0;\nCREATE TABLE t (transaction_timeout int);\n-- SET transaction_timeout = 5;\n");
+        unlink($file);
+    });
+});
+
 describe('on the screen', function () {
     beforeEach(function () {
         $this->seed(RolesAndPermissionsSeeder::class);
