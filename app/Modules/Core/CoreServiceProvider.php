@@ -9,6 +9,7 @@ use App\Modules\Core\Console\PreflightCheck;
 use App\Modules\Core\Console\PruneIdempotencyKeys;
 use App\Modules\Core\Console\PurgeAttachments;
 use App\Modules\Core\Console\RelayOutbox;
+use App\Modules\Core\Console\RestoreDatabase;
 use App\Modules\Core\Contracts\Appearance;
 use App\Modules\Core\Contracts\AttachmentScanner;
 use App\Modules\Core\Contracts\AttachmentStore;
@@ -70,6 +71,7 @@ class CoreServiceProvider extends ModuleServiceProvider
             'core.user.manage',
             'core.appearance.manage',
             'core.backup.manage',
+            'core.backup.restore', // held by nobody: only the super-admin passes (putting a copy back replaces everything)
             'core.appearance.vendor', // held by nobody: only the super-admin (the vendor) passes
         ];
     }
@@ -136,6 +138,7 @@ class CoreServiceProvider extends ModuleServiceProvider
                 RelayOutbox::class,
                 PurgeAttachments::class,
                 BackupDatabase::class,
+                RestoreDatabase::class,
             ]);
         }
     }

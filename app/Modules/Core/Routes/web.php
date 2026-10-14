@@ -68,6 +68,8 @@ Route::middleware('auth')->group(function () {
         Route::post('admin/backups', [BackupController::class, 'store'])->middleware('throttle:6,1')->name('backups.store');
         Route::get('admin/backups/{name}/download', [BackupController::class, 'download'])->middleware('throttle:20,1')->where('name', '[A-Za-z0-9_.\-]+')->name('backups.download');
 
+        Route::post('admin/backups/{name}/restore', [BackupController::class, 'restore'])->middleware('throttle:3,10')->where('name', '[A-Za-z0-9_.\-]+')->name('backups.restore');
+
         Route::get('admin/audit-log', [AuditLogController::class, 'index'])->name('audit-log.index');
 
         Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');

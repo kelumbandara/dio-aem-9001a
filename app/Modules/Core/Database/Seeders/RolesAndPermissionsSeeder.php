@@ -26,8 +26,8 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // super-admin bypasses gates (Gate::before) and therefore holds no explicit permissions.
         Role::findOrCreate(CoreServiceProvider::SUPER_ADMIN_ROLE, 'web');
-        // The vendor-only permissions (the "Powered by" line) are held by nobody: only the super-admin passes the gate.
-        Role::findOrCreate('admin', 'web')->syncPermissions(array_values(array_diff($names, ['core.appearance.vendor'])));
+        // The vendor-only permissions (the "Powered by" line) and restoring a database copy are held by nobody: only the super-admin passes the gate.
+        Role::findOrCreate('admin', 'web')->syncPermissions(array_values(array_diff($names, ['core.appearance.vendor', 'core.backup.restore'])));
         Role::findOrCreate('user', 'web');
 
         // The accountant runs Finance (every finance.* permission, including locking a period), reads what Finance reports on
