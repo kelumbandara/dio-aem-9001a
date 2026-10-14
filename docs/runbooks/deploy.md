@@ -27,6 +27,7 @@ Follow [first-install.md](first-install.md).
 3. **Build and push the image** (CI does this on a tag; by hand: `docker build -t REGISTRY/dio-erp:2026.10.1 --build-arg RELEASE=2026.10.1 .`).
 4. **Announce a short maintenance window** to the customer if the release contains migrations (see the release notes).
 5. In Coolify set `APP_IMAGE` to the new tag and **Deploy**. The order is automatic: `migrate` runs first; `web`, `worker`, `scheduler` start only when it succeeded. If `migrate` fails, nothing new starts and the old containers keep running.
+5a. **If the release adds a permission** (the release notes say so), run the roles seeder once on the web container: `php artisan db:seed --class="App\Modules\Core\Database\Seeders\RolesAndPermissionsSeeder" --force`. Migrations do not create permissions, so until then the new menu item and page are hidden from everyone but the owner. It is safe to repeat. (Needed for Database backups, 2026-10-14.)
 6. **Verify** (2 minutes):
    - `https://<customer-url>/up` → 200; `https://<customer-url>/api/v1/health/ready` → `"status":"ok"` for database, redis, storage, queue.
    - Sign in; open the dashboard; open one invoice.
