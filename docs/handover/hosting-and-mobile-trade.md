@@ -24,7 +24,7 @@ Status: **ready for owner review.** Follows [Sprint 15](sprint-15.md). Server de
 | Phone app bundles | `expo export` for **Android (Hermes)** and **web** both build the whole app |
 | Phone app against the real API (local dev server, a sales user and a purchasing user) | **43 of 43 checks passed**: lists, search, details, suggestions, creating quotations and purchase orders, the moves, the approval flow, and the refusals (see below) |
 | Hand mutation checks of the phone logic | **13 of 13 caught** (one test gap found and fixed: a purchase-order link with a bad id) |
-| ERP on the real server | all containers healthy; `https://erp.dio.lk/api/v1/health/ready` ok; strict start-up check passes (2 warnings: files on the server's disk, no licence key); real ClamAV scan (clean passes, EICAR flagged); real e-mail accepted by Hostinger from the server |
+| ERP on the real server | all containers healthy; `https://mes.dio.lk/api/v1/health/ready` ok; strict start-up check passes (2 warnings: files on the server's disk, no licence key); real ClamAV scan (clean passes, EICAR flagged); real e-mail accepted by Hostinger from the server |
 | **Restore drill on the real server** | backup → restore into a scratch database in 3 s → tables and triggers match → the application's own finance/stock checks on the copy: no discrepancies → scratch database dropped (recorded in the backup runbook) |
 | Website | HTTPS on both names, `.htaccess` single-page fallback works, public zip moved out of the web folder |
 | Closed ports | from the internet only 22, 80 and 443 answer |

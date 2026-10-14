@@ -6,7 +6,7 @@ Server for the rehearsal and the first pilot. **No passwords, keys or tokens are
 
 | | |
 |---|---|
-| Address | 91.99.129.228 (Hetzner Cloud, KVM). Names: `erp.dio.lk` (the ERP), `coolify.dio.lk` (the Coolify dashboard), `dio.lk` and `www.dio.lk` (the website); all with Let's Encrypt certificates issued by Coolify's proxy |
+| Address | 91.99.129.228 (Hetzner Cloud, KVM). Names: `mes.dio.lk` (the ERP; it was `erp.dio.lk` until 2026-10-14, when the name was changed: DNS A record, domain on the `web` service, `APP_URL`, redeploy), `coolify.dio.lk` (the Coolify dashboard), `dio.lk` and `www.dio.lk` (the website); all with Let's Encrypt certificates issued by Coolify's proxy |
 | System | Ubuntu 22.04.5 LTS, 3 vCPU, 3.8 GB RAM + 4 GB swap (swappiness 10), 75 GB disk |
 | Set up on 2026-10-13 | security updates + reboot; swap file; `ufw` active (open from outside: **22, 80, 443 only**); Coolify v4.4.6 installed with its official installer (installs Docker 29); the dashboard has its own HTTPS address and ports 8000/6001/6002 are closed (see §7) |
 | Access | SSH as root with a key created on the vendor's development machine (`~/.ssh/dio_server_ed25519`, never in the repository). **Password login is still enabled** until the owner agrees to turn it off (then: set `PasswordAuthentication no` in `/etc/ssh/sshd_config.d/50-cloud-init.conf`, restart `ssh`) |
@@ -26,8 +26,8 @@ The first deployment runs over plain HTTP on `http://erp.91.99.129.228.sslip.io`
 
 | Variable | Rehearsal | Production |
 |---|---|---|
-| `APP_URL` | `http://erp.91.99.129.228.sslip.io` | `https://erp.dio.lk` (or the chosen name) |
-| Domain on the `web` service | `http://erp.91.99.129.228.sslip.io` | `https://erp.dio.lk` (Coolify issues the certificate by itself once DNS points at the server) |
+| `APP_URL` | `http://erp.91.99.129.228.sslip.io` | `https://mes.dio.lk` (or the chosen name) |
+| Domain on the `web` service | `http://erp.91.99.129.228.sslip.io` | `https://mes.dio.lk` (Coolify issues the certificate by itself once DNS points at the server) |
 | `SESSION_SECURE_COOKIE` | `false` | `true` |
 | `HSTS_SECONDS` | `0` | `31536000` |
 | `MAIL_MAILER` + `MAIL_*` | `log` (nothing is sent) | `smtp` with the mailbox settings |

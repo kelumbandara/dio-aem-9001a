@@ -54,7 +54,7 @@ Record each drill here (or in the customer's log): date, who, which backup file,
 | Date | Environment | Backup | Data size | Restore time | Reconciliations | Result |
 |---|---|---|---|---|---|---|
 | 2026-10-13 | development machine (Docker, PostgreSQL 16) | see Sprint 15 handover | see Sprint 15 handover | see Sprint 15 handover | see Sprint 15 handover | drill of the scripts on realistic volume (238,469 rows, 5.6 MB, restore 14 s) |
-| 2026-10-13 | **the real server** (Coolify, `erp.dio.lk` stack) | dio_erp-20261013T133144Z.dump.enc | 608 KB (freshly seeded: 1 user, 139 accounts, 226 audit rows, 41 migrations) | 3 s | `finance:reconcile` and `inventory:reconcile` logic run on the restored copy: 0 discrepancies; row counts of 8 key tables equal; 45 of 45 triggers present | passed. Restored into a scratch database beside the real one, checked, dropped. Backup kept on the same server only (owner's decision 2026-10-13: off-site copy later) |
+| 2026-10-13 | **the real server** (Coolify stack, then named `erp.dio.lk`) | dio_erp-20261013T133144Z.dump.enc | 608 KB (freshly seeded: 1 user, 139 accounts, 226 audit rows, 41 migrations) | 3 s | `finance:reconcile` and `inventory:reconcile` logic run on the restored copy: 0 discrepancies; row counts of 8 key tables equal; 45 of 45 triggers present | passed. Restored into a scratch database beside the real one, checked, dropped. Backup kept on the same server only (owner's decision 2026-10-13: off-site copy later) |
 
 ## 4. When a backup fails
 

@@ -36,7 +36,7 @@
     ],
     "scheme": "dioerp",
     "extra": {
-      "apiUrl": "https://erp.dio.lk"
+      "apiUrl": "https://mes.dio.lk"
     }
   }
 }
